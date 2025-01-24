@@ -1,0 +1,40 @@
+global:
+  logfile: /dev/stderr
+  loglevel: debug
+  log-caller: false
+  log-json: false
+
+db:
+  file: /tmp/varnishmon.db
+  memory-limit: 128
+  threads: 1
+  temp-directory:
+  max-temp-directory-size: 128
+
+scraper:
+  enabled: true
+  period: 5s
+  timeout: 5s
+  varnishstat: /mnt/host/files/varnishstat.sh
+
+api:
+  enabled: true
+  #workers: 2
+  listen-ip: 0.0.0.0
+  listen-port: 6100
+  basic-auth:
+    username:
+    password:
+  tls:
+    certfile:
+    keyfile:
+  backlog: 1024
+  concurrency: 1024
+  read-buffer-size: 65536
+  write-buffer-size: 65536
+  max-request-body-size: 65536
+  read-timeout: 60s
+  write-timeout: 60s
+  idle-timeout: 2m
+  tcp-keepalive: true
+  tcp-keepalive-period: 2m

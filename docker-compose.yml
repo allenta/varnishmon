@@ -1,0 +1,72 @@
+---
+
+#
+# Cheat sheet:
+#
+#   $ echo -e "UID=$(id -u)\nGID=$(id -g)" > .env
+#   $ docker compose up --build --detach dev
+#
+#   $ docker compose exec --user dev --workdir /mnt/host dev bash
+#     # Compile with development mode enabled & run the application overriding
+#     # some settings in the configuration file.
+#     $ ENVIRONMENT=development make
+#     $ ./build/bin/varnishmon --config ./files/varnishmon.yml --loglevel info
+#
+#     # Regenerate static assets & templates incrementally (useful when
+#     # compiling with development mode enabled).
+#     $ make webpack-watch
+#
+#     # Regenerate static assets & templates, ready for production. Beware
+#     # generated files are versioned to simplify the whole packaging process.
+#     # It's ok to push generated static assets & templates to the repository
+#     # at any time, but the ideal scenario is to do it only when creating a
+#     # new release.
+#     $ make webpack-build
+#     $ git add ...
+#
+#     # Run the test suite (or part of it).
+#     $ TEST_PACKAGES='./pkg/helpers/...' TEST_PATTERN='TestLogFileWriterTestSuite' make test
+#
+#     # Trigger reopening of the log and database files.
+#     $ kill -HUP $(pgrep varnishmon)
+#
+#     # Generate dist & package files. This will fail if activation of the
+#     # development mode is requested (i.e., ENVIRONMENT=development). Also,
+#     # beware packing is expected to be done on the target platform +
+#     # architecture.
+#     $ PLATFORM=noble make package
+#
+#     # Fetch profiling data & metrics.
+#     $ curl -o /tmp/cpu.pprof http://127.0.0.1:6100/debug/pprof/profile?seconds=15
+#     $ curl -v http://127.0.0.1:6100/metrics
+#
+#   $ docker compose exec --user root --workdir /root dev bash
+#     # Supervisor commands.
+#     $ supervisorctl status
+#     $ supervisorctl restart varnishd
+#
+#   $ docker compose logs --follow dev
+#
+#   $ docker compose down --volumes --remove-orphans
+#
+
+name: varnishmon
+
+services:
+  dev:
+    hostname: dev
+    build:
+      context: ./extras/docker
+    privileged: true
+    environment:
+      HOST_UID: ${UID:?}
+      HOST_GID: ${GID:?}
+    volumes:
+      - .:/mnt/host.raw
+    ports:
+      - 6100:6100
+    tmpfs:
+      - /run
+      - /run/lock
+      - /var/cache
+      - /tmp:exec

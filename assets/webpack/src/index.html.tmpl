@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>varnishmon</title>
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <script type="text/javascript">const varnishmon={{.Config}}</script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">varnishmon</a>
+      <div class="d-flex ms-auto">
+        <div class="me-4 align-self-center">
+          <span class="navbar-text font-monospace text-white"><i class="fa-solid fa-computer"></i> {{.Hostname}}</span>
+        </div>
+
+        <div class="me-2">
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+            <input type="text" id="range-from" class="form-control" placeholder="from">
+          </div>
+        </div>
+        <div class="me-2 align-self-center text-light" id="range">
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+        <div class="me-2">
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+            <input type="text" id="range-to" class="form-control" placeholder="to">
+          </div>
+        </div>
+        <div class="me-4 align-self-center align-self-end">
+          <button id="apply-time-range" class="btn btn-primary" title="Apply the selected time range">
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </div>
+
+        <div class="me-2">
+          <select id="refresh-interval" class="form-select"></select>
+        </div>
+        <div class="align-self-center align-self-end">
+          <button id="refresh" class="btn btn-primary" title="Trigger refresh now">
+            <i class="fa-solid fa-sync"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow-1 d-flex flex-column">
+    <div class="container-fluid py-md-4 flex-grow-1 d-flex flex-column">
+      <div class="row mb-2">
+        <div class="col-md-8">
+          <label for="filter" class="form-label">Filter</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" id="filter" class="form-control" placeholder="type here to filter metrics by name">
+          </div>
+        </div>
+        <div class="col-md-1">
+          <label for="verbosity" class="form-label">Verbosity</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-regular fa-comments"></i></span>
+            <select id="verbosity" class="form-select"></select>
+          </div>
+        </div>
+        <div class="col-md-1">
+          <label for="columns" class="form-label">Columns</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-table-cells-large"></i></span>
+            <select id="columns" class="form-select"></select>
+            </div>
+        </div>
+        <div class="col-md-1">
+          <label for="aggregator" class="form-label">Aggregator</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-filter"></i></span>
+            <select id="aggregator" class="form-select"></select>
+          </div>
+        </div>
+        <div class="col-md-1">
+          <label for="step" class="form-label">Step</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-arrows-left-right-to-line"></i></span>
+            <input type="number" id="step" class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col align-content-center text-muted" id="filter-stats"></div>
+        <div class="col text-end">
+          <a class="btn btn-link" href="/metrics" role="button" title="Open internal monitoring URL">metrics</a> |
+          <button type="button" id="reset" class="btn btn-link" title="Discard saved state & reload">reset</button> |
+          <button type="button" id="toggle-collapse" class="btn btn-link" title="Toggle collapse">collapse</button>
+        </div>
+      </div>
+
+      <div id="clusters" class="accordion accordion-flush flex-grow-1">
+        <div class="d-flex justify-content-center">
+          <div class="spinner-border fs-2 opacity-50" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center mt-4">
+    <i class="fa-solid fa-bolt"></i> Powered by <a href="https://github.com/allenta/varnishmon/">varnishmon</a>
+    v{{.Version}} (<span class="font-monospace">{{.Revision}}</span>)
+  </footer>
+
+  <div id="notifications" class="position-fixed bottom-0 end-0 p-3 d-grid gap-2">
+  </div>
+
+  <!-- Template elements -->
+
+  <template id="spinner-template">
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border fs-2 opacity-50" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </template>
+
+  <template id="cluster-template">
+    <div class="cluster accordion-item">
+      <div class="accordion-header">
+        <button class="cluster-name accordion-button bg-light text-dark fs-5 border-0" type="button">
+        </button>
+      </div>
+      <div class="accordion-collapse">
+        <div class="charts row g-4 py-4">
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="chart-template">
+    <div class="chart col">
+      <div class="card">
+        <div class="card-body">
+          <div class="graph" style="height: 300px;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="notification-template">
+    <div class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"></div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </template>
+</body>
+</html>

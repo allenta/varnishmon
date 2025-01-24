@@ -1,0 +1,50 @@
+name: Build
+
+inputs:
+  platform:
+    required: true
+  architecture:
+    required: true
+  go-version:
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - uses: docker/setup-qemu-action@v3
+      with:
+        platforms: ${{ inputs.architecture }}
+
+    - uses: docker/setup-buildx-action@v3
+
+    - shell: bash
+      run: |
+        IMAGE=$( \
+          docker build \
+            --quiet \
+            --platform linux/${{ inputs.architecture }} \
+            --file extras/github/docker/Dockerfile-${{ inputs.platform }} \
+            --build-arg GO_VERSION=${{ inputs.go-version }} \
+            .)
+
+        docker run \
+          --rm \
+          --platform linux/${{ inputs.architecture }} \
+          --volume ${{ github.workspace }}:/workspace \
+          --workdir /workspace \
+          $IMAGE \
+          bash -c ' \
+            git config --global --add safe.directory /workspace; \
+            export PATH=/usr/local/go/bin:$PATH; \
+            export PLATFORM=${{ inputs.platform }}; \
+            make lint vet test package'
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.platform }}-${{ inputs.architecture }}-artifacts
+        path: |
+          build/varnishmon-*.tgz
+          build/varnishmon_*.deb
+          build/varnishmon-*.rpm
+        retention-days: 1

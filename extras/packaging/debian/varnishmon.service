@@ -1,0 +1,25 @@
+[Unit]
+Description=varnishmon daemon
+Documentation=man:varnishmon(1)
+After=network.target
+
+[Service]
+Type=simple
+RuntimeDirectory=varnishmon
+EnvironmentFile=/etc/default/varnishmon
+UMask=027
+ExecStart=/usr/bin/varnishmon $VARNISHMON_DAEMON_OPTS
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+TimeoutStopSec=60
+Restart=on-failure
+RestartSec=100ms
+User=varnish
+Group=varnish
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=varnishmon
+LimitNOFILE=2048
+
+[Install]
+WantedBy=multi-user.target

@@ -1,9 +1,9 @@
 # varnishmon
 
-[![main GitHub Actions workflow](https://github.com/carlosabalde/varnishmon/actions/workflows/main.yml/badge.svg)](../../actions/workflows/main.yml)
-[![latest GitHub Release](https://img.shields.io/github/v/release/carlosabalde/varnishmon.svg)](../../releases)
-[![codecov](https://codecov.io/gh/carlosabalde/pgp-tomb/branch/master/graph/badge.svg)](https://codecov.io/gh/carlosabalde/pgp-tomb)
-[![Go Report Card](https://goreportcard.com/badge/github.com/carlosabalde/pgp-tomb)](https://goreportcard.com/report/github.com/carlosabalde/pgp-tomb)
+[![main GitHub Actions workflow](https://github.com/allenta/varnishmon/actions/workflows/main.yml/badge.svg)](../../actions/workflows/main.yml)
+[![latest GitHub Release](https://img.shields.io/github/v/release/allenta/varnishmon.svg)](../../releases)
+[![codecov](https://codecov.io/gh/allenta/varnishmon/branch/master/graph/badge.svg)](https://codecov.io/gh/allenta/varnishmon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/allenta/varnishmon)](https://goreportcard.com/report/github.com/allenta/varnishmon)
 
 `varnishmon` is a utility inspired by the [classic `atop` tool](https://www.atoptool.nl). It periodically collects metrics from [Varnish Cache](https://varnish-cache.org) / [Varnish Enterprise](https://www.varnish-software.com/products/varnish-enterprise/) using the [`varnishstat` utility](https://varnish-cache.org/docs/trunk/reference/varnishstat.html), stores them in a [DuckDB](https://duckdb.org) database, and provides a simple built-in web interface for visualizing the timeseries data. **In summary, `varnishmon` is a tool designed to effortlessly record, visualize, and share `varnishstat` output with minimal setup.**
 

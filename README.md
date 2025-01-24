@@ -52,10 +52,10 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > ```
 
 - **Can I use `varnishmon` with Varnish instances running in a container?**
-  > If you can run `varnishmon` directly within the container, no special configuration is required. However, if you need to execute a command like `docker exec ...` to gather the `varnishstat` output, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify an alternative command.  Remember to to use the `-1 -j` flags to ensure `varnishstat` outputs JSON.
+  > If you can run `varnishmon` directly within the container, no special configuration is required. However, if you need to execute a command like `docker exec ...` to gather the `varnishstat` output, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify an alternative command.  Remember to to use the `-1 -j` flags to ensure `varnishstat` outputs JSON and to provide the full path to the `docker` command.
 
 - **How do I use `varnishmon` to collect metrics remotely?**
-  > You can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a command that collects metrics remotely. For example, you can use `ssh <user>@<host> varnishstat -1 -j`. Ensure you use SSH keys for passwordless authentication.
+  > You can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a command that collects metrics remotely. For example, you can use `/usr/bin/ssh <user>@<host> varnishstat -1 -j`. Ensure you use SSH keys for passwordless authentication and don't forge to provide the full path to the `ssh` command.
 
 - **How do I use `varnishmon` to visualize metrics previously collected on a different server?**
   > Similar to `atop`, you can collect metrics on the Varnish server, transfer them to your local machine, and use `varnishmon` to visualize them. In this case, you might want to:

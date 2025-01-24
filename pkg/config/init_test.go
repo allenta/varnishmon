@@ -16,6 +16,7 @@ type InitTestSuite struct {
 
 func (suite *InitTestSuite) BeforeTest(suiteName, testName string) {
 	vpr := viper.New()
+	vpr.Set("scraper.varnishstat", "/dev/null")
 	suite.cfg = NewConfig(NewTestLogger(suite.T(), zerolog.ErrorLevel), vpr)
 }
 

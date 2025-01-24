@@ -1,0 +1,22 @@
+FROM docker.io/ubuntu:noble-20240423
+
+ARG GO_VERSION
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt update \
+    && apt install -y \
+        curl \
+        g++ \
+        git \
+        make \
+        ruby \
+        ruby-dev \
+        tar \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -L -s https://go.dev/dl/go${GO_VERSION}.linux-$(dpkg --print-architecture).tar.gz | tar xvfz - -C /usr/local
+
+RUN gem install fpm -v 1.15.1 \
+    && gem cleanup

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" -eq 0 ]; then
+    if [ -x "$(command -v systemctl)" ]; then
+        systemctl stop varnishmon > /dev/null || :
+        systemctl disable varnishmon > /dev/null
+    fi
+fi

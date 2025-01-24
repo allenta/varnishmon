@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+
+env:
+  GO_VERSION: 1.23.3
+
+jobs:
+  build-amd64:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        platform:
+          - noble
+          - jammy
+          - bookworm
+          - rhel9
+        architecture:
+          - amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./extras/github/build-action
+        with:
+          platform: ${{ matrix.platform }}
+          architecture: ${{ matrix.architecture }}
+          go-version: ${{ env.GO_VERSION }}
+
+  build-arm64:
+    # XXX: 'ubuntu-24.04-arm' is not supported yet for private repositories. For
+    # now, the build action relies on QEMU to emulate the ARM64 architecture.
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        platform:
+          - noble
+          - jammy
+          - bookworm
+          - rhel9
+        architecture:
+          - arm64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./extras/github/build-action
+        # XXX: ARM64 build is temporarily disabled. The QEMU emulation is just
+        # too slow for now.
+        if: false
+        with:
+          platform: ${{ matrix.platform }}
+          architecture: ${{ matrix.architecture }}
+          go-version: ${{ env.GO_VERSION }}
+
+  release:
+    needs:
+      - build-amd64
+      - build-arm64
+
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      # Beware 'Settings' > 'Actions' > 'General' > 'Workflow permissions' >
+      # 'Read and write permissions' is required for this to work.
+      - shell: bash
+        run: |
+          gh release create \
+            "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            $(find ./artifacts/*-*-artifacts -type f -maxdepth 1)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

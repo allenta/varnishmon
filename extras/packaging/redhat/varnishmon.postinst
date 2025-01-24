@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" -eq 1 ]; then
+    getent group varnish > /dev/null 2>&1 || groupadd varnish > /dev/null
+    id -u varnish > /dev/null 2>&1 || useradd --system -g varnish varnish > /dev/null
+
+    chown varnish:varnish \
+        /var/log/varnishmon\
+        /var/lib/varnishmon > /dev/null
+    chown root:varnishmon \
+        /etc/varnish/varnishmon.yml > /dev/null
+    chmod 640 /etc/varnish/varnishmon.yml > /dev/null
+
+    if [ -x "$(command -v systemctl)" ]; then
+        systemctl daemon-reload > /dev/null
+        systemctl enable varnishmon > /dev/null
+    fi
+elif [ "$1" -gt 1 ]; then
+    chown varnish:varnish \
+        /var/log/varnishmon\
+        /var/lib/varnishmon > /dev/null
+    chown root:varnishmon \
+        /etc/varnish/varnishmon.yml > /dev/null
+    chmod 640 /etc/varnish/varnishmon.yml > /dev/null
+
+    if [ -x "$(command -v systemctl)" ]; then
+        systemctl daemon-reload > /dev/null
+        systemctl try-reload-or-restart varnishmon > /dev/null
+    fi
+fi

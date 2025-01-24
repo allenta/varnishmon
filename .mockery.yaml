@@ -1,0 +1,11 @@
+inpackage: True
+dir: "{{.InterfaceDir}}"
+mockname: "{{.Mock}}{{.InterfaceName | firstUpper}}"
+outpkg: "{{.PackageName}}"
+filename: "mock_{{.InterfaceName}}.go"
+all: True
+with-expecter: False
+packages:
+  allenta.com/task-executor-for-cribl:
+    config:
+      recursive: True

@@ -1,0 +1,55 @@
+/******************************************************************************
+ * Bootstrap.
+ ******************************************************************************/
+
+@import '~bootstrap/scss/bootstrap';
+
+/******************************************************************************
+ * Font Awesome.
+ ******************************************************************************/
+
+@import '~@fortawesome/fontawesome-free/css/all.css';
+
+/******************************************************************************
+ * Fonts.
+ ******************************************************************************/
+
+ @font-face {
+  font-family: 'UbuntuRegular';
+  src: url('../fonts/Ubuntu-Regular-webfont.eot');
+  src: url('../fonts/Ubuntu-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/Ubuntu-Regular-webfont.woff') format('woff'),
+       url('../fonts/Ubuntu-Regular-webfont.ttf') format('truetype'),
+       url('../fonts/Ubuntu-Regular-webfont.svg#UbuntuRegular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'UbuntuMedium';
+  src: url('../fonts/Ubuntu-Medium-webfont.eot');
+  src: url('../fonts/Ubuntu-Medium-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/Ubuntu-Medium-webfont.woff') format('woff'),
+       url('../fonts/Ubuntu-Medium-webfont.ttf') format('truetype'),
+       url('../fonts/Ubuntu-Medium-webfont.svg#UbuntuMedium') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/******************************************************************************
+ * Top level.
+ ******************************************************************************/
+
+body {
+  font-family: 'UbuntuRegular', Verdana, Arial, sans-serif;
+}
+
+#clusters.accordion {
+  --bs-accordion-border-width: 0;
+  --bs-accordion-btn-focus-box-shadow: 0;
+}
+
+#clusters .spinner-border {
+  width: 5rem;
+  height: 5rem;
+}

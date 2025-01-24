@@ -1,0 +1,61 @@
+global:
+  # An empty / undefined value will use 'stdout' for logging purposes. Beware
+  # this is useful for systemd journal integration. In a systemd context,
+  # 'stdout' and 'stderr' will be AF_UNIX stream sockets, and not pipes or FIFOs
+  # that can be re-opened. In other words, using '/dev/stdout' here for journal
+  # integration is not possible; use an empty value instead.
+  logfile: /var/log/varnishmon/varnishmon.log
+  loglevel: info
+  log-caller: false
+  log-json: false
+
+db:
+  # An empty / undefined value will use an in-memory database. Beware in-memory
+  # database will be lost on service restart and it will grow indefinitely.
+  file: /var/lib/varnishmon/varnishmon.db
+  # The maximum amount of data, in MiB, that DuckDB is allowed to keep in
+  # memory.
+  memory-limit: 128
+  # The number of total threads used by DuckDB.
+  threads: 1
+  # The directory where temporary files are stored. If not provided, defaults to
+  # the 'db.file' setting with a '.tmp' suffix. This also applies for in-memory
+  # databases.
+  temp-directory:
+  # The maximum amount of data, in MiB, that DuckDB is allowed to keep in the
+  # temporary directory 'db.temp-directory'.
+  max-temp-directory-size: 128
+
+scraper:
+  enabled: true
+  period: 60s
+  timeout: 5s
+  # If not provided, '/usr/bin/varnishstat -1 -j' will be used. The main use
+  # case for this is to provide a wrapper command (e.g., to execute in a
+  # container, to filter metrics, etc.).
+  varnishstat:
+
+api:
+  enabled: true
+  # If an explicit number of workers is not provided, this will default to the
+  # number of usable logical CPUs during service startup.
+  #workers: 2
+  # Use '0.0.0.0' to listen on all interfaces.
+  listen-ip: 127.0.0.1
+  listen-port: 6100
+  basic-auth:
+    username:
+    password:
+  tls:
+    certfile:
+    keyfile:
+  backlog: 1024
+  concurrency: 1024
+  read-buffer-size: 65536
+  write-buffer-size: 65536
+  max-request-body-size: 65536
+  read-timeout: 60s
+  write-timeout: 60s
+  idle-timeout: 2m
+  tcp-keepalive: true
+  tcp-keepalive-period: 2m

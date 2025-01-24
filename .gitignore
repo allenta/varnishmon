@@ -1,0 +1,4 @@
+/.env
+/coverage.txt
+/build/
+/assets/webpack/node_modules/

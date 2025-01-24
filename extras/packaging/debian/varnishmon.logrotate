@@ -1,0 +1,12 @@
+/var/log/varnishmon/*.log
+/var/lib/varnishmon/*.db {
+  daily
+  rotate 7
+  compress
+  delaycompress
+  missingok
+  sharedscripts
+  postrotate
+    /bin/kill -HUP `systemctl show -p MainPID --value varnishmon.service 2> /dev/null` 2> /dev/null || true
+  endscript
+}

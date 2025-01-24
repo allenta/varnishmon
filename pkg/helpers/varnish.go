@@ -69,6 +69,10 @@ func (vmd *VarnishMetricDetails) IsBitmap() bool {
 	return vmd.Flag == "b"
 }
 
+func (vmd *VarnishMetricDetails) HasDurationFormat() bool {
+	return vmd.Format == "d"
+}
+
 func ParseVarnishMetrics(input []byte) (*VarnishMetrics, error) {
 	var stats VarnishMetrics
 	err := json.Unmarshal(input, &stats)

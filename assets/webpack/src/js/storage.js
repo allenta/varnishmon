@@ -1,57 +1,6 @@
 import * as helpers from './helpers';
 
-// Debug metrics are explicitly tagged as such. Otherwise they are assumed to be
-// regular metrics.
-const debugMetrics = [
-  /^MGT[.](?!(?:uptime)$)/,
-  /^ACCG_DIAG[.]/,
-  /^VBE[.](?!.*[.](?:bereq_bodybytes|bereq_hdrbytes|beresp_bodybytes|beresp_hdrbytes|happy|is_healthy|req)$)/,
-  /^MEMPOOL[.]/,
-  /^LCK[.]/,
-];
-
-// Clustering of metrics is based on the longest prefix just before the last
-// dot, unless explicitly overridden here using a regex + a capture group.
-const adhocClusteringPrefixes = [
-  /^(MAIN[.]backend)/,
-  /^(MAIN[.]bans)_?/,
-  /^(MAIN[.]cache)/,
-  /^(MAIN[.]client)/,
-  /^(MAIN[.]esi_)/,
-  /^(MAIN[.]fetch)/,
-  /^(MAIN[.]g_mem)/,
-  /^(MAIN[.]s_)/,
-  /^(MAIN[.]sc_)/,
-  /^(MAIN[.]sess_)/,
-  /^(MAIN[.]shm_)/,
-  /^(MAIN[.]thread)s?_?/,
-  /^(MAIN[.]vgs_)/,
-  /^(MAIN[.]ws_)/,
-  /^(MEMPOOL[.])/,
-  /^(LCK[.])/,
-];
-
-// Clusters are sorted by name, unless explicitly overridden here using a regex.
-const orderOfClusters = [
-  /^MGT[.]/,
-  /^MAIN[.][*]$/,
-  /^MAIN[.]/,
-  /^MSE[.]/,
-  /^MSE_/,
-  /^MSE4[.]/,
-  /^MSE4_/,
-  /^SMA[.]/,
-  /^SMF[.]/,
-  /^BROTLI[.]/,
-  /^SLICER[.]/,
-  /^VMOD_/,
-  /^KVSTORE[.]/,
-  /^ACCG[.]/,
-  /^ACCG_DIAG[.]/,
-  /^VBE[.]/,
-  /^MEMPOOL[.]/,
-  /^LCK[.]/,
-];
+import * as varnish from './varnish';
 
 /******************************************************************************
  * METRICS.
@@ -100,19 +49,19 @@ export async function getMetrics(from, to, step) {
 function preprocessMetrics(metrics) {
   function addDebugField(metrics) {
     metrics.forEach(metric => {
-      metric.debug = debugMetrics.findIndex(regex => regex.test(metric.name)) !== -1;
+      metric.debug = varnish.DEBUG_METRICS.findIndex(regex => regex.test(metric.name)) !== -1;
     });
   }
 
   function clusterByPrefix(metrics) {
     // Clusters are defined by the longest prefix just before the last dot,
-    // unless explicitly overridden by a regex in 'adhocClusteringPrefixes'.
+    // unless explicitly overridden by a regex in 'ADHOC_CLUSTERING_PREFIXES'.
     const clusters = {};
     metrics.forEach(metric => {
       let prefix = '';
 
       // Check against the list of ad-hoc clustering prefixes.
-      for (let regex of adhocClusteringPrefixes) {
+      for (let regex of varnish.ADHOC_CLUSTERING_PREFIXES) {
         const match = metric.name.match(regex);
         if (match && match[1]) {
           prefix = match[1] + '*';
@@ -145,8 +94,8 @@ function preprocessMetrics(metrics) {
 
   function sortClusteredMetrics(items) {
     items.sort((a, b) => {
-      const indexA = orderOfClusters.findIndex(regex => regex.test(a.name));
-      const indexB = orderOfClusters.findIndex(regex => regex.test(b.name));
+      const indexA = varnish.ORDER_OF_CLUSTERS.findIndex(regex => regex.test(a.name));
+      const indexB = varnish.ORDER_OF_CLUSTERS.findIndex(regex => regex.test(b.name));
 
       if (indexA !== -1 && indexB !== -1) {
         return indexA - indexB;

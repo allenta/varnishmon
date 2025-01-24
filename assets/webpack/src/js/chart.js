@@ -1,6 +1,7 @@
 import Plotly from 'plotly.js-dist';
+import Tooltip from 'bootstrap/js/dist/tooltip';
 
-import * as helpers from './helpers';
+import * as storage from './storage';
 
 // Charts are self-conscious about their visibility to avoid being rendered
 // if they are not visible to the user. To accomplish this, a global
@@ -27,23 +28,34 @@ class Chart {
 
     this.x = [];
     this.y = [];
-    this.date = new Date();
 
     observer.observe(this.container);
   }
 
-  init() {
-    for (let i = 0; i < 50; i++) {
-      this.x.push(this.date.toISOString());
-      this.y.push(Math.random() * 10);
-      this.date = new Date(this.date.getTime() + 5000);
+  async init() {
+    let metric;
+    try {
+      const [from, to] = this.rangeFactory();
+      metric = await storage.getMetric(this.metric.id, from, to, this.step, this.aggregator);
+    } catch (error) {
+      this.setError(`Failed to fetch samples of a metric: ${error}`);
+      return;
     }
+
+    metric.samples.forEach(sample => {
+      this.x.push(sample[0]);
+      this.y.push(sample[1]);
+    });
 
     const data = [
       {
         x: this.x,
         y: this.y,
+        mode: this.x.length < 32 ? 'lines+markers' : 'lines', // TODO: dynamic, based on pixels available -- ! step changes won't be reflected!
         type: 'scatter',
+        marker: { size: 4 },
+        hovertemplate: '<b>X:</b> %{x|%Y-%m-%d %H:%M:%S}<br><b>Y:</b> %{y:.1f}<extra></extra>',
+        connectgaps: false, // TODO: review
       }
     ];
 
@@ -59,18 +71,39 @@ class Chart {
         },
       },
       margin: {
-        l: 20,
-        r: 20,
+        l: 60,
+        r: 10,
         b: 40,
-        t: 25,
-        pad: 4,
+        t: 40,
+        pad: 5,
       },
       xaxis: {
         fixedrange: true,
+        griddash: 'dash',
+        range: [metric.from, new Date(metric.to.getTime() - metric.step * 1000)],
+        autorange: false,
       },
       yaxis: {
-        title: 'eps',
+        title: (() => {
+          if (this.metric.flag === 'c') {
+            if (this.metric.format === 'd') {
+              return 'seconds';
+            } else if (this.metric.format === 'B') {
+              return 'Bps';
+            }
+            return 'eps';
+          } else if (this.metric.flag === 'g') {
+            if (this.metric.format === 'd') {
+              return 'seconds';
+            } else if (this.metric.format === 'B') {
+              return 'bytes';
+            }
+          }
+          return '';
+        })(),
         fixedrange: true,
+        rangemode: 'normal',
+        griddash: 'dash',
       },
     };
 
@@ -81,6 +114,10 @@ class Chart {
         'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d',
         'autoScale2d', 'resetScale2d',
       ],
+      toImageButtonOptions: {
+        filename: `${varnishmon.storage.hostname} - ${this.metric.name}`,
+        format: 'png',
+      },
     };
 
     this.graph = this.container.querySelector('.graph');
@@ -88,28 +125,50 @@ class Chart {
 
     // Since the chart is being initialized, it is visible, so we can start the
     // refresh loop immediately.
-    this.interval = setInterval(this.handleRefresh.bind(this), this.refreshInterval * 1000);
+    this.setupInterval();
   }
 
   //
   // Handlers.
   //
 
-  handleRefresh() {
+  async handleRefresh() {
     // If the chart is not visible, there is no need to update it. Refresh loops
     // are canceled when the chart is not visible, but this is a safety check.
-    if (this.visible) {
-      const [from, to] = this.rangeFactory();
-      console.log('updating chart ' + this.metric.id + ': ' + from + ' => ' + to);
+    // Also, manual refreshes would be pointless for invisible charts.
+    if (this.graph != null && this.visible) {
+      let metric;
+      try {
+        const [from, to] = this.rangeFactory();
+        metric = await storage.getMetric(this.metric.id, from, to, this.step, this.aggregator);
+      } catch (error) {
+        this.setError(`Failed to fetch samples of a metric: ${error}`);
+        return;
+      }
 
-      this.date = new Date(this.date.getTime() + 5000);
-      const newX = this.date.toISOString();
-      const newY = Math.random() * 10;
+      this.x = [];
+      this.y = [];
+      metric.samples.forEach(sample => {
+        this.x.push(sample[0]);
+        this.y.push(sample[1]);
+      });
 
-      this.x.push(newX);
-      this.y.push(newY);
+      const update = {
+        x: [this.x],
+        y: [this.y],
+      };
 
-      Plotly.extendTraces(this.graph, { x: [[newX]], y: [[newY]] }, [0]);
+      const layout = {
+        xaxis: {
+          range: [metric.from, new Date(metric.to.getTime() - metric.step * 1000)],
+        },
+      };
+
+      Plotly.update(this.graph, update, layout);
+      // Plotly.extendTraces(this.graph, { x: [[newX]], y: [[newY]] }, [0]);
+
+      // All good, clear any previous error.
+      this.clearError();
     }
   }
 
@@ -123,12 +182,10 @@ class Chart {
       if (this.graph == null) {
         this.init();
       } else if (this.interval == null) {
-        this.interval = setInterval(this.handleRefresh.bind(this), this.refreshInterval * 1000);
+        this.setupInterval();
       }
     } else {
-      if (this.graph != null && this.interval != null) {
-        clearInterval(this.interval);
-      }
+      this.stopInterval();
     }
   }
 
@@ -149,45 +206,32 @@ class Chart {
   }
 
   setRefreshInterval(interval) {
-    console.log('setting refresh interval ' + interval + ' for chart ' + this.metric.id);
     this.refreshInterval = interval;
-    if (this.graph != null && this.visible) {
-      if (this.interval != null) {
-        clearInterval(this.interval);
-      }
-      this.interval = setInterval(this.handleRefresh.bind(this), this.refreshInterval * 1000);
-    }
+    this.setupInterval();
   }
 
   refresh() {
-    console.log('refreshing asap chart ' + this.metric.id);
-    if (this.graph != null && this.visible) {
-      if (this.interval != null) {
-        clearInterval(this.interval);
-      }
-      this.interval = setInterval(this.handleRefresh.bind(this), this.refreshInterval * 1000);
-      this.handleRefresh();
-    }
+    this.setupInterval();
+    this.handleRefresh();
   }
 
   setAggregator(aggregator) {
-    console.log('setting aggregator ' + aggregator + ' for chart ' + this.metric.id);
-    // TODO.
+    this.aggregator = aggregator;
+    this.setupInterval();
+    this.handleRefresh();
   }
 
   setStep(step) {
-    console.log('setting step ' + step + ' for chart ' + this.metric.id);
-    // TODO.
+    this.step = step;
+    this.setupInterval();
+    this.handleRefresh();
   }
 
   destroy() {
-    console.log('destroying chart ' + this.metric.id);
-    // TODO: what else?
     observer.unobserve(this.container);
+    this.stopInterval();
+    this.clearError();
     if (this.graph != null) {
-      if (this.interval != null) {
-        clearInterval(this.interval);
-      }
       Plotly.purge(this.graph);
     }
   }
@@ -195,6 +239,65 @@ class Chart {
   //
   // Private helpers.
   //
+
+  setupInterval() {
+    this.stopInterval();
+
+    if (this.visible) {
+      if (this.graph != null && this.refreshInterval > 0) {
+        this.interval = setInterval(this.handleRefresh.bind(this), this.refreshInterval * 1000);
+      } else if (this.graph == null) {
+        this.init();
+      }
+    }
+  }
+
+  stopInterval() {
+    if (this.interval != null) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+
+  setError(error) {
+    const card = this.container.querySelector('.card');
+    const errorIcon = card.querySelector('.error-icon');
+
+    if (this.error == null) {
+      // Highlight card & show error icon.
+      card.classList.add('border-danger');
+      errorIcon.classList.remove('d-none');
+    }
+
+    // Create / update tooltip.
+    const tooltipMessage = `${new Date().toISOString()}: ${error}`;
+    let tooltip = Tooltip.getInstance(errorIcon);
+    if (tooltip == null) {
+      tooltip = new Tooltip(errorIcon, { title: tooltipMessage });
+    } else {
+      tooltip.setContent({ '.tooltip-inner': tooltipMessage });
+    }
+
+    // Update error variable.
+    this.error = error;
+  }
+
+  clearError() {
+    if (this.error != null) {
+      // Unhighlight card & hide error icon.
+      const card = this.container.querySelector('.card');
+      card.classList.remove('border-danger');
+      const errorIcon = card.querySelector('.error-icon');
+      errorIcon.classList.add('d-none');
+
+      // Destroy tooltip.
+      const tooltip = Tooltip.getInstance(errorIcon);
+      tooltip.dispose();
+
+      // Update error variable.
+      this.error = null;
+    }
+  }
 }
 
 export default Chart;

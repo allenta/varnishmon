@@ -172,7 +172,7 @@ function setUpEventListeners() {
   });
 
   // On click in the collapse-all button, collapse all clusters.
-  document.getElementById('collapse-all').addEventListener('click', (event) => {
+  document.getElementById('collapse-all').addEventListener('click', () => {
     document.getElementById('clusters').querySelectorAll('.cluster').forEach(cluster => {
       Collapse.getInstance(cluster.querySelector('.accordion-collapse')).hide();
       cluster.querySelector('.accordion-button').classList.add('collapsed');
@@ -180,7 +180,7 @@ function setUpEventListeners() {
   });
 
   // On click in the expand-all button, expand all clusters.
-  document.getElementById('expand-all').addEventListener('click', (event) => {
+  document.getElementById('expand-all').addEventListener('click', () => {
     document.getElementById('clusters').querySelectorAll('.cluster').forEach(cluster => {
       Collapse.getInstance(cluster.querySelector('.accordion-collapse')).show();
       cluster.querySelector('.accordion-button').classList.remove('collapsed');
@@ -189,15 +189,15 @@ function setUpEventListeners() {
 }
 
 async function reloadMetrics() {
-  // Discard any previous search results and show a spinner while fetching new
-  // metrics.
+  // Discard any previous search results and show a spinner while fetching the
+  // new metrics.
   const clustersSelector = document.getElementById('clusters');
   clustersSelector.querySelectorAll('.chart').forEach((chartDiv) => {
     chartDiv.chart.destroy();
   });
   clustersSelector.innerHTML = '';
-  const spinnerTemplateSelector = document.getElementById('spinner-template');
-  clustersSelector.appendChild(spinnerTemplateSelector.content.cloneNode(true).firstElementChild);
+  clustersSelector.appendChild(document.getElementById('spinner-template').
+    content.cloneNode(true).firstElementChild);
 
   // Fetch values from some widgets.
   const rangeFactory = document.getElementById('range').timeRangePicker.getDatesFactory();
@@ -211,6 +211,9 @@ async function reloadMetrics() {
     const [from, to] = rangeFactory();
     metrics = await storage.getMetrics(from, to, step);
   } catch (error) {
+    clustersSelector.innerHTML = '';
+    clustersSelector.appendChild(document.getElementById('metrics-meditation-template').
+      content.cloneNode(true).firstElementChild);
     helpers.notify('error', `Failed to fetch metrics: ${error}`);
     return;
   }

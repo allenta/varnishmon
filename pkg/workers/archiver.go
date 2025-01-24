@@ -105,15 +105,22 @@ func (aw *ArchiverWorker) run() {
 				}
 
 				var value any
-				if details.IsCounter() {
+				if details.IsCounter() && !details.HasDurationFormat() {
+					// Counters are stored as rates, so we need to calculate the
+					// rate based on the previously seen value. However, there
+					// is a special case for uptimes (i.e., 'd' format in the
+					// 'varnishstat' output) which are handled as gauges.
+					// Otherwise, the rate per second of an uptime would be
+					// pretty much useless.
+
 					// Skip if this is the first time seeing the metric: counters
-					// are stored as rates calculated based on the previous seen
+					// are stored as rates calculated based on the previously seen
 					// value.
 					if previousMetric == nil {
 						continue
 					}
 
-					// Skip if this if an out-of-order sample.
+					// Skip if this is an out-of-order sample.
 					if !metrics.Timestamp.After(previousMetric.timestamp) {
 						aw.outOfOrderSamples.Inc()
 						continue
@@ -128,7 +135,7 @@ func (aw *ArchiverWorker) run() {
 					}
 
 					// Transform the 'uint64' value of the counter into a
-					// 'float64' eps rate.
+					// 'float64' rate per second.
 					value = float64(details.Value-previousMetric.value) /
 						metrics.Timestamp.Sub(previousMetric.timestamp).Seconds()
 				} else {
@@ -140,8 +147,8 @@ func (aw *ArchiverWorker) run() {
 						continue
 					}
 
-					// Transform the 'uint64' value of the metric dropping the
-					// higher bit. See: https://github.com/golang/go/issues/6113.
+					// Transform the 'uint64' value of the metric by dropping the
+					// highest bit. See: https://github.com/golang/go/issues/6113.
 					if !details.IsBitmap() && details.Value&0x8000000000000000 != 0 {
 						aw.truncatedSamples.Inc()
 					}

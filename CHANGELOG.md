@@ -1,3 +1,6 @@
+- 0.2.1-1 (2025-01-24):
+    + Improved rendering of timeseries.
+
 - 0.2.0-1 (2025-01-24):
     + Fixed logrotate configuration in RPM packages.
     + Extended the rules used to tag debug metrics in the client side.

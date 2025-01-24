@@ -108,6 +108,16 @@ function setUpEventListeners() {
   // On click in the apply time range button, the search results must be
   // rebuilt from scratch because a different time range might lead to a
   // different set of metrics.
+  document.getElementById('range-from').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      document.getElementById('apply-time-range').click();
+    }
+  });
+  document.getElementById('range-to').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      document.getElementById('apply-time-range').click();
+    }
+  });
   document.getElementById('apply-time-range').addEventListener('click', (event) => {
     // Validate the selected time range.
     const range = document.getElementById('range').timeRangePicker;

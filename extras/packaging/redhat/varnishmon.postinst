@@ -9,7 +9,7 @@ if [ "$1" -eq 1 ]; then
     chown varnish:varnish \
         /var/log/varnishmon\
         /var/lib/varnishmon > /dev/null
-    chown root:varnishmon \
+    chown root:varnish \
         /etc/varnish/varnishmon.yml > /dev/null
     chmod 640 /etc/varnish/varnishmon.yml > /dev/null
 
@@ -21,7 +21,7 @@ elif [ "$1" -gt 1 ]; then
     chown varnish:varnish \
         /var/log/varnishmon\
         /var/lib/varnishmon > /dev/null
-    chown root:varnishmon \
+    chown root:varnish \
         /etc/varnish/varnishmon.yml > /dev/null
     chmod 640 /etc/varnish/varnishmon.yml > /dev/null
 

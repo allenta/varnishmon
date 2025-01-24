@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 UMASK := 022
 
-VERSION := 0.1.0
+VERSION := 0.1.1
 ITERATION := 1
 REVISION := $(shell cd '$(ROOT)' && git rev-parse --short HEAD)
 ENVIRONMENT ?= production

@@ -11,7 +11,7 @@
 
 While `varnishmon` is **not a replacement for comprehensive monitoring solutions like Prometheus or Zabbix**, it is particularly useful when existing monitoring systems fall short. The most common use case is troubleshooting, where **more granular samples** (usual monitoring periods may be insufficient) and/or **additional metrics** (scraping the entire `varnishstat` output is typically excessive for daily monitoring) are needed. The collected data is stored in a DuckDB database, making it easy to share and analyze with other tools.
 
-`varnishmon` is a statically linked executable that allows you to start collecting data with minimal effort and explore it through a simple yet effective web interface. In addition to occasional troubleshooting, `varnishmon` can also be used as a lightweight, permanent service to collect, store, visualize, and rotate Varnish metrics. Similar to running `atop` in logging mode as a complement to regular monitoring, `varnishmon` provides valuable context during incident analysis.
+`varnishmon` is a self-contained executable that allows you to start collecting data with minimal effort and explore it through a simple yet effective web interface. In addition to occasional troubleshooting, `varnishmon` can also be used as a lightweight, permanent service to collect, store, visualize, and rotate Varnish metrics. Similar to running `atop` in logging mode as a complement to regular monitoring, `varnishmon` provides valuable context during incident analysis.
 
 ## 🚀 Quick Start
 

@@ -35,15 +35,20 @@ func (vm *VarnishMetrics) UnmarshalJSON(data []byte) error {
 	// Unmarshal the timestamp and the metric details.
 	for key, value := range raw {
 		if key == "timestamp" {
-			var ts string
-			if err := json.Unmarshal(value, &ts); err != nil {
-				return fmt.Errorf("invalid timestamp: %w", err)
-			}
-			parsedTimestamp, err := time.Parse("2006-01-02T15:04:05", ts)
-			if err != nil {
-				return fmt.Errorf("invalid timestamp: %w", err)
-			}
-			vm.Timestamp = parsedTimestamp
+			// Ideally we'd prefer to parse the timestamp and use it later as
+			// the timestamp of the metrics, but the timestamp value does not
+			// include the timezone information. That results in the timestamp
+			// string being parsed as UTC, which is not correct. For now,
+			// we use the current time as the timestamp of the metrics.
+			// var ts string
+			// if err := json.Unmarshal(value, &ts); err != nil {
+			// 	return fmt.Errorf("invalid timestamp: %w", err)
+			// }
+			// parsedTimestamp, err := time.Parse("2006-01-02T15:04:05", ts)
+			// if err != nil {
+			// 	return fmt.Errorf("invalid timestamp: %w", err)
+			// }
+			vm.Timestamp = time.Now()
 		} else {
 			var details VarnishMetricDetails
 			if err := json.Unmarshal(value, &details); err != nil {

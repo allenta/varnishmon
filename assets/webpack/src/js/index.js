@@ -171,25 +171,20 @@ function setUpEventListeners() {
     location.reload();
   });
 
-  // On click in the collapse / expand button, update the UI accordingly.
-  document.getElementById('toggle-collapse').addEventListener('click', (event) => {
-    const clusterSelectors = document.getElementById('clusters').querySelectorAll('.cluster');
-    const isCollapsed = event.target.textContent === 'collapse';
-
-    clusterSelectors.forEach(cluster => {
-      const collapseInstance = Collapse.getInstance(cluster.querySelector('.accordion-collapse'));
-      const accordionButton = cluster.querySelector('.accordion-button');
-
-      if (isCollapsed) {
-        collapseInstance.hide();
-        accordionButton.classList.add('collapsed');
-      } else {
-        collapseInstance.show();
-        accordionButton.classList.remove('collapsed');
-      }
+  // On click in the collapse-all button, collapse all clusters.
+  document.getElementById('collapse-all').addEventListener('click', (event) => {
+    document.getElementById('clusters').querySelectorAll('.cluster').forEach(cluster => {
+      Collapse.getInstance(cluster.querySelector('.accordion-collapse')).hide();
+      cluster.querySelector('.accordion-button').classList.add('collapsed');
     });
+  });
 
-    event.target.textContent = isCollapsed ? 'expand' : 'collapse';
+  // On click in the expand-all button, expand all clusters.
+  document.getElementById('expand-all').addEventListener('click', (event) => {
+    document.getElementById('clusters').querySelectorAll('.cluster').forEach(cluster => {
+      Collapse.getInstance(cluster.querySelector('.accordion-collapse')).show();
+      cluster.querySelector('.accordion-button').classList.remove('collapsed');
+    });
   });
 }
 

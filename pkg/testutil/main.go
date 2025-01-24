@@ -28,6 +28,10 @@ func NewConfig(tl zerolog.TestingLog, cfg ...interface{}) *config.Config {
 		panic(err)
 	}
 
+	if !vpr.IsSet("scraper.varnishstat") {
+		vpr.Set("scraper.varnishstat", "/dev/null")
+	}
+
 	return config.NewConfig(
 		config.NewTestLogger(tl, loglevel),
 		vpr)

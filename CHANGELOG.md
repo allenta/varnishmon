@@ -1,3 +1,7 @@
+- 0.2.2-1 (2025-01-24):
+    + Added event handlers to apply the time range when 'Enter' is pressed in one of the time range inputs.
+    + Fixed overflow when processing bitmap metrics.
+
 - 0.2.1-1 (2025-01-24):
     + Improved rendering of timeseries.
 

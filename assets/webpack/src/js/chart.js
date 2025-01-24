@@ -348,7 +348,10 @@ class Chart {
       // number of bits set to 1 in the bitmap as the Y value. This will be
       // improved in the future using a different visualization for bitmap
       // metrics.
-      y.push(this.metric.flag === 'b' ? parseInt(sample[1], 16).toString(2).split('1').length - 1 : sample[1]);
+      y.push(
+        this.metric.flag === 'b' ?
+          BigInt(`0x${sample[1]}`).toString(2).split('').filter(bit => bit === '1').length :
+          sample[1]);
     });
     return [x, y];
   }

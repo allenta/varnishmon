@@ -109,11 +109,11 @@ func boot(rootCmd *cobra.Command) *config.Config {
 	if cfgFile != "" {
 		vpr.SetConfigFile(cfgFile)
 	} else {
-		vpr.SetConfigName("varnishmon")
-		vpr.AddConfigPath("/etc/varnish")
-		vpr.AddConfigPath("$HOME/.config")
-		vpr.AddConfigPath("$HOME/.config/varnishmon")
+		vpr.SetConfigName("varnishmon.yml")
 		vpr.AddConfigPath(".")
+		vpr.AddConfigPath("$HOME/.config/varnishmon")
+		vpr.AddConfigPath("$HOME/.config")
+		vpr.AddConfigPath("/etc/varnish")
 	}
 
 	// Enable automatic binding of environment variables.

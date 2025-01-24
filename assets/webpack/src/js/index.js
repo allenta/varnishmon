@@ -172,7 +172,7 @@ function setUpEventListeners() {
   });
 
   // On click in the collapse-all button, collapse all clusters.
-  document.getElementById('collapse-all').addEventListener('click', (event) => {
+  document.getElementById('collapse-all').addEventListener('click', () => {
     document.getElementById('clusters').querySelectorAll('.cluster').forEach(cluster => {
       Collapse.getInstance(cluster.querySelector('.accordion-collapse')).hide();
       cluster.querySelector('.accordion-button').classList.add('collapsed');
@@ -180,7 +180,7 @@ function setUpEventListeners() {
   });
 
   // On click in the expand-all button, expand all clusters.
-  document.getElementById('expand-all').addEventListener('click', (event) => {
+  document.getElementById('expand-all').addEventListener('click', () => {
     document.getElementById('clusters').querySelectorAll('.cluster').forEach(cluster => {
       Collapse.getInstance(cluster.querySelector('.accordion-collapse')).show();
       cluster.querySelector('.accordion-button').classList.remove('collapsed');

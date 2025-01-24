@@ -350,8 +350,8 @@ class Chart {
       // metrics.
       y.push(
         this.metric.flag === 'b' ?
-        BigInt(`0x${sample[1]}`).toString(2).split('').filter(bit => bit === '1').length :
-        sample[1]);
+          BigInt(`0x${sample[1]}`).toString(2).split('').filter(bit => bit === '1').length :
+          sample[1]);
     });
     return [x, y];
   }

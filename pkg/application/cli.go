@@ -70,6 +70,9 @@ func init() {
 	RootCmd.PersistentFlags().String(
 		"db", "",
 		"set DB file (overrides 'db.file' setting)")
+	RootCmd.PersistentFlags().String(
+		"memory-limit", "",
+		"set DB memory limit (overrides 'db.memory-limit' setting)")
 	RootCmd.PersistentFlags().Bool(
 		"no-scraper", true,
 		"disable scraping (overrides 'scraper.enabled' setting)")
@@ -128,6 +131,7 @@ func boot(rootCmd *cobra.Command) *config.Config {
 		"global.logfile":      "logfile",
 		"global.loglevel":     "loglevel",
 		"db.file":             "db",
+		"db.memory-limit":     "memory-limit",
 		"scraper.period":      "period",
 		"scraper.varnishstat": "varnishstat",
 		"api.listen-ip":       "ip",

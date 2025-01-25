@@ -19,6 +19,7 @@ type ScraperWorker struct {
 
 	executionCompleted prometheus.Counter
 	executionFailed    prometheus.Counter
+	queuingFailed      prometheus.Counter
 }
 
 func NewScraperWorker(
@@ -37,6 +38,11 @@ func NewScraperWorker(
 				Name: "scrapper_execution_failed_total",
 				Help: "Failed 'varnishstat' executions by the scraper worker",
 			}),
+		queuingFailed: prometheus.NewCounter(
+			prometheus.CounterOpts{
+				Name: "scrapper_queuing_failed_total",
+				Help: "Failed attempts to queue metrics by the scraper worker",
+			}),
 	}
 
 	sw.worker = &worker{
@@ -51,6 +57,7 @@ func NewScraperWorker(
 
 	sw.app.Cfg().Metrics().Registry.MustRegister(sw.executionCompleted)
 	sw.app.Cfg().Metrics().Registry.MustRegister(sw.executionFailed)
+	sw.app.Cfg().Metrics().Registry.MustRegister(sw.queuingFailed)
 
 	return sw
 }
@@ -110,9 +117,17 @@ func (sw *ScraperWorker) scrape() {
 					Interface("metrics", metrics).
 					Msg("Successfully fetched 'varnishstat' output")
 
+				// Avoid blocking indefinitely if the metrics queue is full.
+				// This is unlikely, but if insertions into the storage are slow,
+				// the queue may fill up, causing a backlog of goroutines
+				// waiting to insert metrics.
 				select {
 				case sw.metricsQueue <- metrics:
 				case <-sw.worker.ctx.Done():
+				default:
+					sw.queuingFailed.Inc()
+					sw.worker.app.Cfg().Log().Error().
+						Msg("Metrics queue is full, dropping metrics!")
 				}
 			} else {
 				sw.executionFailed.Inc()

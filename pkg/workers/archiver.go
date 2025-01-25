@@ -2,9 +2,11 @@ package workers
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
+	duckdb "github.com/marcboeker/go-duckdb"
 	"github.com/prometheus/client_golang/prometheus"
 	"gitlab.com/stone.code/assert"
 
@@ -169,6 +171,7 @@ func (aw *ArchiverWorker) run() {
 					name, metrics.Timestamp, details.Flag, details.Format,
 					details.Description, value); err != nil {
 					aw.pushFailed.Inc()
+
 					aw.app.Cfg().Log().Error().
 						Err(err).
 						Str("name", name).
@@ -176,6 +179,21 @@ func (aw *ArchiverWorker) run() {
 						Str("format", details.Format).
 						Interface("value", value).
 						Msg("Failed to store metric!")
+
+					// On DuckDB errors, discard remaining metrics. Typically,
+					// when DuckDB fails to store a metric, it indicates a
+					// permanent issue (e.g., memory allocation failure). It is
+					// better to stop early to avoid flooding the logs with one
+					// error entry for each metric in the batch an to prevent
+					// further damage like a CPU spike.
+					var duckdbErr *duckdb.Error
+					if errors.As(err, &duckdbErr) {
+						aw.app.Cfg().Log().Error().
+							Interface("type", duckdbErr.Type).
+							Interface("msg", duckdbErr.Msg).
+							Msg("Hitting a DuckDB error, stopping further processing of current batch of metrics!")
+						break
+					}
 				} else {
 					aw.pushCompleted.Inc()
 				}

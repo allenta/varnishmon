@@ -1,3 +1,6 @@
+- ?
+    + Added extra logging during bootstrap / rotation of the storage.
+
 - 0.2.4-1 (2025-01-25):
     + Added `--memory-limit` flag to control the DuckDB memory limit from the command line.
     + Added check to avoid piling up scraping jobs when the internal metrics queue is full.

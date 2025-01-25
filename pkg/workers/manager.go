@@ -23,8 +23,9 @@ type Manager struct {
 
 func NewManager(app Application) *Manager {
 	m := &Manager{
-		wg:           &sync.WaitGroup{},
-		app:          app,
+		wg:  &sync.WaitGroup{},
+		app: app,
+		// Beware of the hardcoded buffer size here.
 		metricsQueue: make(chan *helpers.VarnishMetrics, 1024),
 	}
 

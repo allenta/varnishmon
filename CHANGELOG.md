@@ -1,3 +1,8 @@
+- ?
+    + Added `--memory-limit` flag to control the DuckDB memory limit from the command line.
+    + Added check to avoid piling up scraping jobs when the internal metrics queue is full.
+    + Changed behavior of the archiver worker when hitting DuckDB errors.
+
 - 0.2.3-1 (2025-01-25):
     + Added spinner for visual feedback when loading a metric.
 

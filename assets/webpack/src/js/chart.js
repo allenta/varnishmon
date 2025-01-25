@@ -262,6 +262,7 @@ class Chart {
         marker: { size: 4 },
         hovertemplate: '<b>X:</b> %{x|%Y-%m-%d %H:%M:%S}<br><b>Y:</b> %{y:,.1f}<extra></extra>',
         connectgaps: false,
+        line: { shape: 'spline', width: 1 },
       }
     ];
 

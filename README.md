@@ -36,7 +36,7 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
 ### Usage
 
 - **How do I access the `varnishmon` web interface?**
-  > First, ensure the `varnishmon` API is enabled (it is by default) and successfully bound to an IP address and port (default is `127.0.0.1:6100`). To make it accessible from other hosts, you can bind it to `0.0.0.0`, but typically, using an SSH tunnel is the best option. Then, open your browser and navigate to `http://localhost:6100`.
+  > First, ensure the `varnishmon` API is enabled (it is by default) and successfully bound to an IP address and port (default is `127.0.0.1:6100`). To make it accessible from other hosts, you can bind it to `0.0.0.0`; however, using an SSH tunnel is typically the best option. Then, open your browser and navigate to `http://localhost:6100`.
   > ```bash
   > ssh -L 6100:localhost:6100 user@host
   > ```
@@ -51,29 +51,29 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > ```
 
 - **Can I use `varnishmon` with Varnish instances running in a container?**
-  > If you can run `varnishmon` directly within the container, no special configuration is required. However, if you need to execute a command like `docker exec ...` to gather the `varnishstat` output, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify an alternative command.  Remember to to use the `-1 -j` flags to ensure `varnishstat` outputs JSON and to provide the full path to the `docker` command.
+  > If you can run `varnishmon` directly within the container, no special configuration is required. However, if you need to execute a command like `docker exec ...` to gather the `varnishstat` output, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify an alternative command.  Remember to use the `-1 -j` flags (to ensure `varnishstat` outputs JSON) and to provide the full path to the `docker` command.
 
 - **How do I use `varnishmon` to collect metrics remotely?**
-  > You can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a command that collects metrics remotely. For example, you can use `/usr/bin/ssh <user>@<host> varnishstat -1 -j`. Ensure you use SSH keys for passwordless authentication and don't forge to provide the full path to the `ssh` command.
+  > You can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a command that collects metrics remotely. For example, you can use `/usr/bin/ssh <user>@<host> varnishstat -1 -j`. Make sure to use SSH keys for passwordless authentication and don't forget to provide the full path to the `ssh` command.
 
 - **How do I use `varnishmon` to visualize metrics previously collected on a different server?**
-  > Similar to `atop`, you can collect metrics on the Varnish server, transfer them to your local machine, and use `varnishmon` to visualize them. In this case, you might want to:
+  > Similar to `atop`, you can collect metrics on the Varnish server, transfer them to your local machine, and use `varnishmon` to visualize them. In this case, you may want to:
   >   - Use the `--no-api` flag (or the `api.enabled` setting) on the Varnish server to prevent the web interface from starting there.
   >   - Use the `--no-scraper` flag (or the `scraper.enabled` setting) on your local machine to avoid collecting metrics locally.
 
 - **How often does `varnishmon` collect metrics?**
-  > That depends on the `--period` flag (or the `scraper.period` setting). The default is 60 seconds, but you can adjust it to your needs.
+  > That depends on the `--period` flag (or the `scraper.period` setting). The default value is set to 60 seconds, but you can adjust it to suit your needs.
 
 ### Configuration & Customization
 
 - **What are the system requirements for `varnishmon`?**
-  > `varnishmon` is a lightweight utility. Its embedded DuckDB database is the most resource-intensive component, but the default configuration (i.e., `db.memory-limit`, `db.threads`, etc.) [limits resource consumption](https://duckdb.org/docs/configuration/overview.html) to 128 MiB and 1 CPU core. However, depending on the number of metrics in your Varnish setup and the scraping period, it may require a significant amount of disk space (or memory if using an in-memory database). Plan accordingly.
+  > `varnishmon` is a lightweight utility. Its embedded DuckDB database is by far the most resource-intensive component, but the default configuration (i.e., `db.memory-limit`, `db.threads`, etc.) [limits resource consumption](https://duckdb.org/docs/configuration/overview.html) to 128 MiB and 1 CPU core. However, depending on the number of metrics in your Varnish setup and the scraping period, it may require a significant amount of disk space and memory. Plan accordingly and adjust the limits as needed.
 
 - **I'm tired of typing the same options every time I run `varnishmon`. Can I save them?**
   > Command line flags are shortcuts to override settings in the configuration file. Alternatively, you can create a [configuration file](extras/packaging/varnishmon.yml) in one of the standard locations (`/etc/varnish/varnishmon.yml`, `~/.config/varnishmon.yml`, etc.) and let `varnishmon` read it automatically. This is the default behavior when running `varnishmon` as a service.
 
 - **Is it possible to secure the `varnishmon` web interface?**
-  > For typical operation (i.e., API bound to `127.0.0.1` and accessed through an SSH tunnel), this is likely not a concern. However, the [configuration file](extras/packaging/varnishmon.yml) allows you to specify a username and password for HTTP Basic Authentication and to enable HTTPS.
+  > For typical operation (i.e., API bound to `127.0.0.1` and accessed through an SSH tunnel), this is likely not a concern. However, the [configuration file](extras/packaging/varnishmon.yml) allows you, (1) to specify a username and password for HTTP Basic Authentication; and (2) to enable HTTPS.
 
 - **What if I don't want to run the `varnishmon` web interface?**
   > Use the `--no-api` flag (or the `api.enabled` setting) to prevent the web interface from starting. You can still collect metrics and store them in the database.
@@ -82,7 +82,7 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > Not directly, as `varnishmon` is designed to collect comprehensive information. However, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a wrapper script that filters the `varnishstat` output.
 
 - **What if I don't want to store the collected data permanently?**
-  > To use an in-memory database, set the `--db` flag (or the `db.file` setting) to an empty value. Note that the data will be lost when `varnishmon` exits. Additionally, be aware that an in-memory database may consume a significant amount of memory, depending on the number of metrics, the scraping period, and the duration `varnishmon` runs.
+  > To use an in-memory database, set the `--db` flag (or the `db.file` setting) to an empty value. Note that the data will be lost when `varnishmon` exits. Additionally, be aware that an in-memory database may consume a significant amount of memory, depending on (1) the number of metrics; (2) the scraping period; and (3) the duration `varnishmon` runs.
 
 - **How do I build `varnishmon` from source?**
   > The build process is designed to be executed on the target platform (e.g., Ubuntu Noble, Ubuntu Jammy, etc.) and architecture (`amd64` or `arm64`). The dependencies are minimal (`make`, `git`, `go`, `g++`, etc.; refer to the [Dockerfiles used by GitHub Actions](extras/github/docker) for guidance). To build, simply run `make build` in the root of the repository.
@@ -93,7 +93,7 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > Yes, `varnishmon` is designed to be run as a service. You can use the DEB / RPM packages available in the [releases page](../../releases) or create your own service unit file.
 
 - **I'm running `varnishmon` as a service. How do I rotate the database?**
-  > The DEB / RPM packages include `logrotate` configuration files to manage the rotation of the database and log files. Alternatively, you can manually rotate them by renaming the database and log files, then sending a `SIGHUP` signal to the `varnishmon` process. This method also works with an in-memory database, discarding the old data.
+  > The DEB / RPM packages include `logrotate` configuration files to manage the rotation of the database and log files. Alternatively, you can manually rotate them by renaming the database and log files, and then sending a `SIGHUP` signal to the `varnishmon` process. This method also works with an in-memory database, discarding the old data.
   > ```bash
   > kill -HUP $(pgrep varnishmon)
   > ```
@@ -102,7 +102,7 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > While it is not mandatory, `varnishmon` is optimized for navigating databases that cover relatively short time periods. For visualizing metrics over extended periods, it is recommended to use a dedicated monitoring tool like Prometheus or Zabbix.
 
 - **I'm running `varnishmon` as a service. How can I monitor its health?**
-  > Whether running as a service or standalone, `varnishmon` exposes a `/metrics` API endpoint for health monitoring. You can use a monitoring tool like Prometheus to scrape this endpoint and set up alerts based on the collected metrics.
+  > Whether running as a service or as a standalone tool, `varnishmon` exposes a `/metrics` API endpoint for health monitoring. You can use a monitoring tool like Prometheus to scrape this endpoint and set up alerts based on the collected metrics.
   > ```
   > $ curl -s http://localhost:6100/metrics
   >...
@@ -126,7 +126,7 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
 ### Miscellaneous
 
 - **Why `varnishstat`? Why not use the Varnish shared memory log?**
-  > While avoiding forking the `varnishstat` process on every scrape might seem beneficial, we believe it wouldn't significantly impact performance. Moreover, it would reduce the flexibility provided by using a wrapper script, such as filtering metrics or running on a different host.
+  > While it may seem beneficial to avoid forking the `varnishstat` process on every scrape, we believe it wouldn't significantly impact performance. Moreover, it would reduce the flexibility provided by the use of a wrapper script, such as filtering metrics or running on a different host.
 
 - **How is the collected data stored?**
   > The collected data is stored as timeseries in a DuckDB database using a straightforward schema. The output of `varnishstat` is stored mostly as-is, except for counters, which are converted into eps rates to enhance data usability. [Download the DuckDB CLI](https://duckdb.org/docs/installation/) to explore the database on your own. It's very simple.
@@ -161,7 +161,7 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > Counters are stored in the DuckDB database as `float64` eps rates for convenience. Other `uint64` values (e.g., gauges, bitmaps, etc.) are stored with the most significant bit dropped due to a limitation in Go's SQL package. Additionally, on the client side (JavaScript), we are constrained by the Number type, which is a `float64` value. In summary, `varnishstat` `uint64` values are supported, but with these minor limitations.
 
 - **Why DuckDB?**
-  > DuckDB is an ideal choice for `varnishmon` because it is lightweight, timeseries-friendly, and easily embeddable in-process analytical database. Its CLI is a simple statically linked binary that provides an easy way to analyze and share collected data with other tools.
+  > DuckDB is an ideal choice for `varnishmon` because it is a lightweight, timeseries-friendly, and easily embeddable in-process analytical database. Its CLI is a simple, statically-linked binary that provides an easy way to analyze and share collected data with other tools.
 
 - **I want to contribute to `varnishmon`. How can I help?**
   > This is a small project, but there are many areas where you can contribute. Feel free to open an issue or a PR, or simply share your thoughts and ideas. A good starting point is to check [the cheat sheet in the `docker-compose.yml` file](docker-compose.yml) and start using the development environment.

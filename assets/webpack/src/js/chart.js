@@ -213,10 +213,16 @@ class Chart {
     // and ignoring the selected aggregator if the metric is a bitmap. This
     // will be improved in the future adding more flexibility to control the
     // down-sampling of bitmap metrics.
-    const [from, to] = this.rangeFactory();
-    const optimalStep = this.estimateOptimalStep(from, to);
-    const aggregator = this.metric.flag === 'b' ? 'bit_and' : this.aggregator;
-    return await storage.getMetric(this.metric.id, from, to, optimalStep, aggregator);
+    const loadingIcon = this.container.querySelector('.card .loading-icon');
+    loadingIcon.classList.remove('d-none');
+    try {
+      const [from, to] = this.rangeFactory();
+      const optimalStep = this.estimateOptimalStep(from, to);
+      const aggregator = this.metric.flag === 'b' ? 'bit_and' : this.aggregator;
+      return await storage.getMetric(this.metric.id, from, to, optimalStep, aggregator);
+    } finally {
+      loadingIcon.classList.add('d-none');
+    }
   }
 
   estimateOptimalStep(from, to) {

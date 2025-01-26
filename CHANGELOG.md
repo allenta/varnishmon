@@ -1,4 +1,4 @@
-- ?
+- 0.3.0-1 (2026-01-25):
     + Added extra logging during bootstrap / rotation of the storage.
     + Adjusted shape and with of lines in charts.
     + Added support to zoom in and out in the charts.

@@ -2,7 +2,8 @@
     + Added extra logging during bootstrap / rotation of the storage.
     + Adjusted shape and with of lines in charts.
     + Added support to zoom in and out in the charts.
-    + Increase default DuckDB memory limit to 512 MiB.
+    + Increased default DuckDB memory limit to 512 MiB.
+    + Added support to filter metrics by multiple search terms.
 
 - 0.2.4-1 (2025-01-25):
     + Added `--memory-limit` flag to control the DuckDB memory limit from the command line.

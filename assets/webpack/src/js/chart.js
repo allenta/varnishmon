@@ -156,7 +156,11 @@ class Chart {
   }
 
   redraw(filter, verbosity, columns) {
-    const hidden = !this.metric.name.includes(filter) || (verbosity === 'normal' && this.metric.debug);
+    let hidden = verbosity === 'normal' && this.metric.debug;
+    if (!hidden) {
+      const terms = filter.split(/\s+/);
+      hidden = !terms.some(term => term.length > 0 && this.metric.name.includes(term));
+    }
     this.container.classList.toggle('d-none', hidden);
 
     this.container.classList.forEach(className => {

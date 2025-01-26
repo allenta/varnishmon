@@ -79,7 +79,13 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > Use the `--no-api` flag (or the `api.enabled` setting) to prevent the web interface from starting. You can still collect metrics and store them in the database.
 
 - **Can I customize the metrics collected by `varnishmon`?**
-  > Not directly, as `varnishmon` is designed to collect comprehensive information. However, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a wrapper script that filters the `varnishstat` output.
+  > Not directly, as `varnishmon` is designed to collect comprehensive information. However, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a wrapper script that filters the `varnishstat` output (or an inline command if you're up for the quoting challenge).
+    > ```bash
+    > varnishmon \
+    >   --period 5s \
+    >   --db /tmp/varnishmon.db \
+    >   --varnishstat "/usr/bin/bash -c 'varnishstat -1 -j | jq \"with_entries(select(.key | test(\\\"^VBE|MEMPOOL[.]\\\") | not))\"'"
+    > ```
 
 - **What if I don't want to store the collected data permanently?**
   > To use an in-memory database, set the `--db` flag (or the `db.file` setting) to an empty value. Note that the data will be lost when `varnishmon` exits. Additionally, be aware that an in-memory database may consume a significant amount of memory, depending on (1) the number of metrics; (2) the scraping period; and (3) the duration `varnishmon` runs.

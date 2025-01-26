@@ -23,10 +23,15 @@ class Chart {
     this.aggregator = aggregator;
     this.step = step;
 
+    this.listeners = {};
+
     this.visible = false;
     this.graph = null;
     this.interval = null;
     this.error = null;
+
+    this.range = null;
+    this.zoomRange = null;
 
     observer.observe(this.container);
   }
@@ -35,6 +40,10 @@ class Chart {
     try {
       // Fetch metric, adjusting the effective step if necessary.
       const metric = await this.getMetric();
+
+      // Calculate & store the range for the X axis. This may change during zoom
+      // events, and we need to know the original range to reset it.
+      this.range = this.getPlotlyXAxisRange(metric);
 
       // Render the graph for the first time.
       this.graph = this.renderGraph(metric);
@@ -64,6 +73,10 @@ class Chart {
         // Fetch metric, adjusting the effective step if necessary.
         const metric = await this.getMetric();
 
+        // Calculate & store the range for the X axis. This may change during
+        // zoom events, and we need to know the original range to reset it.
+        this.range = this.getPlotlyXAxisRange(metric);
+
         // Update the graph with the new samples. For now we are just
         // re-rendering the whole graph, but in the future we should be able to
         // update it in a more efficient way. The server-side already supports
@@ -78,6 +91,50 @@ class Chart {
         // eventually succeed and clear the error.
         this.setError(`Failed to fetch samples of a metric: ${error}`);
       }
+    }
+  }
+
+  handleGraphRelayout(event) {
+    if (event['xaxis.range[0]'] && event['xaxis.range[1]']) {
+      this.zoomRange = [
+        new Date(event['xaxis.range[0]']),
+        new Date(event['xaxis.range[1]']),
+      ];
+    } else if (event['xaxis.range'] && Array.isArray(event['xaxis.range']) && event['xaxis.range'].length === 2) {
+      this.zoomRange = [
+        new Date(event['xaxis.range'][0]),
+        new Date(event['xaxis.range'][1]),
+      ];
+    } else {
+      this.zoomRange = null;
+    }
+
+    this.notifyEventListeners('zoom', {
+      target: this,
+      range: this.zoomRange,
+    });
+  }
+
+  //
+  // Event listeners.
+  //
+
+  addEventListener(event, callback) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(callback);
+  }
+
+  removeEventListener(event, callback) {
+    if (this.listeners[event]) {
+      this.listeners[event] = this.listeners[event].filter(listener => listener !== callback);
+    }
+  }
+
+  notifyEventListeners(event, data) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach(callback => callback(data));
     }
   }
 
@@ -99,7 +156,11 @@ class Chart {
   }
 
   redraw(filter, verbosity, columns) {
-    const hidden = !this.metric.name.includes(filter) || (verbosity === 'normal' && this.metric.debug);
+    let hidden = verbosity === 'normal' && this.metric.debug;
+    if (!hidden) {
+      const terms = filter.split(/\s+/);
+      hidden = !terms.some(term => term.length > 0 && this.metric.name.includes(term));
+    }
     this.container.classList.toggle('d-none', hidden);
 
     this.container.classList.forEach(className => {
@@ -134,6 +195,24 @@ class Chart {
     this.step = step;
     this.setupInterval();
     this.handleRefresh();
+  }
+
+  setZoomRange(range) {
+    // Ignore if the range is the same as the current one.
+    if (this.zoomRange === range) {
+      return;
+    }
+    this.zoomRange = range;
+
+    // Adjust range in the X axis. It's important to apply the adjustment to
+    // every initialized chart, even if they are not visible.
+    if (this.graph != null) {
+      Plotly.update(this.graph, [], {
+        xaxis: {
+          range: this.zoomRange != null ? this.zoomRange : this.range,
+        },
+      });
+    }
   }
 
   destroy() {
@@ -262,6 +341,7 @@ class Chart {
         marker: { size: 4 },
         hovertemplate: '<b>X:</b> %{x|%Y-%m-%d %H:%M:%S}<br><b>Y:</b> %{y:,.1f}<extra></extra>',
         connectgaps: false,
+        line: { shape: 'spline', width: 1 },
       }
     ];
 
@@ -275,9 +355,9 @@ class Chart {
       },
       margin: { l: 60, r: 10, b: 40, t: 40, pad: 5 },
       xaxis: {
-        fixedrange: true,
+        fixedrange: false,
         griddash: 'dash',
-        range: this.getPlotlyXAxisRange(metric),
+        range: this.zoomRange != null ? this.zoomRange : this.range,
         autorange: false,
       },
       yaxis: {
@@ -310,8 +390,7 @@ class Chart {
       responsive: true,
       displaylogo: false,
       modeBarButtonsToRemove: [
-        'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d',
-        'autoScale2d', 'resetScale2d',
+        'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'autoScale2d',
       ],
       toImageButtonOptions: {
         filename: `${varnishmon.storage.hostname} - ${this.metric.name}`,
@@ -319,16 +398,21 @@ class Chart {
       },
     };
 
-    // Render the graph!
+    // Render the graph.
     const graph = this.container.querySelector('.graph');
     Plotly.newPlot(graph, data, layout, config);
+
+    // Handle Plotly events.
+    graph.on('plotly_relayout', this.handleGraphRelayout.bind(this));
+
+    // Done!
     return graph;
   }
 
   updateGraph(metric) {
     // Prepare data for Plotly.
     const [x, y] = this.getPlotlyDataXY(metric);
-    const update = {
+    const data = {
       x: [x],
       y: [y],
       mode: this.estimatePlotlyDataMode(metric),
@@ -337,12 +421,12 @@ class Chart {
     // Prepare layout for Plotly.
     const layout = {
       xaxis: {
-        range: this.getPlotlyXAxisRange(metric),
+        range: this.zoomRange != null ? this.zoomRange : this.range,
       },
     };
 
     // Update the graph!
-    Plotly.update(this.graph, update, layout);
+    Plotly.update(this.graph, data, layout);
   }
 
   getPlotlyDataXY(metric) {

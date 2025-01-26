@@ -21,6 +21,12 @@ func (stg *Storage) init() {
 	stg.cache.mutex.Lock()
 	defer stg.cache.mutex.Unlock()
 
+	// Log start of database and cache initialization.
+	start := time.Now()
+	stg.app.Cfg().Log().Info().
+		Str("file", stg.app.Cfg().DBFile()).
+		Msg("Initializing database & cache. This may take a while")
+
 	// Initialize the database and cache.
 	if stg.db != nil {
 		stg.db.Close()
@@ -57,6 +63,7 @@ func (stg *Storage) init() {
 	// Done!
 	stg.app.Cfg().Log().Info().
 		Str("file", stg.app.Cfg().DBFile()).
+		Str("duration", time.Since(start).String()).
 		Str("database_size", databaseSize).
 		Str("wal_size", walSize).
 		Str("memory_usage", memoryUsage).

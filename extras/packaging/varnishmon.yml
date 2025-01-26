@@ -15,7 +15,7 @@ db:
   file: /var/lib/varnishmon/varnishmon.db
   # The maximum amount of data, in MiB, that DuckDB is allowed to keep in
   # memory.
-  memory-limit: 128
+  memory-limit: 512
   # The number of total threads used by DuckDB.
   threads: 1
   # The directory where temporary files are stored. If not provided, defaults to

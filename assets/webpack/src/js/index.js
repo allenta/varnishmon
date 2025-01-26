@@ -253,6 +253,13 @@ async function reloadMetrics() {
     cluster.metrics.forEach(metric => {
       const chartDiv = chartTemplateSelector.content.cloneNode(true).firstElementChild;
       const chart = new Chart(chartDiv, metric, rangeFactory, refreshInterval, aggregator, step);
+      chart.addEventListener('zoom', (event) => {
+        document.getElementById('clusters').querySelectorAll('.chart').forEach((chartDiv) => {
+          if (chartDiv.chart !== event.target) {
+            chartDiv.chart.setZoomRange(event.range);
+          }
+        });
+      });
       chartDiv.chart = chart;
       chartsDiv.appendChild(chartDiv);
     });

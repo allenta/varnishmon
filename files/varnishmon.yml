@@ -6,7 +6,7 @@ global:
 
 db:
   file: /tmp/varnishmon.db
-  memory-limit: 128
+  memory-limit: 512
   threads: 1
   temp-directory:
   max-temp-directory-size: 128

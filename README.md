@@ -19,9 +19,9 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
    - The executable is self-contained and does not require any additional dependencies.
 
 1. **Collect metrics**
-   - Run the following command to scrape metrics every 5 seconds, store them in `/tmp/varnishmon.db` (to use an in-memory database, omit the `--db` option), and bind the built-in web interface to port 6100 on all interfaces. Behind the scenes this will run `/usr/bin/varnishstat -1 -j` periodically, so ensure your user has the necessary permissions (typically, you need to be in the `varnish` group):
+   - Run the following command to scrape metrics every 15 seconds, store them in `/tmp/varnishmon.db` (to use an in-memory database, omit the `--db` option), and bind the built-in web interface to port 6100 on all interfaces. Behind the scenes this will run `/usr/bin/varnishstat -1 -j` periodically, so ensure your user has the necessary permissions (typically, you need to be in the `varnish` group):
      ```bash
-     varnishmon --period 5s --db /tmp/varnishmon.db --ip 0.0.0.0 --port 6100
+     varnishmon --period 15s --db /tmp/varnishmon.db --ip 0.0.0.0 --port 6100
      ```
    - If running `varnishmon` as a service:
      - Fine-tune the configuration by editing [the `/etc/varnishmon/varnishmon.yml` file](extras/packaging/varnishmon.yml) and start the service with `systemctl start varnishmon`.
@@ -45,7 +45,7 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > Ideally, you should add your user to the `varnish` group to avoid using `sudo`. If this is not possible, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify the command `varnishmon` should use to collect metrics. Ensure you use the `-1 -j` flags to output JSON. Note that the full path of the `sudo` command is required because `varnishmon` does not use a shell.
   > ```bash
   > varnishmon \
-  >   --period 5s \
+  >   --period 15s \
   >   --db /tmp/varnishmon.db \
   >   --varnishstat '/usr/bin/sudo varnishstat -1 -j'
   > ```
@@ -67,7 +67,7 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
 ### Configuration & Customization
 
 - **What are the system requirements for `varnishmon`?**
-  > `varnishmon` is a lightweight utility. Its embedded DuckDB database is by far the most resource-intensive component, but the default configuration (i.e., `db.memory-limit`, `db.threads`, etc.) [limits resource consumption](https://duckdb.org/docs/configuration/overview.html) to 128 MiB and 1 CPU core. However, depending on the number of metrics in your Varnish setup and the scraping period, it may require a significant amount of disk space and memory. Plan accordingly and adjust the limits as needed.
+  > `varnishmon` is a lightweight utility. Its embedded DuckDB database is by far the most resource-intensive component, but the default configuration (i.e., `db.memory-limit`, `db.threads`, etc.) [limits resource consumption](https://duckdb.org/docs/configuration/overview.html) to 512 MiB and 1 CPU core. However, depending on the number of metrics in your Varnish setup and the scraping period, it may require a significant amount of disk space and memory. Plan accordingly and adjust the limits as needed.
 
 - **I'm tired of typing the same options every time I run `varnishmon`. Can I save them?**
   > Command line flags are shortcuts to override settings in the configuration file. Alternatively, you can create a [configuration file](extras/packaging/varnishmon.yml) in one of the standard locations (`/etc/varnish/varnishmon.yml`, `~/.config/varnishmon.yml`, etc.) and let `varnishmon` read it automatically. This is the default behavior when running `varnishmon` as a service.
@@ -79,7 +79,13 @@ While `varnishmon` is **not a replacement for comprehensive monitoring solutions
   > Use the `--no-api` flag (or the `api.enabled` setting) to prevent the web interface from starting. You can still collect metrics and store them in the database.
 
 - **Can I customize the metrics collected by `varnishmon`?**
-  > Not directly, as `varnishmon` is designed to collect comprehensive information. However, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a wrapper script that filters the `varnishstat` output.
+  > Not directly, as `varnishmon` is designed to collect comprehensive information. However, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a wrapper script that filters the `varnishstat` output (or an inline command if you're up for the quoting challenge).
+    > ```bash
+    > varnishmon \
+    >   --period 15s \
+    >   --db /tmp/varnishmon.db \
+    >   --varnishstat "/usr/bin/bash -c 'varnishstat -1 -j | jq \"with_entries(select(.key | test(\\\"^VBE|MEMPOOL[.]\\\") | not))\"'"
+    > ```
 
 - **What if I don't want to store the collected data permanently?**
   > To use an in-memory database, set the `--db` flag (or the `db.file` setting) to an empty value. Note that the data will be lost when `varnishmon` exits. Additionally, be aware that an in-memory database may consume a significant amount of memory, depending on (1) the number of metrics; (2) the scraping period; and (3) the duration `varnishmon` runs.

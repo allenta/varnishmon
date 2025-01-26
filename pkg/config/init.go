@@ -41,7 +41,7 @@ func (cfg *Config) initGlobalConfig() {
 func (cfg *Config) initDBConfig() {
 	cfg.vpr.SetDefault("db.file", "")
 
-	cfg.vpr.SetDefault("db.memory-limit", 128)
+	cfg.vpr.SetDefault("db.memory-limit", 512)
 	cfg.checkInt("db.memory-limit", 1, math.MaxInt32)
 
 	cfg.vpr.SetDefault("db.threads", 1)

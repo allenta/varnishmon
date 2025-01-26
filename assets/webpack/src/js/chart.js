@@ -158,8 +158,10 @@ class Chart {
   redraw(filter, verbosity, columns) {
     let hidden = verbosity === 'normal' && this.metric.debug;
     if (!hidden) {
-      const terms = filter.split(/\s+/);
-      hidden = !terms.some(term => term.length > 0 && this.metric.name.includes(term));
+      const terms = filter.split(/\s+/).filter(term => term.length > 0);
+      if (terms.length > 0) {
+        hidden = !terms.some(term => this.metric.name.includes(term));
+      }
     }
     this.container.classList.toggle('d-none', hidden);
 
@@ -341,7 +343,7 @@ class Chart {
         marker: { size: 4 },
         hovertemplate: '<b>X:</b> %{x|%Y-%m-%d %H:%M:%S}<br><b>Y:</b> %{y:,.1f}<extra></extra>',
         connectgaps: false,
-        line: { shape: 'spline', width: 1 },
+        line: { shape: 'linear', width: 1 },
       }
     ];
 

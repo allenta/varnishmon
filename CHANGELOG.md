@@ -1,5 +1,6 @@
 - ?
     + Fixed filtering of metrics when no search terms are provided.
+    + Changed line shape in charts back to linear.
 
 - 0.3.0-1 (2026-01-25):
     + Added extra logging during bootstrap / rotation of the storage.

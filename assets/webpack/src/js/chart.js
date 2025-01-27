@@ -410,6 +410,17 @@ class Chart {
       metric.from,
       new Date(metric.to.getTime() - metric.step * 1000),
     ];
+
+    // If the effective step is different from the selected step, show in the
+    // card the factor by which the selected step has been adjusted.
+    const stepFactor = this.container.querySelector('.card .step-factor');
+    if (this.graph.step !== this.step) {
+      const factor = Math.round(this.graph.step / this.step);
+      stepFactor.innerHTML =
+        `<i class="fa-solid fa-arrows-left-right-to-line"></i> ${factor}x`;
+    } else {
+      stepFactor.innerHTML = '';
+    }
   }
 
   renderGraph() {

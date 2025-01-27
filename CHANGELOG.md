@@ -5,6 +5,7 @@
     + Enabled zooming in and out of charts using the mouse wheel.
     + Adjusted the width of lines in charts.
     + Added a filter history to easily reuse previous filter strings.
+    + Added visual feedback to charts when the effective step is different from the selected step.
 
 - 0.3.1-1 (2025-01-26):
     + Fixed filtering of metrics when no search terms are provided.

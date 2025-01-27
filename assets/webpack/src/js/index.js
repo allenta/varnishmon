@@ -163,6 +163,27 @@ function setUpEventListeners() {
   document.getElementById('verbosity').addEventListener('change', updateSearchResults);
   document.getElementById('columns').addEventListener('change', updateSearchResults);
 
+  // Keep track of the latest filter values in the local storage and rebuild
+  // the filter history list in the UI each time a new filter is set.
+  document.getElementById('filter').addEventListener('change', (event) => {
+    const filterValue = event.target.value;
+    if (filterValue) {
+      const filterHistory = config.getFilterHistory();
+      const index = filterHistory.indexOf(filterValue);
+      if (index !== 0) {
+        if (index !== -1) {
+          filterHistory.splice(index, 1);
+        }
+        filterHistory.unshift(filterValue);
+        if (filterHistory.length > 10) {
+          filterHistory.pop();
+        }
+        config.setFilterHistory(filterHistory);
+      }
+      rebuildFilterHistoryList();
+    }
+  });
+
   // On change in the aggregator, report the new value to all the charts.
   document.getElementById('aggregator').addEventListener('change', (event) => {
     document.getElementById('clusters').querySelectorAll('.chart').forEach((chartDiv) => {
@@ -323,33 +344,19 @@ function updateSearchResults() {
     `${numVisibleMetrics} metrics found (${numMetrics-numVisibleMetrics} hidden),` +
     ` organized in ${numVisibleClusters} clusters (${numClusters-numVisibleClusters}` +
     ' hidden)';
+}
 
-  // Keep track of the latest filter values in the local storage and rebuild
-  // the filter history list in the UI each time a new search is done.
-  const filterValue = document.getElementById('filter').value;
-  const filterHistory = config.getFilterHistory();
+function rebuildFilterHistoryList() {
   const filterHistoryList = document.getElementById('filterHistoryList');
-  if (filterValue) {
-    const index = filterHistory.indexOf(filterValue);
-    if (index != 0) {
-      if (index != -1) {
-        filterHistory.splice(index, 1);
-      }
-      filterHistory.unshift(filterValue);
-      if (filterHistory.length > 10) {
-        filterHistory.pop();
-      }
-      config.setFilterHistory(filterHistory);
-    }
-  }
   filterHistoryList.innerHTML = '';
-  filterHistory.forEach(item => {
+  config.getFilterHistory().forEach(item => {
     const li = document.createElement('li');
     li.classList.add('dropdown-item');
     li.textContent = item;
     li.addEventListener('click', () => {
       const input = document.getElementById('filter');
       input.value = item;
+      input.dispatchEvent(new Event('change'));
       updateSearchResults();
     });
     filterHistoryList.appendChild(li);
@@ -376,8 +383,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Set up event listeners for all the widgets.
   setUpEventListeners();
 
-  // Initialize Bootstrap components.
+  // Prepare filter history list dropdown.
   new Dropdown(document.getElementById('filterHistoryList'));
+  rebuildFilterHistoryList();
 
   // Load metrics.
   reloadMetrics();

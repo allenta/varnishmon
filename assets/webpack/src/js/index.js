@@ -1,5 +1,6 @@
 import '../scss/main.scss';
 import Collapse from 'bootstrap/js/dist/collapse';
+import Dropdown from 'bootstrap/js/dist/dropdown';
 
 import * as config from './config';
 import * as helpers from './helpers';
@@ -322,6 +323,37 @@ function updateSearchResults() {
     `${numVisibleMetrics} metrics found (${numMetrics-numVisibleMetrics} hidden),` +
     ` organized in ${numVisibleClusters} clusters (${numClusters-numVisibleClusters}` +
     ' hidden)';
+
+  // Keep track of the latest filter values in the local storage and rebuild
+  // the filter history list in the UI each time a new search is done.
+  const filterValue = document.getElementById('filter').value;
+  const filterHistory = config.getFilterHistory();
+  const filterHistoryList = document.getElementById('filterHistoryList');
+  if (filterValue) {
+    const index = filterHistory.indexOf(filterValue);
+    if (index != 0) {
+      if (index != -1) {
+        filterHistory.splice(index, 1);
+      }
+      filterHistory.unshift(filterValue);
+      if (filterHistory.length > 10) {
+        filterHistory.pop();
+      }
+      config.setFilterHistory(filterHistory);
+    }
+  }
+  filterHistoryList.innerHTML = '';
+  filterHistory.forEach(item => {
+    const li = document.createElement('li');
+    li.classList.add('dropdown-item');
+    li.textContent = item;
+    li.addEventListener('click', () => {
+      const input = document.getElementById('filter');
+      input.value = item;
+      updateSearchResults();
+    });
+    filterHistoryList.appendChild(li);
+  });
 }
 
 /******************************************************************************
@@ -343,6 +375,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Set up event listeners for all the widgets.
   setUpEventListeners();
+
+  // Initialize Bootstrap components.
+  new Dropdown(document.getElementById('filterHistoryList'));
 
   // Load metrics.
   reloadMetrics();

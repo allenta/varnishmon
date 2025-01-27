@@ -4,6 +4,7 @@
     + Limited the zoom of charts to a minimum and maximum range.
     + Enabled zooming in and out of charts using the mouse wheel.
     + Adjusted the width of lines in charts.
+    + Added a filter history to easily reuse previous filter strings.
 
 - 0.3.1-1 (2025-01-26):
     + Fixed filtering of metrics when no search terms are provided.

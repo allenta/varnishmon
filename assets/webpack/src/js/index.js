@@ -158,7 +158,7 @@ function setUpEventListeners() {
   // On change in the filter, verbosity or columns widgets, update the search
   // results accordingly. This is a lightweight operation, as it only adjusts
   // the visibility and arranging of the charts and clusters already fetched.
-  document.getElementById('filter').addEventListener('input', updateSearchResults);
+  document.getElementById('filter').addEventListener('input', helpers.debounce(updateSearchResults, 500));
   document.getElementById('verbosity').addEventListener('change', updateSearchResults);
   document.getElementById('columns').addEventListener('change', updateSearchResults);
 

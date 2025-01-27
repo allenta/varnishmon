@@ -113,7 +113,7 @@ class Chart {
   }
 
   handleGraphRelayout(event) {
-    // Update the zoom range of the graph.
+    // Extract the zoom range of the graph.
     if (event['xaxis.range[0]'] && event['xaxis.range[1]']) {
       this.graph.zoomRange = [
         new Date(event['xaxis.range[0]']),
@@ -128,17 +128,41 @@ class Chart {
       this.graph.zoomRange = null;
     }
 
-    // In the range is identical to the original range, reset the zoom range so
-    // listeners can detect the no-zoom event.
+    // If the zoom range goes beyond the original range, adjust it to the
+    // original range.
     if (this.graph.zoomRange != null) {
-      if (this.graph.zoomRange[0].getTime() === this.graph.range[0].getTime() &&
-          this.graph.zoomRange[1].getTime() === this.graph.range[1].getTime()) {
+      if (helpers.dateToUnix(this.graph.zoomRange[0]) < helpers.dateToUnix(this.graph.range[0])) {
+        this.graph.zoomRange[0] = this.graph.range[0];
+      }
+      if (helpers.dateToUnix(this.graph.zoomRange[1]) > helpers.dateToUnix(this.graph.range[1])) {
+        this.graph.zoomRange[1] = this.graph.range[1];
+      }
+    }
+
+    // If the zoom range is too small, adjust it to a reasonable range.
+    if (this.graph.zoomRange != null) {
+      const difference = helpers.dateToUnix(this.graph.zoomRange[1]) - helpers.dateToUnix(this.graph.zoomRange[0]);
+      if (difference < this.graph.step) {
+        const center = helpers.dateToUnix(this.graph.zoomRange[0]) + Math.round(difference / 2);
+        this.graph.zoomRange = [
+          helpers.unixToDate(center - this.graph.step),
+          helpers.unixToDate(center + this.graph.step),
+        ];
+      }
+    }
+
+    // In the zoom range is identical to the original range, reset the zoom
+    // range so listeners can detect the no-zoom event.
+    if (this.graph.zoomRange != null) {
+      if (helpers.dateToUnix(this.graph.zoomRange[0]) === helpers.dateToUnix(this.graph.range[0]) &&
+          helpers.dateToUnix(this.graph.zoomRange[1]) === helpers.dateToUnix(this.graph.range[1])) {
         this.graph.zoomRange = null;
       }
     }
 
     // Force a re-render of the graph. The zoom range is already applied, but we
-    // might want to adjust other properties of the graph (e.g., the data mode).
+    // might want to adjust other properties of the graph (e.g., the data mode),
+    // or the adjusted zoom range itself.
     this.updateGraph(true);
 
     // Inform listeners about the zoom event.
@@ -402,7 +426,7 @@ class Chart {
         marker: { size: 4 },
         hovertemplate: '<b>X:</b> %{x|%Y-%m-%d %H:%M:%S}<br><b>Y:</b> %{y:,.1f}<extra></extra>',
         connectgaps: false,
-        line: { shape: 'linear', width: 1 },
+        line: { shape: 'linear', width: 2 },
       }
     ];
 
@@ -457,6 +481,7 @@ class Chart {
         filename: `${varnishmon.storage.hostname} - ${this.metric.name}`,
         format: 'png',
       },
+      scrollZoom: true,
     };
 
     // Render the graph.

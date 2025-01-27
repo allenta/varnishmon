@@ -27,6 +27,8 @@ class Chart {
 
     this.visible = false;
     this.interval = null;
+    this.lastRefresh = 0;
+    this.pendingRefresh = false;
     this.error = null;
 
     this.graph = {
@@ -71,6 +73,19 @@ class Chart {
       // Since the chart is being initialized, it is visible, so we can start
       // the refresh loop to keep the chart up-to-date.
       this.setupInterval();
+
+      // Initialize refresh flags:
+      //   - The 'last refresh' is needed because refresh loops are canceled
+      //     when the chart is not visible. When it becomes visible again,
+      //     the last refresh time is used to decide if the chart needs to be
+      //     refreshed right away or if it can wait for the next scheduled
+      //     refresh.
+      //   - The 'pending refresh' is needed because other properties (e.g, step,
+      //     aggregator, etc.) can change while the chart is not visible. When
+      //     the chart becomes visible again, it needs to be refreshed right
+      //     away to reflect these changes.
+      this.lastRefresh = helpers.dateToUnix(new Date());
+      this.pendingRefresh = false;
     } catch (error) {
       // On error, show some visual feedback to the user. Failing during the
       // initialization is a bit more complicated to recover automatically, so
@@ -85,29 +100,37 @@ class Chart {
   //
 
   async handleRefresh() {
-    // If the chart is not visible, there is no need to update it. Refresh loops
-    // are canceled when the chart is not visible, but this is a safety check.
-    // Also, manual refreshes would be pointless for invisible charts.
-    if (this.visible && this.graph.element != null) {
-      try {
-        // Fetch metric (adjusting the effective step if necessary, overriding the
-        // selected aggregator if the metric is a bitmap, etc.) and immediately
-        // process it to prepare the graph for the update.
-        this.processMetric(await this.getMetric());
+    // Charts that are still pending initialization are not refreshed. This will
+    // be done when they are created for the first time.
+    if (this.graph.element != null) {
+      // Refreshing an already initialized chart that is not visible is a no-op,
+      // but a mark is used to trigger the pending refreshed as soon as it
+      // becomes visible again. Same for failed refreshes of visible charts.
+      this.pendingRefresh = true;
+      if (this.visible) {
+        try {
+          // Fetch metric (adjusting the effective step if necessary, overriding
+          // the selected aggregator if the metric is a bitmap, etc.) and
+          // immediately process it to prepare the graph for the update.
+          this.processMetric(await this.getMetric());
 
-        // Update the graph with the new samples. For now we are just
-        // re-rendering the whole graph, but in the future we should be able to
-        // update it in a more efficient way. The server-side already supports
-        // this kind of incremental updates.
-        this.updateGraph(false);
+          // Update the graph with the new samples. For now we are just
+          // re-fetching and re-rendering the whole graph, but in the future we
+          // should be able to me more efficient. The server-side already
+          // supports this kind of incremental updates.
+          this.updateGraph(false);
 
-        // All good, clear any previous error.
-        this.clearError();
-      } catch (error) {
-        // On error, show some visual feedback to the user. The next refresh,
-        // manual or automatic, will try to fetch the metric again and it will
-        // eventually succeed and clear the error.
-        this.setError(`Failed to fetch samples of a metric: ${error}`);
+          // All good, clear any previous error message and update the refresh
+          // flags.
+          this.clearError();
+          this.lastRefresh = helpers.dateToUnix(new Date());
+          this.pendingRefresh = false;
+        } catch (error) {
+          // On error, show some visual feedback to the user. The next refresh,
+          // manual or automatic, will try to fetch the metric again and it will
+          // eventually succeed and clear the error.
+          this.setError(`Failed to fetch samples of a metric: ${error}`);
+        }
       }
     }
   }
@@ -204,8 +227,14 @@ class Chart {
     if (this.visible) {
       if (this.graph.element == null) {
         this.init();
-      } else if (this.interval == null) {
-        this.setupInterval();
+      } else {
+        if (this.interval == null) {
+          this.setupInterval();
+        }
+        if (this.pendingRefresh ||
+            (this.refreshInterval > 0 && helpers.dateToUnix(new Date()) - this.lastRefresh > this.refreshInterval)) {
+          this.handleRefresh();
+        }
       }
     } else {
       this.stopInterval();
@@ -231,33 +260,43 @@ class Chart {
     });
     this.container.classList.add(`col-${12 / columns}`);
 
-    // If the chart has already been initialized (whether visible or not),
-    // update it to reflect the new size, the potential new data mode, etc.
+    // If the chart is already initialized, re-fetch samples to reflect any
+    // changes in the effective step, etc. This will be a no-op if the chart is
+    // not visible, but an internal flag will be set to refresh it as soon as it
+    // becomes visible again.
     if (this.graph.element != null) {
-      this.updateGraph(true);
+      this.handleRefresh();
     }
   }
 
   setRefreshInterval(interval) {
     this.refreshInterval = interval;
-    this.setupInterval();
+    if (this.visible && this.graph.element != null) {
+      this.setupInterval();
+    }
   }
 
   refresh() {
-    this.setupInterval();
-    this.handleRefresh();
+    if (this.visible && this.graph.element != null) {
+      this.setupInterval();
+      this.handleRefresh();
+    }
   }
 
   setAggregator(aggregator) {
     this.aggregator = aggregator;
-    this.setupInterval();
-    this.handleRefresh();
+    if (this.visible && this.graph.element != null) {
+      this.setupInterval();
+      this.handleRefresh();
+    }
   }
 
   setStep(step) {
     this.step = step;
-    this.setupInterval();
-    this.handleRefresh();
+    if (this.visible && this.graph.element != null) {
+      this.setupInterval();
+      this.handleRefresh();
+    }
   }
 
   setZoomRange(range) {
@@ -265,6 +304,9 @@ class Chart {
 
     // If the chart has already been initialized (whether visible or not),
     // update it to reflect the new range, the potential new data mode, etc.
+    // Beware 'handleRefresh()' is not called here, as we are not fetching new
+    // samples, just updating the graph with the current data. Also note that
+    // this is done both for visible and non-visible already initialized charts.
     if (this.graph.element != null) {
       this.updateGraph(true);
     }
@@ -285,13 +327,9 @@ class Chart {
 
   setupInterval() {
     this.stopInterval();
-
-    if (this.visible) {
-      if (this.graph.element != null && this.refreshInterval > 0) {
-        this.interval = setInterval(this.handleRefresh.bind(this), this.refreshInterval * 1000);
-      } else if (this.graph.element == null) {
-        this.init();
-      }
+    if (this.refreshInterval > 0) {
+      this.interval = setInterval(
+        this.handleRefresh.bind(this), this.refreshInterval * 1000);
     }
   }
 
@@ -492,7 +530,7 @@ class Chart {
         filename: `${varnishmon.storage.hostname} - ${this.metric.name}`,
         format: 'png',
       },
-      scrollZoom: true,
+      scrollZoom: false,
     };
 
     // Render the graph.

@@ -280,5 +280,5 @@ mrproper:
 	@( \
 		echo '> Cleaning up...'; \
 		rm -rf '$(ROOT)/build'; \
-		git clean -f -x -d -e .env -e assets/webpack/node_modules $(ROOT); \
+		git clean -f -x -d -e .env -e assets/webpack/node_modules -e varnishmon.db $(ROOT); \
 	)

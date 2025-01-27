@@ -1,3 +1,6 @@
+- ?
+    + Reworked internals of the chart widget.
+
 - 0.3.1-1 (2025-01-26):
     + Fixed filtering of metrics when no search terms are provided.
     + Changed line shape in charts back to linear.

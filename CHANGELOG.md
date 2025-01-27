@@ -1,5 +1,6 @@
 - ?
-    + Reworked internals of the chart widget.
+    + Reworked the internals of the chart widget.
+    + Modified the behavior to update (but not apply) the time range picker during zoom in/out events.
 
 - 0.3.1-1 (2025-01-26):
     + Fixed filtering of metrics when no search terms are provided.

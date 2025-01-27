@@ -128,6 +128,15 @@ class Chart {
       this.graph.zoomRange = null;
     }
 
+    // In the range is identical to the original range, reset the zoom range so
+    // listeners can detect the no-zoom event.
+    if (this.graph.zoomRange != null) {
+      if (this.graph.zoomRange[0].getTime() === this.graph.range[0].getTime() &&
+          this.graph.zoomRange[1].getTime() === this.graph.range[1].getTime()) {
+        this.graph.zoomRange = null;
+      }
+    }
+
     // Force a re-render of the graph. The zoom range is already applied, but we
     // might want to adjust other properties of the graph (e.g., the data mode).
     this.updateGraph(true);

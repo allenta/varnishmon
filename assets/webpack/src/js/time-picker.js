@@ -72,6 +72,7 @@ class TimePicker {
       if (parsed != null) {
         this.expression = date;
         this.element.value = date;
+        this.flatpickr.selectedDates = [];
         return;
       }
     }

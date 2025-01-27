@@ -120,8 +120,8 @@ function setUpEventListeners() {
   });
   document.getElementById('apply-time-range').addEventListener('click', (event) => {
     // Validate the selected time range.
-    const range = document.getElementById('range').timeRangePicker;
-    if (!range.hasValidDates()) {
+    const rangeSelector = document.getElementById('range');
+    if (!rangeSelector.timeRangePicker.hasValidDates()) {
       event.stopPropagation();
       helpers.notify(
         'error',
@@ -131,7 +131,10 @@ function setUpEventListeners() {
     }
 
     // Update the config with the selected time range using the raw dates.
-    config.setTimeRange(...range.getRawDates());
+    config.setTimeRange(...rangeSelector.timeRangePicker.getRawDates());
+
+    // Discard the initial range if it was set.
+    rangeSelector.initialRange = null;
 
     // Reload the metrics using the new time range.
     reloadMetrics();
@@ -254,11 +257,27 @@ async function reloadMetrics() {
       const chartDiv = chartTemplateSelector.content.cloneNode(true).firstElementChild;
       const chart = new Chart(chartDiv, metric, rangeFactory, refreshInterval, aggregator, step);
       chart.addEventListener('zoom', (event) => {
+        // Apply the zoom range to all the charts except the one that triggered
+        // the event.
         document.getElementById('clusters').querySelectorAll('.chart').forEach((chartDiv) => {
           if (chartDiv.chart !== event.target) {
             chartDiv.chart.setZoomRange(event.range);
           }
         });
+
+        // Update the range input with the zoom range.
+        const rangeSelector = document.getElementById('range');
+        if (event.range != null) {
+          if (rangeSelector.initialRange == null) {
+            rangeSelector.initialRange = rangeSelector.timeRangePicker.getRawDates();
+          }
+          rangeSelector.timeRangePicker.setDates(...event.range);
+        } else {
+          if (rangeSelector.initialRange != null) {
+            rangeSelector.timeRangePicker.setDates(...rangeSelector.initialRange);
+            rangeSelector.initialRange = null;
+          }
+        }
       });
       chartDiv.chart = chart;
       chartsDiv.appendChild(chartDiv);

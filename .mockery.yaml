@@ -6,6 +6,6 @@ filename: "mock_{{.InterfaceName}}.go"
 all: True
 with-expecter: False
 packages:
-  allenta.com/varnishmon:
+  github.com/allenta/varnishmon:
     config:
       recursive: True

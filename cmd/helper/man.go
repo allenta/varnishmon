@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"allenta.com/varnishmon/pkg/application"
+	"github.com/allenta/varnishmon/pkg/application"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 )

@@ -8,7 +8,7 @@ import (
 	"text/template"
 	"time"
 
-	"allenta.com/varnishmon/pkg/workers/storage"
+	"github.com/allenta/varnishmon/pkg/workers/storage"
 	"github.com/fasthttp/router"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

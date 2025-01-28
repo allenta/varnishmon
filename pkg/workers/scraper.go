@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"allenta.com/varnishmon/pkg/helpers"
+	"github.com/allenta/varnishmon/pkg/helpers"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

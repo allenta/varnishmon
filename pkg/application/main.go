@@ -10,9 +10,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 
-	"allenta.com/varnishmon/pkg/config"
-	"allenta.com/varnishmon/pkg/helpers"
-	"allenta.com/varnishmon/pkg/workers"
+	"github.com/allenta/varnishmon/pkg/config"
+	"github.com/allenta/varnishmon/pkg/helpers"
+	"github.com/allenta/varnishmon/pkg/workers"
 )
 
 type Application struct {

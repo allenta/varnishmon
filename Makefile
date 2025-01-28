@@ -31,9 +31,9 @@ build: mrproper
 		set -e; \
 		\
 		export LD_FLAGS="\
-			-X allenta.com/varnishmon/pkg/config.version=$(VERSION) \
-			-X allenta.com/varnishmon/pkg/config.revision=$(REVISION) \
-			-X allenta.com/varnishmon/pkg/config.environment=$(ENVIRONMENT) \
+			-X github.com/allenta/varnishmon/pkg/config.version=$(VERSION) \
+			-X github.com/allenta/varnishmon/pkg/config.revision=$(REVISION) \
+			-X github.com/allenta/varnishmon/pkg/config.environment=$(ENVIRONMENT) \
 			-s -w"; \
 		export CGO_ENABLED=1; \
 		\

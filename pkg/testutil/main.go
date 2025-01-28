@@ -1,7 +1,7 @@
 package testutil
 
 import (
-	"allenta.com/varnishmon/pkg/config"
+	"github.com/allenta/varnishmon/pkg/config"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
 )

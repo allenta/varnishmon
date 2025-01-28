@@ -1,3 +1,6 @@
+- 0.4.1-1 (2025-01-28):
+    + Enabled ARM64 builds.
+
 - 0.4.0-1 (2025-01-28):
     + Reworked the internals of the chart widget.
     + Modified the behavior to update (but not apply) the time range picker during zoom in/out events.

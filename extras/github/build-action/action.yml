@@ -12,9 +12,10 @@ runs:
   using: composite
 
   steps:
-    - uses: docker/setup-qemu-action@v3
-      with:
-        platforms: ${{ inputs.architecture }}
+    # Using QEMU emulation is not needed now that ARM64 runners are available.
+    # - uses: docker/setup-qemu-action@v3
+    #   with:
+    #     platforms: ${{ inputs.architecture }}
 
     - uses: docker/setup-buildx-action@v3
 

@@ -4,15 +4,26 @@ import Tooltip from 'bootstrap/js/dist/tooltip';
 import * as storage from './storage';
 import * as helpers from './helpers';
 
-// Charts are self-conscious about their visibility to avoid being rendered
-// if they are not visible to the user. To accomplish this, a global
-// 'IntersectionObserver' is used to monitor the visibility of the charts and
-// update their status accordingly.
-const observer = new IntersectionObserver((entries) => {
+// Charts are aware of their visibility to avoid rendering when not visible and
+// to start/stop refresh loops accordingly. A global 'IntersectionObserver' is
+// used to monitor their visibility status.
+const intersectionObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    entry.target.chart.setVisible(entry.isIntersecting);
+    entry.target.chart.handleVisibilityChange(entry.isIntersecting);
   });
 }, { threshold: 0.1 });
+
+// Charts need to be notified about changes in their container size to adjust
+// the graph accordingly. This might require a full data refresh (e.g., less
+// space is available, resulting in a smaller effective step, which requires
+// fetching new down-sampled data), or just a re-render of the graph (e.g., more
+// space is available, allowing the use of lines and markers instead of just
+// lines).
+const resizeObserver = new ResizeObserver((entries) => {
+  entries.forEach(entry => {
+    entry.target.chart.handleSizeChange();
+  });
+});
 
 class Chart {
   constructor(container, metric, rangeFactory, refreshInterval, aggregator, step) {
@@ -24,6 +35,11 @@ class Chart {
     this.step = step;
 
     this.listeners = {};
+
+    this.initializing = false;
+    this.refreshing = false;
+
+    this.debouncedHandleRefresh = helpers.debounce(this.handleRefresh.bind(this), 500);
 
     this.visible = false;
     this.interval = null;
@@ -57,10 +73,17 @@ class Chart {
       zoomRange: null,
     };
 
-    observer.observe(this.container);
+    intersectionObserver.observe(this.container);
+    resizeObserver.observe(this.container);
   }
 
   async init() {
+    // Prevent execution of multiple initializations at the same time, due to
+    // the evaluation of the 'getMetric()' promise.
+    if (this.initializing) {
+      return;
+    }
+    this.initializing = true;
     try {
       // Fetch metric (adjusting the effective step if necessary, overriding the
       // selected aggregator if the metric is a bitmap, etc.) and immediately
@@ -92,6 +115,8 @@ class Chart {
       // we just show the error and let the user try to manually refresh the
       // chart.
       this.setError(`Failed to fetch samples of a metric: ${error}`);
+    } finally {
+      this.initializing = false;
     }
   }
 
@@ -100,38 +125,77 @@ class Chart {
   //
 
   async handleRefresh() {
-    // Charts that are still pending initialization are not refreshed. This will
-    // be done when they are created for the first time.
-    if (this.graph.element != null) {
-      // Refreshing an already initialized chart that is not visible is a no-op,
-      // but a mark is used to trigger the pending refreshed as soon as it
-      // becomes visible again. Same for failed refreshes of visible charts.
-      this.pendingRefresh = true;
-      if (this.visible) {
-        try {
-          // Fetch metric (adjusting the effective step if necessary, overriding
-          // the selected aggregator if the metric is a bitmap, etc.) and
-          // immediately process it to prepare the graph for the update.
-          this.processMetric(await this.getMetric());
+    // Prevent execution of multiple refreshes at the same time, due to the
+    // evaluation of the 'getMetric()' promise.
+    if (this.refreshing) {
+      return;
+    }
+    this.refreshing = true;
+    try {
+      // Charts that are still pending initialization are not refreshed. This
+      // will be done when they are created for the first time.
+      if (this.graph.element != null) {
+        // Refreshing an already initialized chart that is not visible is a
+        // no-op, but a mark is used to trigger the pending refreshed as soon
+        // as it becomes visible again. Same for failed refreshes of visible
+        // charts.
+        this.pendingRefresh = true;
+        if (this.visible) {
+          try {
+            // Fetch metric (adjusting the effective step if necessary,
+            // overriding the selected aggregator if the metric is a bitmap,
+            // etc.) and immediately process it to prepare the graph for the
+            // update.
+            this.processMetric(await this.getMetric());
 
-          // Update the graph with the new samples. For now we are just
-          // re-fetching and re-rendering the whole graph, but in the future we
-          // should be able to me more efficient. The server-side already
-          // supports this kind of incremental updates.
-          this.updateGraph(false);
+            // Update the graph with the new samples. For now we are just
+            // re-fetching and re-rendering the whole graph, but in the future
+            // we should be able to me more efficient. The server-side already
+            // supports this kind of incremental updates.
+            this.updateGraph(false);
 
-          // All good, clear any previous error message and update the refresh
-          // flags.
-          this.clearError();
-          this.lastRefresh = helpers.dateToUnix(new Date());
-          this.pendingRefresh = false;
-        } catch (error) {
-          // On error, show some visual feedback to the user. The next refresh,
-          // manual or automatic, will try to fetch the metric again and it will
-          // eventually succeed and clear the error.
-          this.setError(`Failed to fetch samples of a metric: ${error}`);
+            // All good, clear any previous error message and update the refresh
+            // flags.
+            this.clearError();
+            this.lastRefresh = helpers.dateToUnix(new Date());
+            this.pendingRefresh = false;
+          } catch (error) {
+            // On error, show some visual feedback to the user. The next refresh,
+            // manual or automatic, will try to fetch the metric again and it
+            // will eventually succeed and clear the error.
+            this.setError(`Failed to fetch samples of a metric: ${error}`);
+          }
         }
       }
+    } finally {
+      this.refreshing = false;
+    }
+  }
+
+  handleVisibilityChange(visible) {
+    this.visible = visible;
+    if (this.visible) {
+      if (this.graph.element == null) {
+        this.init();
+      } else {
+        if (this.interval == null) {
+          this.setupInterval();
+        }
+        if (this.pendingRefresh ||
+            (this.refreshInterval > 0 && helpers.dateToUnix(new Date()) - this.lastRefresh > this.refreshInterval)) {
+            // Note that the debounced refresh handler is used here.
+            this.debouncedHandleRefresh();
+        }
+      }
+    } else {
+      this.stopInterval();
+    }
+  }
+
+  handleSizeChange() {
+    if (this.graph.element != null) {
+      // Note that the debounced refresh handler is used here.
+      this.debouncedHandleRefresh();
     }
   }
 
@@ -222,25 +286,6 @@ class Chart {
   // Public API.
   //
 
-  setVisible(visible) {
-    this.visible = visible;
-    if (this.visible) {
-      if (this.graph.element == null) {
-        this.init();
-      } else {
-        if (this.interval == null) {
-          this.setupInterval();
-        }
-        if (this.pendingRefresh ||
-            (this.refreshInterval > 0 && helpers.dateToUnix(new Date()) - this.lastRefresh > this.refreshInterval)) {
-          this.handleRefresh();
-        }
-      }
-    } else {
-      this.stopInterval();
-    }
-  }
-
   redraw(filter, verbosity, columns) {
     // Hide the chart if the metric name does not match the filter & verbosity.
     let hidden = verbosity === 'normal' && this.metric.debug;
@@ -260,13 +305,9 @@ class Chart {
     });
     this.container.classList.add(`col-${12 / columns}`);
 
-    // If the chart is already initialized, re-fetch samples to reflect any
-    // changes in the effective step, etc. This will be a no-op if the chart is
-    // not visible, but an internal flag will be set to refresh it as soon as it
-    // becomes visible again.
-    if (this.graph.element != null) {
-      this.handleRefresh();
-    }
+    // No need to call 'handleRefresh()' here: visibility changes are managed by
+    // 'handleVisibilityChange()', and size changes are managed by
+    // 'handleSizeChange()'.
   }
 
   setRefreshInterval(interval) {
@@ -305,15 +346,15 @@ class Chart {
     // If the chart has already been initialized (whether visible or not),
     // update it to reflect the new range, the potential new data mode, etc.
     // Beware 'handleRefresh()' is not called here, as we are not fetching new
-    // samples, just updating the graph with the current data. Also note that
-    // this is done both for visible and non-visible already initialized charts.
-    if (this.graph.element != null) {
+    // samples, just updating the graph with the current data.
+    if (this.visible && this.graph.element != null) {
       this.updateGraph(true);
     }
   }
 
   destroy() {
-    observer.unobserve(this.container);
+    intersectionObserver.unobserve(this.container);
+    resizeObserver.unobserve(this.container);
     this.stopInterval();
     this.clearError();
     if (this.graph.element != null) {
@@ -407,6 +448,12 @@ class Chart {
     // let Plotly to decide this, but apparently it's not possible.
     const containerWidth = this.container.clientWidth;
     const maxSamples = Math.floor(0.9 * containerWidth);
+
+    // Stop here if the maximum number of samples cannot be calculated (most
+    // likely because the container is not visible due to a race condition).
+    if (maxSamples <= 0) {
+      throw new Error('Failed to estimate the optimal step');
+    }
 
     // If the number of samples required to cover the whole range is less than
     // the number of samples that would fit in the graph, we can use the current

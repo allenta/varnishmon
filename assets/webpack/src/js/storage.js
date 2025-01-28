@@ -159,20 +159,42 @@ export async function getMetric(id, from, to, step, aggregator) {
     from: helpers.unixToDate(data.from),
     to: helpers.unixToDate(data.to),
     step: data.step,
-    samples: preprocessSamples(data.samples),
+    samples: preprocessSamples(data.samples, data.step),
   };
 }
 
 /**
- * Sorts the samples by timestamp and converts the timestamps to Date objects.
+ * Sorts the samples by timestamp, converts the timestamps to Date objects and
+ * injects null values in all detected gaps.
  *
  * @param {Array} samples - The samples to process, as returned by the storage
  * API.
+ * @param {number} step - The time step in seconds.
  * @returns {Array} The processed samples.
  */
-function preprocessSamples(samples) {
-  return samples.sort((a, b) => a[0] - b[0]).map(sample => ([
-    helpers.unixToDate(sample[0]),
-    sample[1],
-  ]));
+function preprocessSamples(samples, step) {
+  // Sort samples by timestamp.
+  const sortedSamples = samples.sort((a, b) => a[0] - b[0]);
+
+  // Fill gaps with nulls and convert timestamps to Date objects.
+  const preprocessedSamples = [];
+  for (let i = 0; i < sortedSamples.length; i++) {
+    // Add the current sample to the processed samples.
+    const currentSample = sortedSamples[i];
+    const currentTime = currentSample[0];
+    const currentValue = currentSample[1];
+    preprocessedSamples.push([helpers.unixToDate(currentTime), currentValue]);
+
+    // Check if there is a gap to the next sample and fill it with nulls in each
+    // missing step.
+    if (i < sortedSamples.length - 1) {
+      const nextSample = sortedSamples[i + 1];
+      const nextTime = nextSample[0];
+      for (let j = 1; j < (nextTime - currentTime) / step; j++) {
+        preprocessedSamples.push([helpers.unixToDate(currentTime + j * step), null]);
+      }
+    }
+  }
+
+  return preprocessedSamples;
 }

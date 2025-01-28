@@ -1,4 +1,4 @@
-module allenta.com/varnishmon
+module github.com/allenta/varnishmon
 
 go 1.23
 

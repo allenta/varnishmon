@@ -4,9 +4,9 @@ import (
 	"context"
 	"sync"
 
-	"allenta.com/varnishmon/pkg/helpers"
-	"allenta.com/varnishmon/pkg/workers/api"
-	"allenta.com/varnishmon/pkg/workers/storage"
+	"github.com/allenta/varnishmon/pkg/helpers"
+	"github.com/allenta/varnishmon/pkg/workers/api"
+	"github.com/allenta/varnishmon/pkg/workers/storage"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

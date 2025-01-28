@@ -6,6 +6,6 @@ filename: "mock_{{.InterfaceName}}.go"
 all: True
 with-expecter: False
 packages:
-  allenta.com/task-executor-for-cribl:
+  github.com/allenta/varnishmon:
     config:
       recursive: True

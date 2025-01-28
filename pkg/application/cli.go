@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"allenta.com/varnishmon/pkg/config"
+	"github.com/allenta/varnishmon/pkg/config"
 )
 
 var (

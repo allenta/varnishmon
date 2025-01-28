@@ -1,7 +1,7 @@
 package main
 
 import (
-	"allenta.com/varnishmon/pkg/application"
+	"github.com/allenta/varnishmon/pkg/application"
 )
 
 func main() {

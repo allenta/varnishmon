@@ -10,8 +10,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"gitlab.com/stone.code/assert"
 
-	"allenta.com/varnishmon/pkg/helpers"
-	"allenta.com/varnishmon/pkg/workers/storage"
+	"github.com/allenta/varnishmon/pkg/helpers"
+	"github.com/allenta/varnishmon/pkg/workers/storage"
 )
 
 type ArchiverWorker struct {

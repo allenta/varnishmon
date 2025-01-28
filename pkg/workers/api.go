@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"allenta.com/varnishmon/pkg/config"
+	"github.com/allenta/varnishmon/pkg/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/tcplisten"

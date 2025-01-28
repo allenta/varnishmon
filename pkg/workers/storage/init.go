@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"allenta.com/varnishmon/pkg/config"
+	"github.com/allenta/varnishmon/pkg/config"
 	_ "github.com/marcboeker/go-duckdb" // Register the DuckDB driver.
 )
 

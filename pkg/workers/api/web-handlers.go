@@ -9,9 +9,9 @@ import (
 	"text/template"
 	"time"
 
-	"allenta.com/varnishmon/assets"
-	"allenta.com/varnishmon/pkg/config"
-	"allenta.com/varnishmon/pkg/workers/storage"
+	"github.com/allenta/varnishmon/assets"
+	"github.com/allenta/varnishmon/pkg/config"
+	"github.com/allenta/varnishmon/pkg/workers/storage"
 	"github.com/valyala/fasthttp"
 )
 

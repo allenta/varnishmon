@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"allenta.com/varnishmon/pkg/config"
+	"github.com/allenta/varnishmon/pkg/config"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

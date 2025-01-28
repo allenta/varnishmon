@@ -31,9 +31,7 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
   build-arm64:
-    # XXX: 'ubuntu-24.04-arm' is not supported yet for private repositories. For
-    # now, the build action relies on QEMU to emulate the ARM64 architecture.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
 
     strategy:
       matrix:
@@ -49,9 +47,6 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: ./extras/github/build-action
-        # XXX: ARM64 build is temporarily disabled. The QEMU emulation is just
-        # too slow for now.
-        if: false
         with:
           platform: ${{ matrix.platform }}
           architecture: ${{ matrix.architecture }}

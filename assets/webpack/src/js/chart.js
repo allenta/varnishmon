@@ -183,8 +183,8 @@ class Chart {
         }
         if (this.pendingRefresh ||
             (this.refreshInterval > 0 && helpers.dateToUnix(new Date()) - this.lastRefresh > this.refreshInterval)) {
-            // Note that the debounced refresh handler is used here.
-            this.debouncedHandleRefresh();
+          // Note that the debounced refresh handler is used here.
+          this.debouncedHandleRefresh();
         }
       }
     } else {
@@ -318,24 +318,30 @@ class Chart {
   }
 
   refresh() {
-    if (this.visible && this.graph.element != null) {
-      this.setupInterval();
+    if (this.graph.element != null) {
+      if (this.visible) {
+        this.setupInterval();
+      }
       this.handleRefresh();
     }
   }
 
   setAggregator(aggregator) {
     this.aggregator = aggregator;
-    if (this.visible && this.graph.element != null) {
-      this.setupInterval();
+    if (this.graph.element != null) {
+      if (this.visible) {
+        this.setupInterval();
+      }
       this.handleRefresh();
     }
   }
 
   setStep(step) {
     this.step = step;
-    if (this.visible && this.graph.element != null) {
-      this.setupInterval();
+    if (this.graph.element != null) {
+      if (this.visible) {
+        this.setupInterval();
+      }
       this.handleRefresh();
     }
   }
@@ -347,7 +353,7 @@ class Chart {
     // update it to reflect the new range, the potential new data mode, etc.
     // Beware 'handleRefresh()' is not called here, as we are not fetching new
     // samples, just updating the graph with the current data.
-    if (this.visible && this.graph.element != null) {
+    if (this.graph.element != null) {
       this.updateGraph(true);
     }
   }

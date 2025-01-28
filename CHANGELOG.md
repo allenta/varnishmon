@@ -1,10 +1,19 @@
+- 0.4.0-1 (2025-01-28):
+    + Reworked the internals of the chart widget.
+    + Modified the behavior to update (but not apply) the time range picker during zoom in/out events.
+    + Limited the zoom of charts to a minimum and maximum range.
+    + Adjusted the width of lines in charts.
+    + Added a filter history to easily reuse previous filter strings.
+    + Added visual feedback to charts when the effective step is different from the selected step.
+    + Improved refreshing of charts.
+
 - 0.3.1-1 (2025-01-26):
     + Fixed filtering of metrics when no search terms are provided.
     + Changed line shape in charts back to linear.
 
 - 0.3.0-1 (2025-01-26):
     + Added extra logging during bootstrap / rotation of the storage.
-    + Adjusted shape and with of lines in charts.
+    + Adjusted shape and width of lines in charts.
     + Added support to zoom in and out in the charts.
     + Increased default DuckDB memory limit to 512 MiB.
     + Added support to filter metrics by multiple search terms.

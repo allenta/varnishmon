@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 UMASK := 022
 
-VERSION := 0.3.1
+VERSION := 0.4.0
 ITERATION := 1
 REVISION := $(shell cd '$(ROOT)' && git rev-parse --short HEAD)
 ENVIRONMENT ?= production
@@ -280,5 +280,5 @@ mrproper:
 	@( \
 		echo '> Cleaning up...'; \
 		rm -rf '$(ROOT)/build'; \
-		git clean -f -x -d -e .env -e assets/webpack/node_modules $(ROOT); \
+		git clean -f -x -d -e .env -e assets/webpack/node_modules -e varnishmon.db $(ROOT); \
 	)

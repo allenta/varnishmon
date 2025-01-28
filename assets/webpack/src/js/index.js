@@ -1,5 +1,6 @@
 import '../scss/main.scss';
 import Collapse from 'bootstrap/js/dist/collapse';
+import Dropdown from 'bootstrap/js/dist/dropdown';
 
 import * as config from './config';
 import * as helpers from './helpers';
@@ -120,8 +121,8 @@ function setUpEventListeners() {
   });
   document.getElementById('apply-time-range').addEventListener('click', (event) => {
     // Validate the selected time range.
-    const range = document.getElementById('range').timeRangePicker;
-    if (!range.hasValidDates()) {
+    const rangeSelector = document.getElementById('range');
+    if (!rangeSelector.timeRangePicker.hasValidDates()) {
       event.stopPropagation();
       helpers.notify(
         'error',
@@ -131,7 +132,10 @@ function setUpEventListeners() {
     }
 
     // Update the config with the selected time range using the raw dates.
-    config.setTimeRange(...range.getRawDates());
+    config.setTimeRange(...rangeSelector.timeRangePicker.getRawDates());
+
+    // Discard the initial range if it was set.
+    rangeSelector.initialRange = null;
 
     // Reload the metrics using the new time range.
     reloadMetrics();
@@ -155,9 +159,30 @@ function setUpEventListeners() {
   // On change in the filter, verbosity or columns widgets, update the search
   // results accordingly. This is a lightweight operation, as it only adjusts
   // the visibility and arranging of the charts and clusters already fetched.
-  document.getElementById('filter').addEventListener('input', updateSearchResults);
+  document.getElementById('filter').addEventListener('input', helpers.debounce(updateSearchResults, 500));
   document.getElementById('verbosity').addEventListener('change', updateSearchResults);
   document.getElementById('columns').addEventListener('change', updateSearchResults);
+
+  // Keep track of the latest filter values in the local storage and rebuild
+  // the filter history list in the UI each time a new filter is set.
+  document.getElementById('filter').addEventListener('change', (event) => {
+    const filterValue = event.target.value;
+    if (filterValue) {
+      const filterHistory = config.getFilterHistory();
+      const index = filterHistory.indexOf(filterValue);
+      if (index !== 0) {
+        if (index !== -1) {
+          filterHistory.splice(index, 1);
+        }
+        filterHistory.unshift(filterValue);
+        if (filterHistory.length > 10) {
+          filterHistory.pop();
+        }
+        config.setFilterHistory(filterHistory);
+      }
+      rebuildFilterHistoryList();
+    }
+  });
 
   // On change in the aggregator, report the new value to all the charts.
   document.getElementById('aggregator').addEventListener('change', (event) => {
@@ -254,11 +279,27 @@ async function reloadMetrics() {
       const chartDiv = chartTemplateSelector.content.cloneNode(true).firstElementChild;
       const chart = new Chart(chartDiv, metric, rangeFactory, refreshInterval, aggregator, step);
       chart.addEventListener('zoom', (event) => {
+        // Apply the zoom range to all the charts except the one that triggered
+        // the event.
         document.getElementById('clusters').querySelectorAll('.chart').forEach((chartDiv) => {
           if (chartDiv.chart !== event.target) {
             chartDiv.chart.setZoomRange(event.range);
           }
         });
+
+        // Update the range input with the zoom range.
+        const rangeSelector = document.getElementById('range');
+        if (event.range != null) {
+          if (rangeSelector.initialRange == null) {
+            rangeSelector.initialRange = rangeSelector.timeRangePicker.getRawDates();
+          }
+          rangeSelector.timeRangePicker.setDates(...event.range);
+        } else {
+          if (rangeSelector.initialRange != null) {
+            rangeSelector.timeRangePicker.setDates(...rangeSelector.initialRange);
+            rangeSelector.initialRange = null;
+          }
+        }
       });
       chartDiv.chart = chart;
       chartsDiv.appendChild(chartDiv);
@@ -305,6 +346,23 @@ function updateSearchResults() {
     ' hidden)';
 }
 
+function rebuildFilterHistoryList() {
+  const filterHistoryList = document.getElementById('filterHistoryList');
+  filterHistoryList.innerHTML = '';
+  config.getFilterHistory().forEach(item => {
+    const li = document.createElement('li');
+    li.classList.add('dropdown-item');
+    li.textContent = item;
+    li.addEventListener('click', () => {
+      const input = document.getElementById('filter');
+      input.value = item;
+      input.dispatchEvent(new Event('change'));
+      updateSearchResults();
+    });
+    filterHistoryList.appendChild(li);
+  });
+}
+
 /******************************************************************************
  * MAIN.
  ******************************************************************************/
@@ -324,6 +382,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Set up event listeners for all the widgets.
   setUpEventListeners();
+
+  // Prepare filter history list dropdown.
+  new Dropdown(document.getElementById('filterHistoryList'));
+  rebuildFilterHistoryList();
 
   // Load metrics.
   reloadMetrics();

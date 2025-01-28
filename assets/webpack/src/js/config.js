@@ -124,6 +124,7 @@ function isValidRefreshIntervalValue(value) {
 ******************************************************************************/
 
 const FILTER = `${PREFIX}filter`;
+const FILTER_HISTORY = `${PREFIX}filter-history`;
 
 export function getFilter() {
   try {
@@ -143,6 +144,27 @@ export function setFilter(value) {
     localStorage.setItem(FILTER, value);
   } catch (error) {
     console.error(`Failed to write '${FILTER}' to local storage!`, error);
+  }
+}
+
+export function getFilterHistory() {
+  try {
+    let value = localStorage.getItem(FILTER_HISTORY);
+    if (value != null) {
+      return JSON.parse(value);
+    }
+  } catch (error) {
+    console.error(`Failed to read '${FILTER_HISTORY}' from local storage!`, error);
+  }
+
+  return [];
+}
+
+export function setFilterHistory(value) {
+  try {
+    localStorage.setItem(FILTER_HISTORY, JSON.stringify(value));
+  } catch (error) {
+    console.error(`Failed to write '${FILTER_HISTORY}' to local storage!`, error);
   }
 }
 

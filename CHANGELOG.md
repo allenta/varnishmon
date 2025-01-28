@@ -1,4 +1,4 @@
-- ?
+- 0.4.2-1 (2025-01-28):
     + Fixed handling of gaps in metrics.
     + Moved the Go project to the GitHub namespace.
 

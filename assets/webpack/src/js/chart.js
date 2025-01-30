@@ -200,23 +200,21 @@ class Chart {
   }
 
   handleGraphRelayout(event) {
-    // Extract the zoom range of the graph.
+    // Extract the zoom range of the graph, if any. This includes detecting the
+    // no-zoom / zoom-reset event.
     if (event['xaxis.range[0]'] && event['xaxis.range[1]']) {
       this.graph.zoomRange = [
         new Date(event['xaxis.range[0]']),
         new Date(event['xaxis.range[1]']),
       ];
     } else if (event['xaxis.range'] && Array.isArray(event['xaxis.range']) && event['xaxis.range'].length === 2) {
-      this.graph.zoomRange = [
-        new Date(event['xaxis.range'][0]),
-        new Date(event['xaxis.range'][1]),
-      ];
+      this.graph.zoomRange = null;
     } else {
       this.graph.zoomRange = null;
     }
 
-    // If the zoom range goes beyond the original range, adjust it to the
-    // original range.
+    // If the zoom range goes beyond the current range, adjust it to the
+    // current range.
     if (this.graph.zoomRange != null) {
       if (helpers.dateToUnix(this.graph.zoomRange[0]) < helpers.dateToUnix(this.graph.range[0])) {
         this.graph.zoomRange[0] = this.graph.range[0];
@@ -238,15 +236,6 @@ class Chart {
       }
     }
 
-    // In the zoom range is identical to the original range, reset the zoom
-    // range so listeners can detect the no-zoom event.
-    if (this.graph.zoomRange != null) {
-      if (helpers.dateToUnix(this.graph.zoomRange[0]) === helpers.dateToUnix(this.graph.range[0]) &&
-          helpers.dateToUnix(this.graph.zoomRange[1]) === helpers.dateToUnix(this.graph.range[1])) {
-        this.graph.zoomRange = null;
-      }
-    }
-
     // Force a re-render of the graph. The zoom range is already applied, but we
     // might want to adjust other properties of the graph (e.g., the data mode),
     // or the adjusted zoom range itself.
@@ -255,7 +244,7 @@ class Chart {
     // Inform listeners about the zoom event.
     this.notifyEventListeners('zoom', {
       target: this,
-      range: this.graph.zoomRange,
+      range: this.graph.zoomRange, // null if no zoom.
     });
   }
 

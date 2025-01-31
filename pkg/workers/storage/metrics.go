@@ -186,40 +186,67 @@ func (stg *Storage) GetMetric(
 	}, nil
 }
 
-func (stg *Storage) PushMetricSample(
-	name string, timestamp time.Time, flag, format, description string,
-	value any) error {
-	// Check if the metric is known and identical to the one in the database.
-	// Non identical metrics will preserve their internal ID, but the rest of
-	// the fields will be updated.
-	var metric *CachedMetric
-	stg.cache.mutex.RLock()
-	if m := stg.cache.metricsByName[name]; m != nil {
-		if m.Flag == flag && m.Format == format && m.Description == description {
-			metric = m
-		}
-	}
-	stg.cache.mutex.RUnlock()
-
+func (stg *Storage) PushMetricSamples(timestamp time.Time, samples []*MetricSample) error {
 	// This is a write operation on 'db' but a read lock is intentionally used.
 	// See the note on the 'Storage' type for more information.
 	stg.mutex.RLock()
 	defer stg.mutex.RUnlock()
 
-	// Insert / update in the 'metrics' table.
-	if metric == nil {
-		var class string
-		switch value.(type) {
-		case uint64:
-			class = "uint64"
-		case float64:
-			class = "float64"
-		default:
-			return ErrInvalidMetricType
-		}
+	// Using a transaction is crucial to batch the inserts and avoid performance
+	// penalties.
+	tx, err := stg.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback() //nolint:errcheck
 
-		var metricID int
-		if err := stg.db.QueryRow(`
+	// Build prepared statements for batch inserts, one for each metric class.
+	uint64Statement, err := tx.Prepare(`
+		INSERT INTO metric_values (metric_id, timestamp, value)
+		VALUES (?, ?, union_value(uint64 := ?))`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare statement: %w", err)
+	}
+	defer uint64Statement.Close()
+	float64Statement, err := tx.Prepare(`
+		INSERT INTO metric_values (metric_id, timestamp, value)
+		VALUES (?, ?, union_value(float64 := ?))`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare statement: %w", err)
+	}
+	defer float64Statement.Close()
+
+	// Prepare batched inserts into the 'metric_values' table. During this
+	// process, insert or update in the 'metrics' table if necessary.
+	for _, sample := range samples {
+		// Check if the metric is known and identical to the one in the database.
+		// Non identical metrics will preserve their internal ID, but the rest
+		// of the fields will be updated. Beware of locking order: 'stg.mutex'
+		// was locked before 'stg.cache.mutex'.
+		var metric *CachedMetric
+		stg.cache.mutex.RLock()
+		if m := stg.cache.metricsByName[sample.Name]; m != nil {
+			if m.Flag == sample.Flag && m.Format == sample.Format &&
+				m.Description == sample.Description {
+				metric = m
+			}
+		}
+		stg.cache.mutex.RUnlock()
+
+		// Insert / update in the 'metrics' table.
+		if metric == nil {
+			var class string
+			switch sample.Value.(type) {
+			case uint64:
+				class = "uint64"
+			case float64:
+				class = "float64"
+			default:
+				return ErrInvalidMetricType
+			}
+
+			var metricID int
+			if err := stg.db.QueryRow(`
 			INSERT INTO metrics (id, name, flag, format, description, class)
 			VALUES (
 				COALESCE((SELECT id FROM metrics WHERE name = $1), NEXTVAL('metrics_seq')),
@@ -229,35 +256,43 @@ func (stg *Storage) PushMetricSample(
 				format = excluded.format,
 				description = excluded.description
 			RETURNING id`,
-			name, flag, format, description, class).Scan(&metricID); err != nil {
-			return fmt.Errorf("failed to insert / update into 'metrics' table: %w", err)
+				sample.Name, sample.Flag, sample.Format, sample.Description, class).Scan(&metricID); err != nil {
+				return fmt.Errorf("failed to insert / update into 'metrics' table: %w", err)
+			}
+
+			metric = &CachedMetric{
+				ID:          metricID,
+				Name:        sample.Name,
+				Flag:        sample.Flag,
+				Format:      sample.Format,
+				Description: sample.Description,
+				Class:       class,
+			}
+
+			// Beware of locking order: 'stg.mutex' was locked before
+			// 'stg.cache.mutex'.
+			stg.cache.mutex.Lock()
+			stg.cache.metricsByID[metric.ID] = metric
+			stg.cache.metricsByName[metric.Name] = metric
+			stg.cache.mutex.Unlock()
 		}
 
-		metric = &CachedMetric{
-			ID:          metricID,
-			Name:        name,
-			Flag:        flag,
-			Format:      format,
-			Description: description,
-			Class:       class,
+		// Insert sample in the 'metric_values' table.
+		switch metric.Class {
+		case "uint64":
+			if _, err := uint64Statement.Exec(metric.ID, timestamp, sample.Value); err != nil {
+				return fmt.Errorf("failed to insert into 'metric_values' table: %w", err)
+			}
+		case "float64":
+			if _, err := float64Statement.Exec(metric.ID, timestamp, sample.Value); err != nil {
+				return fmt.Errorf("failed to insert into 'metric_values' table: %w", err)
+			}
 		}
-
-		// Beware of locking order: 'stg.mutex' was locked before
-		// 'stg.cache.mutex'.
-		stg.cache.mutex.Lock()
-		stg.cache.metricsByID[metric.ID] = metric
-		stg.cache.metricsByName[metric.Name] = metric
-		stg.cache.mutex.Unlock()
 	}
 
-	// Insert in the 'metric_values' table. Beware using 'metric' outside the
-	// lock is safe.
-	//nolint:gosec
-	if _, err := stg.db.Exec(`
-        INSERT INTO metric_values (metric_id, timestamp, value)
-        VALUES (?, ?, union_value(`+metric.Class+` := ?))`,
-		metric.ID, timestamp, value); err != nil {
-		return fmt.Errorf("failed to insert into 'metric_values' table: %w", err)
+	// Commit transaction.
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	// Update 'earliest' and 'latest' cache values. Beware of locking order:

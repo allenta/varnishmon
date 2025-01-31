@@ -2,11 +2,9 @@ package workers
 
 import (
 	"context"
-	"errors"
 	"sync"
 	"time"
 
-	duckdb "github.com/marcboeker/go-duckdb"
 	"github.com/prometheus/client_golang/prometheus"
 	"gitlab.com/stone.code/assert"
 
@@ -59,12 +57,12 @@ func NewArchiverWorker(
 		pushCompleted: prometheus.NewCounter(
 			prometheus.CounterOpts{
 				Name: "archiver_push_completed_total",
-				Help: "Successful pushes of metrics by the archiver worker",
+				Help: "Successful pushes of batches of samples by the archiver worker",
 			}),
 		pushFailed: prometheus.NewCounter(
 			prometheus.CounterOpts{
 				Name: "archiver_push_failed_total",
-				Help: "Failed pushes of metrics by the archiver worker",
+				Help: "Failed pushes of batches of samples by the archiver worker",
 			}),
 	}
 
@@ -96,6 +94,8 @@ func (aw *ArchiverWorker) run() {
 		case <-aw.ctx.Done():
 			return
 		case metrics := <-aw.metricsQueue:
+			batch := make([]*storage.MetricSample, 0, len(metrics.Items))
+
 			for name, details := range metrics.Items {
 				// Check if this is the first time seeing the metric.
 				previousMetric, ok := aw.lastMetrics[name]
@@ -115,9 +115,9 @@ func (aw *ArchiverWorker) run() {
 					// Otherwise, the rate per second of an uptime would be
 					// pretty much useless.
 
-					// Skip if this is the first time seeing the metric: counters
-					// are stored as rates calculated based on the previously seen
-					// value.
+					// Skip if this is the first time seeing the metric:
+					// counters are stored as rates calculated based on the
+					// previously seen value.
 					if previousMetric == nil {
 						continue
 					}
@@ -149,8 +149,8 @@ func (aw *ArchiverWorker) run() {
 						continue
 					}
 
-					// Transform the 'uint64' value of the metric by dropping the
-					// highest bit. See: https://github.com/golang/go/issues/6113.
+					// Transform the 'uint64' value of the metric by dropping
+					// the highest bit. See: https://github.com/golang/go/issues/6113.
 					if !details.IsBitmap() && details.Value&0x8000000000000000 != 0 {
 						aw.truncatedSamples.Inc()
 					}
@@ -166,37 +166,25 @@ func (aw *ArchiverWorker) run() {
 					previousMetric.value = details.Value
 				}
 
-				// Store the metric.
-				if err := aw.storage.PushMetricSample(
-					name, metrics.Timestamp, details.Flag, details.Format,
-					details.Description, value); err != nil {
-					aw.pushFailed.Inc()
+				// Append the metric sample to the batch.
+				batch = append(batch, &storage.MetricSample{
+					Name:        name,
+					Flag:        details.Flag,
+					Format:      details.Format,
+					Description: details.Description,
+					Value:       value,
+				})
+			}
 
-					aw.app.Cfg().Log().Error().
-						Err(err).
-						Str("name", name).
-						Str("flag", details.Flag).
-						Str("format", details.Format).
-						Interface("value", value).
-						Msg("Failed to store metric!")
-
-					// On DuckDB errors, discard remaining metrics. Typically,
-					// when DuckDB fails to store a metric, it indicates a
-					// permanent issue (e.g., memory allocation failure). It is
-					// better to stop early to avoid flooding the logs with one
-					// error entry for each metric in the batch an to prevent
-					// further damage like a CPU spike.
-					var duckdbErr *duckdb.Error
-					if errors.As(err, &duckdbErr) {
-						aw.app.Cfg().Log().Error().
-							Interface("type", duckdbErr.Type).
-							Interface("msg", duckdbErr.Msg).
-							Msg("Hitting a DuckDB error, stopping further processing of current batch of metrics!")
-						break
-					}
-				} else {
-					aw.pushCompleted.Inc()
-				}
+			if err := aw.storage.PushMetricSamples(metrics.Timestamp, batch); err != nil {
+				aw.pushFailed.Inc()
+				aw.app.Cfg().Log().Error().
+					Err(err).
+					Time("timestamp", metrics.Timestamp).
+					Int("count", len(batch)).
+					Msg("Failed to store batch of samples!")
+			} else {
+				aw.pushCompleted.Inc()
 			}
 		}
 	}

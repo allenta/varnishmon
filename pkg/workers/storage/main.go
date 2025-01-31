@@ -57,6 +57,13 @@ type CachedMetric struct {
 	Description string
 	Class       string
 }
+type MetricSample struct {
+	Name        string
+	Flag        string
+	Format      string
+	Description string
+	Value       interface{}
+}
 
 func NewStorage(app Application) *Storage {
 	// Create instance.

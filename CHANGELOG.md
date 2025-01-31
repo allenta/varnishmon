@@ -1,3 +1,6 @@
+- ?
+    + Fixed major I/O performance issue when writing metrics to DuckDB.
+
 - 0.4.3-1 (2025-01-30):
     + Fixed zoom reset in charts.
 

@@ -94,7 +94,8 @@ func (stg *Storage) unsafeConfigureDB() {
 		SET memory_limit = '%dMiB';
 		SET threads = '%d';
 		SET temp_directory = '%s';
-		SET max_temp_directory_size = '%dMiB';`,
+		SET max_temp_directory_size = '%dMiB';
+		SET preserve_insertion_order = false;`,
 		stg.app.Cfg().DBMemoryLimit(),
 		stg.app.Cfg().DBThreads(),
 		stg.app.Cfg().DBTempDirectory(),

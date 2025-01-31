@@ -1,4 +1,4 @@
-- ?
+- 0.4.4-1 (2025-01-31):
     + Fixed major I/O performance issue when writing metrics to DuckDB.
 
 - 0.4.3-1 (2025-01-30):

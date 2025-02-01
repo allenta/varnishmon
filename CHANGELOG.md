@@ -1,3 +1,6 @@
+- 0.4.5-1 (2025-02-01):
+    + Added `nocreate` to logrotate configuration.
+
 - 0.4.4-1 (2025-01-31):
     + Fixed major I/O performance issue when writing metrics to DuckDB.
 

@@ -36,6 +36,18 @@
 #     # architecture.
 #     $ PLATFORM=noble make package
 #
+#     # Periodic update of dependencies:
+#     #   - Development & CI environments:
+#     #     + extras/docker/Dockerfile: Go, Node.js, FPM, etc.
+#     #     + .github/workflows/main.yml: Go, etc.
+#     #     + extras/github/docker/*: FPM, etc.
+#     #     + Makefile: Go tools, etc. + make mocks
+#     #   - Go:
+#     #     + go get -u ./... + make mod fmt lint vet test
+#     #   - Node.js:
+#     #     + rm -rf package-lock.json node_modules && npm update && npm audit fix
+#     #     + npm outdated && npm install --save-dev <package>@latest
+#
 #     # Fetch profiling data & metrics.
 #     $ curl -o /tmp/cpu.pprof http://127.0.0.1:6100/debug/pprof/profile?seconds=15
 #     $ curl -v http://127.0.0.1:6100/metrics
@@ -51,7 +63,7 @@
 #
 #   $ IMAGE=$(docker build \
 #       --file extras/github/docker/Dockerfile-jammy \
-#       --build-arg GO_VERSION=1.23.3 \
+#       --build-arg GO_VERSION=1.23.5 \
 #       .)
 #   $ docker run \
 #       --rm \

@@ -32,11 +32,11 @@ RUN apt update \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L -s https://go.dev/dl/go1.23.3.linux-$(dpkg --print-architecture).tar.gz | tar xvfz - -C /usr/local \
+RUN curl -L -s https://go.dev/dl/go1.23.5.linux-$(dpkg --print-architecture).tar.gz | tar xvfz - -C /usr/local \
     && echo 'export PATH=$PATH:/usr/local/go/bin' >> /home/dev/.bashrc
 
 RUN mkdir -p /usr/local/node \
-    && curl -L -s https://nodejs.org/dist/v22.13.0/node-v22.13.0-linux-x64.tar.xz | tar xvfJ - -C /usr/local/node --strip-components 1 \
+    && curl -L -s https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz | tar xvfJ - -C /usr/local/node --strip-components 1 \
     && echo 'export PATH=$PATH:/usr/local/node/bin' >> /home/dev/.bashrc
 
 RUN gem install fpm -v 1.15.1 \

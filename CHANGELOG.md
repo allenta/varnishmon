@@ -1,3 +1,6 @@
+- ?:
+    + Updated dependencies.
+
 - 0.4.6-1 (2025-02-03):
     + Added an action to the chart widget to copy the plot to the clipboard.
 

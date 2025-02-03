@@ -51,7 +51,7 @@ fmt:
 		\
 		if [ ! -f "$$HOME/go/bin/goimports" ]; then \
 			echo '> Installing goimports...'; \
-			go install golang.org/x/tools/cmd/goimports@v0.27.0; \
+			go install golang.org/x/tools/cmd/goimports@v0.29.0; \
 		fi; \
 		\
 		echo '> Running goimports (includes gofmt)...'; \
@@ -69,7 +69,7 @@ lint:
 		\
 		if [ ! -f "$$HOME/go/bin/golangci-lint" ]; then \
 			echo '> Installing golangci-lint...'; \
-			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.62.2; \
+			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.63.4; \
 		fi; \
 		\
 		echo '> Running golangci-lint...'; \
@@ -124,7 +124,7 @@ mocks:
 		\
 		if [ ! -f "$$HOME/go/bin/mockery" ]; then \
 			echo '> Installing mockery...'; \
-			go install github.com/vektra/mockery/v2@v2.49.1; \
+			go install github.com/vektra/mockery/v2@v2.52.1; \
 		fi; \
 		\
 		echo '> Removing previous mocks from Git...'; \

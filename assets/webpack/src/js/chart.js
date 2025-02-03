@@ -562,16 +562,56 @@ class Chart {
     };
 
     // Prepare configuration for Plotly.
+    const downloadButton = {
+      name: 'download',
+      title: 'Download plot',
+      icon: Plotly.Icons.disk,
+      click: (gd) => {
+        Plotly.downloadImage(gd, {
+          filename: `${varnishmon.storage.hostname} - ${this.metric.name}`,
+          format: 'png',
+          width: null,
+          height: null,
+          scale: 1,
+        }).then(() => {
+          helpers.notify('info', 'Plot ready for download');
+        }).catch((error) => {
+          helpers.notify('error', `Failed to download plot: ${error}`);
+        });
+      },
+    };
+    const copyToClipboardButton = {
+      name: 'copy-to-clipboard',
+      title: 'Copy plot to clipboard',
+      icon: Plotly.Icons.camera,
+      click: (gd) => {
+        Plotly.toImage(gd, {
+          format: 'png',
+          width: null,
+          height: null,
+          scale: 1,
+        }).then((url) => {
+          fetch(url).then((response) => {
+            response.blob().then((blob) => {
+              navigator.clipboard.write([
+                new ClipboardItem({'image/png': blob})
+              ]).then(() => {
+                helpers.notify('info', 'Plot copied to clipboard');
+              }).catch((error) => {
+                helpers.notify('error', `Failed to copy plot to clipboard: ${error}`);
+              });
+            });
+          });
+        });
+      },
+    };
     const config = {
       responsive: true,
       displaylogo: false,
-      modeBarButtonsToRemove: [
-        'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'autoScale2d',
+      modeBarButtons: [
+        ['zoomIn2d', 'zoomOut2d', 'resetScale2d'],
+        [downloadButton, copyToClipboardButton],
       ],
-      toImageButtonOptions: {
-        filename: `${varnishmon.storage.hostname} - ${this.metric.name}`,
-        format: 'png',
-      },
       scrollZoom: false,
     };
 

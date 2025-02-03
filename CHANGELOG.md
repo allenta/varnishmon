@@ -6,7 +6,9 @@
             - golangci-lint 1.62.2 ➙ 1.63.4
             - mockery 2.49.1 ➙ 2.52.1
             - router 1.5.3 ➙ 1.5.4
-        * Node 22.13.0 ➙ 22.13.1
+        * Node.js 22.13.0 ➙ 22.13.1
+            - eslint 9.18.0 ➙ 9.19.0
+            - plotly.js-dist 2.35.3 ➙ 3.0.0
 
 - 0.4.6-1 (2025-02-03):
     + Added an action to the chart widget to copy the plot to the clipboard.

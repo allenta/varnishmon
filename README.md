@@ -1,6 +1,7 @@
 # varnishmon
 
-[![main GitHub Actions workflow](https://github.com/allenta/varnishmon/actions/workflows/main.yml/badge.svg)](../../actions/workflows/main.yml)
+[![CI GitHub Actions workflow](https://github.com/allenta/varnishmon/actions/workflows/main.yml/badge.svg)](../../actions/workflows/main.yml)
+[![CodeQL GitHub Actions workflow](https://github.com/allenta/varnishmon/actions/workflows/codeql.yml/badge.svg)](../../actions/workflows/codeql.yml)
 [![latest GitHub Release](https://img.shields.io/github/v/release/allenta/varnishmon.svg)](../../releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/allenta/varnishmon)](https://goreportcard.com/report/github.com/allenta/varnishmon)
 [![Go Reference](https://pkg.go.dev/badge/github.com/allenta/varnishmon.svg)](https://pkg.go.dev/github.com/allenta/varnishmon)

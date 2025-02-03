@@ -1,6 +1,6 @@
 module github.com/allenta/varnishmon
 
-go 1.23
+go 1.23.5
 
 require (
 	github.com/fasthttp/router v1.5.4

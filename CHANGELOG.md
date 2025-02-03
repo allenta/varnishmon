@@ -1,9 +1,11 @@
 - ?:
     + Updated dependencies.
         * Go 1.23.3 ➙ 1.23.5
-            - mockery 2.49.1 ➙ 2.52.1
-            - golangci-lint 1.62.2 ➙ 1.63.4
+            - fasthttp 1.57.0 ➙ 1.58.0
             - goimports 0.27.0 ➙ 0.29.0
+            - golangci-lint 1.62.2 ➙ 1.63.4
+            - mockery 2.49.1 ➙ 2.52.1
+            - router 1.5.3 ➙ 1.5.4
         * Node 22.13.0 ➙ 22.13.1
 
 - 0.4.6-1 (2025-02-03):

@@ -3,7 +3,7 @@ module github.com/allenta/varnishmon
 go 1.23
 
 require (
-	github.com/fasthttp/router v1.5.3
+	github.com/fasthttp/router v1.5.4
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/marcboeker/go-duckdb v1.8.3
 	github.com/prometheus/client_golang v1.20.5
@@ -11,7 +11,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
-	github.com/valyala/fasthttp v1.57.0
+	github.com/valyala/fasthttp v1.58.0
 	github.com/valyala/tcplisten v1.0.0
 	gitlab.com/stone.code/assert v1.1.4
 )

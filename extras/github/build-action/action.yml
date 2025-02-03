@@ -21,21 +21,6 @@ runs:
 
     - shell: bash
       run: |
-        # XXX: for ARM64 builds, jobs occasionally fail with an error suggesting
-        # that Docker is not ready. This is a dirty attempt to mitigate the
-        # issue.
-        if [ '${{ inputs.architecture }}' = 'arm64' ]; then
-          for i in {1..10}; do
-            if docker info > /dev/null 2>&1; then
-              echo 'Docker is ready!'
-              break
-            else
-              echo 'Waiting for Docker to be ready...'
-              sleep 5
-            fi
-          done
-        fi
-
         IMAGE=$( \
           docker build \
             --quiet \

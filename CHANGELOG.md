@@ -1,5 +1,10 @@
 - ?:
     + Updated dependencies.
+        * Go 1.23.3 ➙ 1.23.5
+            - mockery 2.49.1 ➙ 2.52.1
+            - golangci-lint 1.62.2 ➙ 1.63.4
+            - goimports 0.27.0 ➙ 0.29.0
+        * Node 22.13.0 ➙ 22.13.1
 
 - 0.4.6-1 (2025-02-03):
     + Added an action to the chart widget to copy the plot to the clipboard.

@@ -1,6 +1,7 @@
 - 0.4.8-1 (2025-02-04):
     + Fixed the X-axis layout in charts during refresh, adding additional styling.
     + Used a monospace font for cluster names.
+    + Fixed an issue with packaging that caused the service to reload instead of restart after an upgrade.
 
 - 0.4.7-1 (2025-02-03):
     + Updated dependencies.

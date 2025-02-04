@@ -25,6 +25,17 @@ const resizeObserver = new ResizeObserver((entries) => {
   });
 });
 
+const xaxisLayout = {
+  fixedrange: false,
+  griddash: 'dash',
+  autorange: false,
+  showspikes: true,
+  spikemode: 'across',
+  spikesnap: 'cursor',
+  spikedash: 'dot',
+  spikethickness: 1,
+};
+
 class Chart {
   constructor(container, metric, rangeFactory, refreshInterval, aggregator, step) {
     this.container = container;
@@ -530,11 +541,10 @@ class Chart {
         subtitle: { text: this.metric.description },
       },
       margin: { l: 60, r: 10, b: 40, t: 40, pad: 5 },
+      hovermode: 'closest',
       xaxis: {
-        fixedrange: false,
-        griddash: 'dash',
+        ...xaxisLayout,
         range: Array.from(range), // Beware the array needs to be cloned.
-        autorange: false,
       },
       yaxis: {
         fixedrange: true,
@@ -642,6 +652,7 @@ class Chart {
     // Prepare layout for Plotly.
     const layout = {
       xaxis: {
+        ...xaxisLayout,
         range: Array.from(range), // Beware the array needs to be cloned.
       },
     };

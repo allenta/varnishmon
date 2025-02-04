@@ -1,3 +1,7 @@
+- 0.4.8-1 (2025-02-04):
+    + Fixed the X-axis layout in charts during refresh, adding additional styling.
+    + Used a monospace font for cluster names.
+
 - 0.4.7-1 (2025-02-03):
     + Updated dependencies.
         * Go 1.23.3 ➙ 1.23.5

@@ -45,7 +45,7 @@
 #     #   - Go:
 #     #     + go get -u ./... + make mod fmt lint vet test
 #     #   - Node.js:
-#     #     + rm -rf package-lock.json node_modules && npm update && npm audit fix
+#     #     + rm -rf package-lock.json node_modules && npm update --save && npm audit fix
 #     #     + npm outdated && npm install --save-dev <package>@latest
 #
 #     # Fetch profiling data & metrics.

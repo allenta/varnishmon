@@ -26,6 +26,8 @@ jobs:
           build-mode: manual
         - language: javascript-typescript
           build-mode: none
+        - language: actions
+          build-mode: none
 
     steps:
     - uses: actions/checkout@v4
@@ -34,6 +36,7 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+        config-file: ./.github/codeql/codeql-config.yml
 
     - if: matrix.build-mode == 'manual'
       shell: bash

@@ -27,6 +27,6 @@ elif [ "$1" -gt 1 ]; then
 
     if [ -x "$(command -v systemctl)" ]; then
         systemctl daemon-reload > /dev/null
-        systemctl try-reload-or-restart varnishmon > /dev/null
+        systemctl restart varnishmon > /dev/null
     fi
 fi

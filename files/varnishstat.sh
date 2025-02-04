@@ -25,8 +25,6 @@
 #   - Beware of JSON numbers being limited to float64 & possible precision loss.
 #
 
-/usr/bin/varnishstat -1 -j && exit 0
-
 cat <<EOF
 {
   "timestamp": "2024-01-01T13:00:00",

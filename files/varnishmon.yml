@@ -16,6 +16,7 @@ scraper:
   period: 5s
   timeout: 5s
   varnishstat: /mnt/host/files/varnishstat.sh
+  # varnishstat: /usr/local/bin/uv run --quiet --python 3.12 --with psutil==6.1.1 /mnt/host/files/varnishstat.py
 
 api:
   enabled: true

@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      security-events: write
-      packages: read
       actions: read
       contents: read
+      packages: read
+      security-events: write
 
     strategy:
       fail-fast: false

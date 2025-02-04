@@ -9,6 +9,10 @@ on:
 env:
   GO_VERSION: 1.23.5
 
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   build-amd64:
     name: Build (${{ matrix.platform }} ${{ matrix.architecture }})

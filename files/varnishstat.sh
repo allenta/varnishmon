@@ -25,38 +25,55 @@
 #   - Beware of JSON numbers being limited to float64 & possible precision loss.
 #
 
-cat <<EOF
-{
-  "timestamp": "2024-01-01T13:00:00",
-  "MGT.uptime": {
-    "description": "Management process uptime",
-    "flag": "c",
-    "format": "d",
-    "value": 6060502
-  },
-  "MAIN.n_backend": {
-    "description": "Number of backends",
-    "flag": "g",
-    "format": "i",
-    "value": 6
-  },
-  "VBE.boot.default_be.happy": {
-    "description": "Happy health probes",
-    "flag": "b",
-    "format": "b",
-    "value": 18446744073709551615
-  },
-  "VBE.boot.default_be.is_healthy": {
-    "description": "Backend health status",
-    "flag": "q",
-    "format": "q",
-    "value": 1
-  },
-  "MAIN.s_req_hdrbytes": {
-    "description": "Request header bytes",
-    "flag": "c",
-    "format": "B",
-    "value": 854488484
-  }
+COUNTERS=$(cat <<EOF
+"MGT.uptime": {
+  "description": "Management process uptime",
+  "flag": "c",
+  "format": "d",
+  "value": 6060502
+},
+"MAIN.n_backend": {
+  "description": "Number of backends",
+  "flag": "g",
+  "format": "i",
+  "value": 6
+},
+"VBE.boot.default_be.happy": {
+  "description": "Happy health probes",
+  "flag": "b",
+  "format": "b",
+  "value": 18446744073709551615
+},
+"VBE.boot.default_be.is_healthy": {
+  "description": "Backend health status",
+  "flag": "q",
+  "format": "q",
+  "value": 1
+},
+"MAIN.s_req_hdrbytes": {
+  "description": "Request header bytes",
+  "flag": "c",
+  "format": "B",
+  "value": 854488484
 }
 EOF
+)
+
+if [ $((RANDOM % 2)) -eq 0 ]; then
+  cat <<EOF
+  {
+    "timestamp": "2024-01-01T13:00:00",
+$(echo "$COUNTERS" | sed 's/^/    /')
+  }
+EOF
+else
+  cat <<EOF
+  {
+    "version": 1,
+    "timestamp": "2024-01-01T13:00:00",
+    "counters": {
+$(echo "$COUNTERS" | sed 's/^/      /')
+    }
+  }
+EOF
+fi

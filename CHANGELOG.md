@@ -1,4 +1,4 @@
-- ?
+- 0.4.8-1 (2025-02-04):
     + Fixed the X-axis layout in charts during refresh, adding additional styling.
     + Used a monospace font for cluster names.
 

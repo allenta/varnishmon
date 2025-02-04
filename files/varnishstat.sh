@@ -25,11 +25,7 @@
 #   - Beware of JSON numbers being limited to float64 & possible precision loss.
 #
 
-/usr/bin/varnishstat -1 -j && exit 0
-
-cat <<EOF
-{
-  "timestamp": "2024-01-01T13:00:00",
+COUNTERS='
   "MGT.uptime": {
     "description": "Management process uptime",
     "flag": "c",
@@ -59,6 +55,25 @@ cat <<EOF
     "flag": "c",
     "format": "B",
     "value": 854488484
+  }'
+
+if [ $((RANDOM % 2)) -eq 0 ]; then
+  # Old 'varnishstat' output.
+  jq <<EOF
+  {
+    "timestamp": "2024-01-01T13:00:00",
+    $COUNTERS
   }
-}
 EOF
+else
+  # New 'varnishstat' output, for Varnish Cache >= 6.5.0.
+  jq <<EOF
+  {
+    "version": 1,
+    "timestamp": "2024-01-01T13:00:00",
+    "counters": {
+      $COUNTERS
+    }
+  }
+EOF
+fi

@@ -35,9 +35,17 @@ RUN apt update \
 RUN curl -L -s https://go.dev/dl/go1.23.5.linux-$(dpkg --print-architecture).tar.gz | tar xvfz - -C /usr/local \
     && echo 'export PATH=$PATH:/usr/local/go/bin' >> /home/dev/.bashrc
 
-RUN mkdir -p /usr/local/node \
-    && curl -L -s https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz | tar xvfJ - -C /usr/local/node --strip-components 1 \
+RUN ARCHITECTURE=$(uname -m) \
+    && case $ARCHITECTURE in \
+            x86_64)  ARCHITECTURE='x64' ;; \
+            aarch64) ARCHITECTURE='arm64' ;; \
+            *)       echo "unknown architecture: $ARCHITECTURE" && exit 1 ;; \
+        esac \
+    && mkdir -p /usr/local/node \
+    && curl -L -s https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-${ARCHITECTURE}.tar.xz | tar xvfJ - -C /usr/local/node --strip-components 1 \
     && echo 'export PATH=$PATH:/usr/local/node/bin' >> /home/dev/.bashrc
+
+RUN curl -L -s https://github.com/astral-sh/uv/releases/download/0.5.27/uv-$(uname -m)-unknown-linux-gnu.tar.gz | tar xvfz - -C /usr/local/bin --strip-components 1
 
 RUN gem install fpm -v 1.15.1 \
     && gem cleanup

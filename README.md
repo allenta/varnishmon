@@ -81,7 +81,7 @@ While `varnishmon` **doesn't replace a comprehensive monitoring solutions like P
   > Use the `--no-api` flag (or the `api.enabled` setting) to prevent the web interface from starting. You can still collect metrics and store them in the database.
 
 - **Can I customize the metrics collected by `varnishmon`?**
-  > Not directly, as `varnishmon` is designed to collect comprehensive information. However, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a wrapper script that filters the `varnishstat` output (or an inline command if you're up for the quoting challenge).
+  > Not directly, as `varnishmon` is designed to collect comprehensive information. However, you can use the `--varnishstat` flag (or the `scraper.varnishstat` setting) to specify a wrapper script that filters the `varnishstat` output (or an inline command if you're up for the quoting challenge). Check out [this example wrapper script](files/varnishstat.py) for inspiration on how to filter and/or extend the metrics collected.
     > ```bash
     > varnishmon \
     >   --period 15s \

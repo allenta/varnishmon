@@ -1,4 +1,4 @@
-- ?:
+- 0.5.0-1 (2025-02-04):
     + Added support for newest varnishstat output format.
 
 - 0.4.8-1 (2025-02-04):

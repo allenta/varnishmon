@@ -111,7 +111,7 @@ mod:
 		set -e; \
 		\
 		echo '> Adding missing and removing unused modules...'; \
-		go mod tidy -compat=1.17; \
+		go mod tidy -compat=1.23; \
 		\
 		echo '> Printing module requirement graph...'; \
 		go mod graph; \

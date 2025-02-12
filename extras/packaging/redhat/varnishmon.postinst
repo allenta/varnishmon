@@ -4,9 +4,9 @@ set -e
 
 if [ "$1" -eq 1 ]; then
     getent group varnish > /dev/null 2>&1 || groupadd varnish > /dev/null
-    id -u varnish > /dev/null 2>&1 || useradd --system -g varnish varnish > /dev/null
+    id -u varnishlog > /dev/null 2>&1 || useradd --system -g varnish varnishlog > /dev/null
 
-    chown varnish:varnish \
+    chown varnishlog:varnish \
         /var/log/varnishmon\
         /var/lib/varnishmon > /dev/null
     chown root:varnish \
@@ -18,7 +18,7 @@ if [ "$1" -eq 1 ]; then
         systemctl enable varnishmon > /dev/null
     fi
 elif [ "$1" -gt 1 ]; then
-    chown varnish:varnish \
+    chown varnishlog:varnish \
         /var/log/varnishmon\
         /var/lib/varnishmon > /dev/null
     chown root:varnish \

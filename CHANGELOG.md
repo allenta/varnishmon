@@ -1,4 +1,4 @@
-- ?
+- 0.5.1-1 (2025-02-12):
     + Updated dependencies.
         * Go 1.23.5 ➙ 1.24.0
             - go-duckdb 1.8.3 ➙ 1.8.4

@@ -1,4 +1,4 @@
-- ?
+- 0.5.2-1 (2025-02-12):
     + Improved logrotate configuration.
     + Fixed DuckDB query when normalizing input `from` and `to` timestamps.
 

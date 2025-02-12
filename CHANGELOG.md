@@ -1,3 +1,6 @@
+- ?
+    + Improved logrotate configuration.
+
 - 0.5.1-1 (2025-02-12):
     + Updated dependencies.
         * Go 1.23.5 ➙ 1.24.0

@@ -1,5 +1,5 @@
-/var/log/varnishmon/*.log
-/var/lib/varnishmon/*.db {
+/var/log/varnishmon/varnishmon.log
+/var/lib/varnishmon/varnishmon.db {
   daily
   rotate 7
   compress

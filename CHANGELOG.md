@@ -1,3 +1,12 @@
+- 0.5.1-1 (2025-02-12):
+    + Updated dependencies.
+        * Go 1.23.5 ➙ 1.24.0
+            - go-duckdb 1.8.3 ➙ 1.8.4
+        * Node.js
+            - eslint 9.19.0 ➙ 9.20.0
+            - sass 1.83.4 ➙ 1.84.0
+    + Packaging adjusted to run the service as `varnishlog:varnish` instead of `varnish:varnish`.
+
 - 0.5.0-1 (2025-02-04):
     + Added support for newest varnishstat output format.
 

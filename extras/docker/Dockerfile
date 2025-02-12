@@ -32,7 +32,7 @@ RUN apt update \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L -s https://go.dev/dl/go1.23.5.linux-$(dpkg --print-architecture).tar.gz | tar xvfz - -C /usr/local \
+RUN curl -L -s https://go.dev/dl/go1.24.0.linux-$(dpkg --print-architecture).tar.gz | tar xvfz - -C /usr/local \
     && echo 'export PATH=$PATH:/usr/local/go/bin' >> /home/dev/.bashrc
 
 RUN ARCHITECTURE=$(uname -m) \

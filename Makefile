@@ -49,16 +49,11 @@ fmt:
 	@( \
 		set -e; \
 		\
-		if [ ! -f "$$HOME/go/bin/goimports" ]; then \
-			echo '> Installing goimports...'; \
-			go install golang.org/x/tools/cmd/goimports@v0.29.0; \
-		fi; \
-		\
 		echo '> Running goimports (includes gofmt)...'; \
 		FILES=$$(find '$(ROOT)/cmd' '$(ROOT)/pkg' -name '*.go'); \
-		for FILE in $$(~/go/bin/goimports -l $$FILES); do \
+		for FILE in $$(go tool goimports -l $$FILES); do \
 			echo "- $$FILE"; \
-			~/go/bin/goimports -w "$$FILE"; \
+			go tool goimports -w "$$FILE"; \
 		done; \
 	)
 
@@ -69,7 +64,7 @@ lint:
 		\
 		if [ ! -f "$$HOME/go/bin/golangci-lint" ]; then \
 			echo '> Installing golangci-lint...'; \
-			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.63.4; \
+			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.64.2; \
 		fi; \
 		\
 		echo '> Running golangci-lint...'; \
@@ -111,7 +106,7 @@ mod:
 		set -e; \
 		\
 		echo '> Adding missing and removing unused modules...'; \
-		go mod tidy -compat=1.23; \
+		go mod tidy -compat=1.24; \
 		\
 		echo '> Printing module requirement graph...'; \
 		go mod graph; \
@@ -122,16 +117,11 @@ mocks:
 	@( \
 		set -e; \
 		\
-		if [ ! -f "$$HOME/go/bin/mockery" ]; then \
-			echo '> Installing mockery...'; \
-			go install github.com/vektra/mockery/v2@v2.52.1; \
-		fi; \
-		\
 		echo '> Removing previous mocks from Git...'; \
 		find '$(ROOT)/pkg' -name 'mock_*.go' -type f -exec git rm -f {} \;; \
 		\
 		echo '> Running mockery...'; \
-		~/go/bin/mockery; \
+		go tool mockery; \
 		\
 		echo '> Add new mocks to Git...'; \
 		find '$(ROOT)/pkg' -name 'mock_*.go' -type f -exec git add -v {} \;; \

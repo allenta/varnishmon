@@ -1,6 +1,6 @@
 - ?
     + Updated dependencies.
-        * Go
+        * Go 1.23.5 ➙ 1.24.0
             - go-duckdb 1.8.3 ➙ 1.8.4
         * Node.js
             - eslint 9.19.0 ➙ 9.20.0

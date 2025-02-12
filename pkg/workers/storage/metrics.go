@@ -322,9 +322,9 @@ func (stg *Storage) unsafeNormalizeFromToAndStep(
 	// this job to ensure consistency.
 	row := stg.db.QueryRow(fmt.Sprintf(`
 		SELECT
-			time_bucket(INTERVAL '%ds', $1) AS from,
-			time_bucket(INTERVAL '%ds', $2) + INTERVAL '%ds' AS to`,
-		step, step, step), from, to)
+			time_bucket(INTERVAL '%ds', $1::TIMESTAMP) AS from,
+			time_bucket(INTERVAL '%ds', $2::TIMESTAMP) + INTERVAL '%ds' AS to`,
+		step, step, step), from.Format(time.RFC3339), to.Format(time.RFC3339))
 	if err := row.Scan(&from, &to); err != nil {
 		return time.Time{}, time.Time{}, 0, fmt.Errorf("failed to scan row with normalized boundaries: %w", err)
 	}

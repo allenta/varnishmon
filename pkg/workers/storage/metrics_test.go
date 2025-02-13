@@ -222,7 +222,7 @@ func (suite *MetricsTestSuite) TestGetMetricsBasics() {
 	assert.NoError(err)
 	assert.Equal(from.Unix(), metrics["from"])
 	assert.Equal(from.Unix()+int64(step), metrics["to"])
-	assert.Equal(10, metrics["step"])
+	assert.Equal(step, metrics["step"])
 	assert.ElementsMatch([]map[string]interface{}{
 		{
 			"id":          suite.stg.cache.metricsByName["foo"].ID,
@@ -258,7 +258,7 @@ func (suite *MetricsTestSuite) TestGetMetricBasics() {
 	assert.NoError(err)
 	assert.Equal(from.Unix(), metric["from"])
 	assert.Equal(from.Unix()+int64(step), metric["to"])
-	assert.Equal(10, metric["step"])
+	assert.Equal(step, metric["step"])
 	assert.ElementsMatch([][2]interface{}{
 		{from.Unix(), int64(2)},
 	}, metric["samples"])

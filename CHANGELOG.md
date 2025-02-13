@@ -1,3 +1,6 @@
+- 0.5.3-1 (2025-02-13):
+    + Fixed step calculation when scraper is disabled (i.e., no scraping period available).
+
 - 0.5.2-1 (2025-02-12):
     + Improved logrotate configuration.
     + Fixed DuckDB query when normalizing input `from` and `to` timestamps.

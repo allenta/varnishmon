@@ -14,6 +14,16 @@ While `varnishmon` **doesn't replace a comprehensive monitoring solutions like P
 
 `varnishmon` is a self-contained executable that allows you to start collecting data with minimal effort and explore it through a simple yet effective web interface. In addition to occasional troubleshooting, `varnishmon` can also be used as a lightweight, permanent service to collect, store, visualize, and rotate Varnish metrics. Similar to running `atop` in logging mode as a complement to regular monitoring, `varnishmon` provides valuable context during incident analysis.
 
+## 📑 Table of Contents
+
+- [Quick Start](#-quick-start)
+- [Q & A](#-q-a)
+  - [Usage](#usage)
+  - [Configuration & Customization](#configuration-customization)
+  - [Running as a Service](#running-as-a-service)
+  - [Miscellaneous](#miscellaneous)
+- [License](#-license)
+
 ## 🚀 Quick Start
 
 1. **Download & install**

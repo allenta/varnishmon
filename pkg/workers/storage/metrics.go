@@ -312,8 +312,12 @@ func (stg *Storage) PushMetricSamples(timestamp time.Time, samples []*MetricSamp
 
 func (stg *Storage) unsafeNormalizeFromToAndStep(
 	from, to time.Time, step int) (time.Time, time.Time, int, error) {
-	// Ensure 'step' is at least the scraper period.
-	period := int(stg.app.Cfg().ScraperPeriod().Seconds())
+	// Ensure 'step' is at least the scraper period, if enabled. If disabled,
+	// 1s is the minimum resolution.
+	period := 1
+	if stg.app.Cfg().ScraperEnabled() {
+		period = int(stg.app.Cfg().ScraperPeriod().Seconds())
+	}
 	if step < period {
 		step = period
 	}

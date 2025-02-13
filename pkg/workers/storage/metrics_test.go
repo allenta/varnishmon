@@ -207,6 +207,63 @@ func (suite *MetricsTestSuite) TestPushSamplesBasics() {
 	assert.Len(suite.stg.app.Cfg().Log().Buffer().Events(), 0)
 }
 
+// Basic test reusing the state created by 'TestPushSamplesBasics'. This is
+// sufficient for now, but should be reviewed and improved in the future.
+func (suite *MetricsTestSuite) TestGetMetricsBasics() {
+	assert := suite.Require()
+
+	suite.TestPushSamplesBasics()
+
+	from := time.Date(2025, time.January, 1, 13, 0, 0, 0, time.UTC)
+	to := time.Date(2025, time.January, 1, 13, 0, 5, 0, time.UTC)
+	step := 10
+	metrics, err := suite.stg.GetMetrics(from, to, step)
+
+	assert.NoError(err)
+	assert.Equal(from.Unix(), metrics["from"])
+	assert.Equal(from.Unix()+int64(step), metrics["to"])
+	assert.Equal(10, metrics["step"])
+	assert.ElementsMatch([]map[string]interface{}{
+		{
+			"id":          suite.stg.cache.metricsByName["foo"].ID,
+			"name":        suite.stg.cache.metricsByName["foo"].Name,
+			"flag":        suite.stg.cache.metricsByName["foo"].Flag,
+			"format":      suite.stg.cache.metricsByName["foo"].Format,
+			"description": suite.stg.cache.metricsByName["foo"].Description,
+		},
+		{
+			"id":          suite.stg.cache.metricsByName["bar"].ID,
+			"name":        suite.stg.cache.metricsByName["bar"].Name,
+			"flag":        suite.stg.cache.metricsByName["bar"].Flag,
+			"format":      suite.stg.cache.metricsByName["bar"].Format,
+			"description": suite.stg.cache.metricsByName["bar"].Description,
+		},
+	}, metrics["metrics"])
+}
+
+// Basic test reusing the state created by 'TestPushSamplesBasics'. This is
+// sufficient for now, but should be reviewed and improved in the future.
+func (suite *MetricsTestSuite) TestGetMetricBasics() {
+	assert := suite.Require()
+
+	suite.TestPushSamplesBasics()
+
+	id := suite.stg.cache.metricsByName["foo"].ID
+	from := time.Date(2025, time.January, 1, 13, 0, 0, 0, time.UTC)
+	to := time.Date(2025, time.January, 1, 13, 0, 5, 0, time.UTC)
+	step := 10
+	aggregator := "count"
+	metric, err := suite.stg.GetMetric(id, from, to, step, aggregator)
+
+	assert.NoError(err)
+	assert.Equal(from.Unix(), metric["from"])
+	assert.Equal(from.Unix()+int64(step), metric["to"])
+	assert.Equal(10, metric["step"])
+	assert.ElementsMatch([][2]interface{}{
+		{from.Unix(), int64(2)},
+	}, metric["samples"])
+}
+
 func TestMetricsTestSuite(t *testing.T) {
 	suite.Run(t, &MetricsTestSuite{})
 }

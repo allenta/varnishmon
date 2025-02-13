@@ -299,6 +299,7 @@ function isValidAggregatorValue(value) {
 ******************************************************************************/
 
 const STEP = `${PREFIX}step`;
+const DEFAULT_STEP = 60;
 
 export function getStep() {
   try {
@@ -313,7 +314,7 @@ export function getStep() {
     console.error(`Failed to read '${STEP}' from local storage!`, error);
   }
 
-  return varnishmon.config.scraper.period;
+  return varnishmon.config.scraper.enabled ? varnishmon.config.scraper.period : DEFAULT_STEP;
 }
 
 export function setStep(value) {
@@ -329,8 +330,12 @@ export function setStep(value) {
   }
 }
 
+export function getMinimumStep() {
+  return varnishmon.config.scraper.enabled ? varnishmon.config.scraper.period : 1;
+}
+
 function isValidStepValue(value) {
-  return Number.isInteger(value) && value >= varnishmon.config.scraper.period;
+  return Number.isInteger(value) && value >= getMinimumStep();
 }
 
 /******************************************************************************

@@ -87,13 +87,17 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 	}
 
 	// Prepare template data & render it.
+	scraperPeriod := 0
+	if h.app.Cfg().ScraperEnabled() {
+		scraperPeriod = int(h.app.Cfg().ScraperPeriod().Seconds())
+	}
 	cfg, err := json.Marshal(map[string]interface{}{
 		"version":  config.Version(),
 		"revision": config.Revision(),
 		"config": map[string]interface{}{
 			"scraper": map[string]interface{}{
 				"enabled": h.app.Cfg().ScraperEnabled(),
-				"period":  h.app.Cfg().ScraperPeriod().Seconds(),
+				"period":  scraperPeriod,
 			},
 		},
 		"storage": map[string]interface{}{

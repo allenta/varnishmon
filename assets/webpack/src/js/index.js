@@ -72,19 +72,17 @@ function syncConfigWithUI() {
 
   // Step.
   const stepSelector = document.getElementById('step');
-  stepSelector.min = varnishmon.config.scraper.period;
+  stepSelector.min = config.getMinimumStep();
   stepSelector.value = config.getStep();
   stepSelector.addEventListener('change', (event) => {
     const value = parseInt(event.target.value, 10);
-    if (value >= varnishmon.config.scraper.period) {
+    const minimum = config.getMinimumStep();
+    if (value >= minimum) {
       config.setStep(value);
     } else {
       event.stopPropagation();
-      stepSelector.value = varnishmon.config.scraper.period;
-      helpers.notify(
-        'error',
-        `Step must be at least ${varnishmon.config.scraper.period} seconds, ` +
-        'which is the metrics scraping period');
+      stepSelector.value = minimum;
+      helpers.notify('error', `Step must be at least ${minimum} seconds`);
     }
   });
 }
@@ -92,15 +90,16 @@ function syncConfigWithUI() {
 function getRefreshInterval() {
   let value = parseInt(document.getElementById('refresh-interval').value, 10);
   if (value < 0) {
-    value = varnishmon.config.scraper.period;
+    value = getStep();
   }
   return value;
 }
 
 function getStep() {
   let value = parseInt(document.getElementById('step').value, 10);
-  if (value < varnishmon.config.scraper.period) {
-    value = varnishmon.config.scraper.period;
+  const minimum = config.getMinimumStep();
+  if (value < minimum) {
+    value = minimum;
   }
   return value;
 }

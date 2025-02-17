@@ -1,3 +1,13 @@
+- ?
+    + Updated dependencies.
+        * Go
+            - cobra 1.8.1 ➙ 1.9.1
+        * Node.js
+            - eslint 9.20.0 ➙ 9.20.1
+            - postcss 8.5.1 ➙ 8.5.2
+            - sass 1.84.0 ➙ 1.85.0
+            - sass-loader 16.0.4 ➙ 16.0.5
+
 - 0.5.3-1 (2025-02-13):
     + Fixed step calculation when scraper is disabled (i.e., no scraping period available).
 

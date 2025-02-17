@@ -1,8 +1,10 @@
 - ?
     + Updated dependencies.
+        * DuckDB 1.1.3 ➙ 1.2.0
+        * uv 0.5.27 ➙ 0.6.0
         * Go
             - cobra 1.8.1 ➙ 1.9.1
-        * Node.js
+        * Node.js 22.13.1 ➙ 22.14.0
             - eslint 9.20.0 ➙ 9.20.1
             - postcss 8.5.1 ➙ 8.5.2
             - sass 1.84.0 ➙ 1.85.0

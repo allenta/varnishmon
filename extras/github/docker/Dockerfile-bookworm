@@ -2,6 +2,8 @@ FROM docker.io/debian:bookworm-20230814
 
 ARG GO_VERSION
 
+ENV FPM_VERSION 1.15.1
+
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt update \
@@ -18,5 +20,5 @@ RUN apt update \
 
 RUN curl -L -s https://go.dev/dl/go${GO_VERSION}.linux-$(dpkg --print-architecture).tar.gz | tar xvfz - -C /usr/local
 
-RUN gem install fpm -v 1.15.1 \
+RUN gem install fpm -v ${FPM_VERSION} \
     && gem cleanup

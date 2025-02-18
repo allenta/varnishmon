@@ -9,6 +9,7 @@
             - postcss 8.5.1 ➙ 8.5.2
             - sass 1.84.0 ➙ 1.85.0
             - sass-loader 16.0.4 ➙ 16.0.5
+    + Added support for `rhel8` packaging in AMD64 architecture.
 
 - 0.5.3-1 (2025-02-13):
     + Fixed step calculation when scraper is disabled (i.e., no scraping period available).

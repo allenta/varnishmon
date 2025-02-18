@@ -25,6 +25,9 @@ FPM = \
 		--license 'BSD 2-Clause License' \
 		--config-files /etc/varnish/varnishmon.yml
 
+# Precompiled DuckDB static bundles work fine for all platforms except RHEL 8
+# due to an old glibc version. In this case, the bundle is built on demand using
+# some dirty and suboptimal logic.
 .PHONY: build
 build: mrproper
 	@( \
@@ -37,10 +40,33 @@ build: mrproper
 			-s -w"; \
 		export CGO_ENABLED=1; \
 		\
+		unset CGO_LDFLAGS; \
+		unset TAGS; \
+		if [ '$(PLATFORM)' = 'rhel8' ]; then \
+			if [ ! -f '/tmp/duckdb/build/release/libduckdb_bundle.a' ]; then \
+				echo '> Building DuckDB static bundle (https://github.com/marcboeker/go-duckdb/blob/main/.github/workflows/deps.yaml)...'; \
+				rm -rf /tmp/duckdb; \
+				git clone -b v1.1.3 --depth 1 https://github.com/duckdb/duckdb.git /tmp/duckdb; \
+				pushd /tmp/duckdb; \
+				CFLAGS='-O3' \
+					CXXFLAGS='-O3' \
+					BUILD_SHELL=0 \
+					BUILD_UNITTESTS=0 \
+					DUCKDB_PLATFORM=any \
+					ENABLE_EXTENSION_AUTOLOADING=1 \
+					ENABLE_EXTENSION_AUTOINSTALL=1 \
+					BUILD_EXTENSIONS='json' \
+					make bundle-library -j 2; \
+				popd; \
+			fi; \
+			export CGO_LDFLAGS='-lstdc++ -lm -ldl -lduckdb_bundle -L/tmp/duckdb/build/release/'; \
+			export TAGS=duckdb_use_static_lib; \
+		fi; \
+		\
 		echo '> Building...'; \
 		for CMD in '$(ROOT)/cmd/'*; do \
 			echo "- $$CMD (linux $(ARCHITECTURE))"; \
-			GOOS=linux GOARCH=$(ARCHITECTURE) go build -trimpath -ldflags "$$LD_FLAGS" -o build/bin/$${CMD##*/} ./cmd/$${CMD##*/}; \
+			GOOS=linux GOARCH=$(ARCHITECTURE) go build -tags=$$TAGS -trimpath -ldflags "$$LD_FLAGS" -o build/bin/$${CMD##*/} ./cmd/$${CMD##*/}; \
 		done; \
 	)
 
@@ -134,7 +160,8 @@ dist: build
 		umask $(UMASK); \
 		\
 		[ '$(PLATFORM)' = 'noble' -o '$(PLATFORM)' = 'jammy' -o \
-			'$(PLATFORM)' = 'bookworm' -o '$(PLATFORM)' = 'rhel9' ] || \
+			'$(PLATFORM)' = 'bookworm' -o '$(PLATFORM)' = 'rhel9' -o \
+			'$(PLATFORM)' = 'rhel8' ] || \
 				{ echo >&2 'Invalid platform ($(PLATFORM))'; exit 1; }; \
 		\
 		[ '$(ENVIRONMENT)' = 'production' ] || \
@@ -179,7 +206,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
 		cp '$(ROOT)/extras/packaging/debian/varnishmon.logrotate' '$(ROOT)/build/dist/etc/logrotate.d/varnishmon'; \
 		cp '$(ROOT)/extras/packaging/debian/varnishmon.service' '$(ROOT)/build/dist/lib/systemd/system/'; \
 	)
-else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9))
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -226,7 +253,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
 			--config-files /etc/logrotate.d/varnishmon \
 			-C '$(ROOT)/build/dist' .; \
 	)
-else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9))
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
 	@( \
 		set -e; \
 		umask $(UMASK); \

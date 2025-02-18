@@ -14,10 +14,13 @@ ARCHITECTURE := $(shell go env GOARCH)
 export GO111MODULE
 
 # Precompiled DuckDB static bundles work fine for all platforms except RHEL 8
-# due to an old glibc version. In this case, the bundle is built on demand using
-# some dirty and suboptimal logic.
+# due to an outdated glibc version. In this case, the bundle is built on demand
+# (see the 'duckdb-static-bundle' target). This is a costly operation, so GitHub
+# Actions caching is used to populate 'duckdb-static-bundle/libduckdb_bundle.a'
+# and avoid rebuilding the bundle on every run (see
+# 'extras/github/build-action/action.yml').
 ifeq ($(PLATFORM),rhel8)
-	CGO_LDFLAGS=-lstdc++ -lm -ldl -lduckdb_bundle -L/tmp/duckdb/build/release/
+	CGO_LDFLAGS=-lstdc++ -lm -ldl -lduckdb_bundle -L$(ROOT)/duckdb-static-bundle/
 	GO_BUILD_TAGS=duckdb_use_static_lib
 else
 	CGO_LDFLAGS=
@@ -38,7 +41,7 @@ FPM = \
 		--config-files /etc/varnish/varnishmon.yml
 
 .PHONY: build
-build: mrproper duckdb-bundle
+build: mrproper duckdb-static-bundle
 	@( \
 		set -e; \
 		\
@@ -52,33 +55,13 @@ build: mrproper duckdb-bundle
 		echo '> Building...'; \
 		for CMD in '$(ROOT)/cmd/'*; do \
 			echo "- $$CMD (linux $(ARCHITECTURE))"; \
-			GOOS=linux GOARCH=$(ARCHITECTURE) go build -tags=$(GO_BUILD_TAGS) -trimpath -ldflags "$$LD_FLAGS" -o build/bin/$${CMD##*/} ./cmd/$${CMD##*/}; \
+			GOOS=linux GOARCH=$(ARCHITECTURE) go build \
+				-tags=$(GO_BUILD_TAGS) \
+				-trimpath \
+				-ldflags "$$LD_FLAGS" \
+				-o build/bin/$${CMD##*/} \
+				./cmd/$${CMD##*/}; \
 		done; \
-	)
-
-.PHONY: duckdb-bundle
-duckdb-bundle:
-	@( \
-		set -e; \
-		\
-		if [ '$(PLATFORM)' = 'rhel8' ]; then \
-			if [ ! -f '/tmp/duckdb/build/release/libduckdb_bundle.a' ]; then \
-				echo '> Building DuckDB static bundle (https://github.com/marcboeker/go-duckdb/blob/main/.github/workflows/deps.yaml)...'; \
-				rm -rf /tmp/duckdb; \
-				git clone -b v1.1.3 --depth 1 https://github.com/duckdb/duckdb.git /tmp/duckdb; \
-				pushd /tmp/duckdb; \
-				CFLAGS='-O3' \
-					CXXFLAGS='-O3' \
-					BUILD_SHELL=0 \
-					BUILD_UNITTESTS=0 \
-					DUCKDB_PLATFORM=any \
-					ENABLE_EXTENSION_AUTOLOADING=1 \
-					ENABLE_EXTENSION_AUTOINSTALL=1 \
-					BUILD_EXTENSIONS='json' \
-					make bundle-library -j 2; \
-				popd; \
-			fi; \
-		fi; \
 	)
 
 .PHONY: fmt
@@ -122,7 +105,7 @@ TEST_PACKAGES ?= '$(ROOT)/...'
 TEST_PATTERN ?= .
 
 .PHONY: test
-test: duckdb-bundle
+test: duckdb-static-bundle
 	@( \
 		set -e; \
 		\
@@ -134,6 +117,7 @@ test: duckdb-bundle
 			-coverprofile=$(ROOT)/coverage.txt \
 			-covermode=atomic \
 			-run '$(TEST_PATTERN)' \
+			-tags=$(GO_BUILD_TAGS) \
 			-timeout=2m; \
 	)
 
@@ -303,10 +287,39 @@ webpack-build:
 		npm run build; \
 	)
 
+# Beware of the hardcoded DuckDB version in the 'git clone' command. See:
+# https://github.com/marcboeker/go-duckdb/blob/main/.github/workflows/deps.yaml.
+.PHONY: duckdb-static-bundle
+duckdb-static-bundle:
+	@( \
+		set -e; \
+		\
+		if [ ! -f '$(ROOT)/duckdb-static-bundle/libduckdb_bundle.a' ]; then \
+			if [ '$(PLATFORM)' = 'rhel8' ]; then \
+				echo '> Building DuckDB static bundle for RHEL8...'; \
+				rm -rf /tmp/duckdb; \
+				git clone -b v1.1.3 --depth 1 https://github.com/duckdb/duckdb.git /tmp/duckdb; \
+				cd /tmp/duckdb; \
+				CFLAGS='-O3' \
+					CXXFLAGS='-O3' \
+					BUILD_SHELL=0 \
+					BUILD_UNITTESTS=0 \
+					DUCKDB_PLATFORM=any \
+					ENABLE_EXTENSION_AUTOLOADING=1 \
+					ENABLE_EXTENSION_AUTOINSTALL=1 \
+					BUILD_EXTENSIONS='json' \
+					make bundle-library -j 2; \
+				\
+				mkdir -p '$(ROOT)/duckdb-static-bundle'; \
+				cp /tmp/duckdb/build/release/libduckdb_bundle.a '$(ROOT)/duckdb-static-bundle'; \
+			fi; \
+		fi; \
+	)
+
 .PHONY: mrproper
 mrproper:
 	@( \
 		echo '> Cleaning up...'; \
 		rm -rf '$(ROOT)/build'; \
-		git clean -f -x -d -e .env -e assets/webpack/node_modules -e varnishmon.db $(ROOT); \
+		git clean -f -x -d -e .env -e assets/webpack/node_modules -e duckdb-static-bundle -e varnishmon.db $(ROOT); \
 	)

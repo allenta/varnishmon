@@ -19,7 +19,17 @@ runs:
 
     - uses: docker/setup-buildx-action@v3
 
+    # Try to populate 'duckdb-static-bundle/libduckdb_bundle.a' from cache. This
+    # will only succeed for platforms + architectures building their own DuckDB
+    # static bundle (currently, only RHEL 8 + AMD64).
+    - uses: actions/cache/restore@v4
+      id: duckdb-static-bundle-restore
+      with:
+        path: duckdb-static-bundle/libduckdb_bundle.a
+        key: ${{ inputs.platform }}-${{ inputs.architecture }}-${{ hashFiles('Makefile') }}-duckdb-static-bundle
+
     - shell: bash
+      id: build
       run: |
         IMAGE=$( \
           docker build \
@@ -40,6 +50,23 @@ runs:
             export PATH=/usr/local/go/bin:$PATH; \
             export PLATFORM=${{ inputs.platform }}; \
             make lint vet test package'
+
+        if [ -f duckdb-static-bundle/libduckdb_bundle.a ]; then
+          echo 'duckdb-static-bundle-exists=true' >> $GITHUB_OUTPUT
+        else
+          echo 'duckdb-static-bundle-exists=false' >> $GITHUB_OUTPUT
+        fi
+
+    # Save 'duckdb-static-bundle/libduckdb_bundle.a' to cache if it was not
+    # restored from cache. The file won't exist for platforms + architectures
+    # that don't build their own DuckDB static bundle.
+    - uses: actions/cache/save@v4
+      if: |
+        steps.duckdb-static-bundle-restore.cache-hit != 'true' &&
+        steps.build.outputs.duckdb-static-bundle-exists == 'true'
+      with:
+        path: duckdb-static-bundle/libduckdb_bundle.a
+        key: ${{ steps.duckdb-static-bundle-restore.outputs.cache-primary-key }}
 
     - uses: actions/upload-artifact@v4
       with:

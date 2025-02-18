@@ -13,6 +13,18 @@ ARCHITECTURE := $(shell go env GOARCH)
 
 export GO111MODULE
 
+# Precompiled DuckDB static bundles work fine for all platforms except RHEL 8
+# due to an old glibc version. In this case, the bundle is built on demand using
+# some dirty and suboptimal logic.
+ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel8))
+	CGO_LDFLAGS=-lstdc++ -lm -ldl -lduckdb_bundle -L/tmp/duckdb/build/release/
+	GO_BUILD_TAGS=duckdb_use_static_lib
+else
+	CGO_LDFLAGS=
+	GO_BUILD_TAGS=
+endif
+export CGO_LDFLAGS
+
 FPM = \
 	fpm -s dir \
 		--name varnishmon \
@@ -25,11 +37,8 @@ FPM = \
 		--license 'BSD 2-Clause License' \
 		--config-files /etc/varnish/varnishmon.yml
 
-# Precompiled DuckDB static bundles work fine for all platforms except RHEL 8
-# due to an old glibc version. In this case, the bundle is built on demand using
-# some dirty and suboptimal logic.
 .PHONY: build
-build: mrproper
+build: mrproper duckdb-bundle
 	@( \
 		set -e; \
 		\
@@ -40,8 +49,18 @@ build: mrproper
 			-s -w"; \
 		export CGO_ENABLED=1; \
 		\
-		unset CGO_LDFLAGS; \
-		unset TAGS; \
+		echo '> Building...'; \
+		for CMD in '$(ROOT)/cmd/'*; do \
+			echo "- $$CMD (linux $(ARCHITECTURE))"; \
+			GOOS=linux GOARCH=$(ARCHITECTURE) go build -tags=$(GO_BUILD_TAGS) -trimpath -ldflags "$$LD_FLAGS" -o build/bin/$${CMD##*/} ./cmd/$${CMD##*/}; \
+		done; \
+	)
+
+.PHONY: duckdb-bundle
+duckdb-bundle:
+	@( \
+		set -e; \
+		\
 		if [ '$(PLATFORM)' = 'rhel8' ]; then \
 			if [ ! -f '/tmp/duckdb/build/release/libduckdb_bundle.a' ]; then \
 				echo '> Building DuckDB static bundle (https://github.com/marcboeker/go-duckdb/blob/main/.github/workflows/deps.yaml)...'; \
@@ -59,15 +78,7 @@ build: mrproper
 					make bundle-library -j 2; \
 				popd; \
 			fi; \
-			export CGO_LDFLAGS='-lstdc++ -lm -ldl -lduckdb_bundle -L/tmp/duckdb/build/release/'; \
-			export TAGS=duckdb_use_static_lib; \
 		fi; \
-		\
-		echo '> Building...'; \
-		for CMD in '$(ROOT)/cmd/'*; do \
-			echo "- $$CMD (linux $(ARCHITECTURE))"; \
-			GOOS=linux GOARCH=$(ARCHITECTURE) go build -tags=$$TAGS -trimpath -ldflags "$$LD_FLAGS" -o build/bin/$${CMD##*/} ./cmd/$${CMD##*/}; \
-		done; \
 	)
 
 .PHONY: fmt
@@ -111,7 +122,7 @@ TEST_PACKAGES ?= '$(ROOT)/...'
 TEST_PATTERN ?= .
 
 .PHONY: test
-test:
+test: duckdb-bundle
 	@( \
 		set -e; \
 		\

@@ -16,7 +16,7 @@ export GO111MODULE
 # Precompiled DuckDB static bundles work fine for all platforms except RHEL 8
 # due to an old glibc version. In this case, the bundle is built on demand using
 # some dirty and suboptimal logic.
-ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel8))
+ifeq ($(PLATFORM),rhel8)
 	CGO_LDFLAGS=-lstdc++ -lm -ldl -lduckdb_bundle -L/tmp/duckdb/build/release/
 	GO_BUILD_TAGS=duckdb_use_static_lib
 else

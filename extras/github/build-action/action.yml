@@ -62,7 +62,7 @@ runs:
     # that don't build their own DuckDB static bundle.
     - uses: actions/cache/save@v4
       if: |
-        steps.duckdb-static-bundle-restore.cache-hit != 'true' &&
+        steps.duckdb-static-bundle-restore.outputs.cache-hit != 'true' &&
         steps.build.outputs.duckdb-static-bundle-exists == 'true'
       with:
         path: duckdb-static-bundle/libduckdb_bundle.a

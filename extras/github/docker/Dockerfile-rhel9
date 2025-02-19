@@ -2,6 +2,8 @@ FROM docker.io/rockylinux/rockylinux:9.4.20240523-ubi
 
 ARG GO_VERSION
 
+ENV FPM_VERSION 1.15.1
+
 RUN yum install -y \
         curl-minimal \
         gcc-c++ \
@@ -21,5 +23,5 @@ RUN ARCHITECTURE=$(uname -m) \
         esac \
     && curl -L -s curl -L -s https://go.dev/dl/go${GO_VERSION}.linux-${ARCHITECTURE}.tar.gz | tar xvfz - -C /usr/local
 
-RUN gem install fpm -v 1.15.1 \
+RUN gem install fpm -v ${FPM_VERSION} \
     && gem cleanup

@@ -1,4 +1,5 @@
 /.env
 /coverage.txt
 /build/
+/duckdb-static-bundle/
 /assets/webpack/node_modules/

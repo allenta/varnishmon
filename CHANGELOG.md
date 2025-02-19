@@ -3,12 +3,16 @@
         * DuckDB 1.1.3 ➙ 1.2.0
         * uv 0.5.27 ➙ 0.6.0
         * Go
+            - client_golang 1.20.5 ➙ 1.21.0
             - cobra 1.8.1 ➙ 1.9.1
+            - fasthttp 1.58.0 ➙ 1.59.0
         * Node.js 22.13.1 ➙ 22.14.0
             - eslint 9.20.0 ➙ 9.20.1
+            - plotly.js-dist 3.0.0 ➙ 3.0.1
             - postcss 8.5.1 ➙ 8.5.2
             - sass 1.84.0 ➙ 1.85.0
             - sass-loader 16.0.4 ➙ 16.0.5
+            - webpack 5.97.1 ➙ 5.98.0
     + Added support for `rhel8` packaging in AMD64 architecture.
 
 - 0.5.3-1 (2025-02-13):

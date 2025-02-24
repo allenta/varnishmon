@@ -70,7 +70,8 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/term v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
-	golang.org/x/tools v0.30.0 // indirect
+	golang.org/x/tools v0.30.1-0.20250220174815-31e3bb2b8fd1 // indirect
+	golang.org/x/tools/gopls v0.18.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -80,4 +81,5 @@ require (
 tool (
 	github.com/vektra/mockery/v2
 	golang.org/x/tools/cmd/goimports
+	golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize
 )

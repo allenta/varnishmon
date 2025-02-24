@@ -101,6 +101,15 @@ vet:
 		go vet ./...; \
 	)
 
+.PHONY: modernize
+modernize:
+	@( \
+		set -e; \
+		\
+		echo '> Running modernize...'; \
+		go tool modernize ./...; \
+	)
+
 TEST_PACKAGES ?= '$(ROOT)/...'
 TEST_PATTERN ?= .
 

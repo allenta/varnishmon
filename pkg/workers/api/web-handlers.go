@@ -91,16 +91,16 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 	if h.app.Cfg().ScraperEnabled() {
 		scraperPeriod = int(h.app.Cfg().ScraperPeriod().Seconds())
 	}
-	cfg, err := json.Marshal(map[string]interface{}{
+	cfg, err := json.Marshal(map[string]any{
 		"version":  config.Version(),
 		"revision": config.Revision(),
-		"config": map[string]interface{}{
-			"scraper": map[string]interface{}{
+		"config": map[string]any{
+			"scraper": map[string]any{
 				"enabled": h.app.Cfg().ScraperEnabled(),
 				"period":  scraperPeriod,
 			},
 		},
-		"storage": map[string]interface{}{
+		"storage": map[string]any{
 			"hostname": h.storage.Hostname(),
 			"earliest": h.storage.Earliest().Unix(),
 			"latest":   h.storage.Latest().Unix(),
@@ -113,7 +113,7 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 		rctx.SetStatusCode(fasthttp.StatusInternalServerError)
 		return
 	}
-	tmplData := map[string]interface{}{
+	tmplData := map[string]any{
 		"Version":  config.Version(),
 		"Revision": config.Revision(),
 		"Hostname": h.storage.Hostname(),
@@ -136,7 +136,7 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 
 func (h *Handler) handleStorageMetricsRequest(rctx *fasthttp.RequestCtx) {
 	idRaw := rctx.UserValue("id")
-	var result map[string]interface{}
+	var result map[string]any
 	var err error
 
 	// Extract 'from' query string parameter.

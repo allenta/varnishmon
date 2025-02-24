@@ -107,7 +107,7 @@ modernize:
 		set -e; \
 		\
 		echo '> Running modernize...'; \
-		go tool modernize ./...; \
+		go tool modernize -fix ./...; \
 	)
 
 TEST_PACKAGES ?= '$(ROOT)/...'

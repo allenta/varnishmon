@@ -116,7 +116,6 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 	tmplData := map[string]any{
 		"Version":  config.Version(),
 		"Revision": config.Revision(),
-		"Hostname": h.storage.Hostname(),
 		"Config":   string(cfg),
 	}
 	var renderedTmpl bytes.Buffer

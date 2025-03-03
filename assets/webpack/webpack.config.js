@@ -20,6 +20,26 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'swc-loader',
+          options: {
+            jsc: {
+              parser: {
+                syntax: 'ecmascript',
+                jsx: true,
+              },
+              transform: {
+                react: {
+                  runtime: 'automatic',
+                },
+              },
+            },
+          },
+        },
+      },
+      {
         test: /\.scss$/,
         use: [
           MiniCssExtractPlugin.loader,
@@ -68,6 +88,9 @@ module.exports = {
       },
     ],
   },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
@@ -79,7 +102,7 @@ module.exports = {
     }),
     new ESLintPlugin({
       configType: 'eslintrc',
-      extensions: ['js'],
+      extensions: ['js', 'jsx'],
       failOnError: false,
     }),
   ],

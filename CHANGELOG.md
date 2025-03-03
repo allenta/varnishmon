@@ -1,4 +1,7 @@
 - ?
+    + Replaced the vanilla JavaScript-based UI with React.
+    + Replaced Flatpickr with Air Datepicker.
+    + Fixed rendering of bitmap metrics when gaps are present.
     + Updated dependencies.
         * Go
             - go-duckdb 1.8.4 ➙ 1.8.5

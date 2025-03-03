@@ -44,12 +44,12 @@ body {
   font-family: 'UbuntuRegular', Verdana, Arial, sans-serif;
 }
 
-#clusters.accordion {
-  --bs-accordion-border-width: 0;
-  --bs-accordion-btn-focus-box-shadow: 0;
-}
-
-#clusters .spinner-border {
+.spinner-border {
   width: 5rem;
   height: 5rem;
+}
+
+.accordion {
+  --bs-accordion-border-width: 0;
+  --bs-accordion-btn-focus-box-shadow: 0;
 }

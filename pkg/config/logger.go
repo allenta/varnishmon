@@ -69,12 +69,12 @@ func (b *LoggingBuffer) Clear() {
 	b.Buffer.Reset()
 }
 
-func (b *LoggingBuffer) Events() []map[string]interface{} {
-	result := make([]map[string]interface{}, 0)
+func (b *LoggingBuffer) Events() []map[string]any {
+	result := make([]map[string]any, 0)
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
-	for _, line := range strings.Split(b.String(), "\n") {
-		var event map[string]interface{}
+	for line := range strings.SplitSeq(b.String(), "\n") {
+		var event map[string]any
 		if err := json.Unmarshal([]byte(line), &event); err == nil {
 			result = append(result, event)
 		}

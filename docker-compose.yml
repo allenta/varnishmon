@@ -43,7 +43,7 @@
 #     #     + extras/github/docker/*: FPM, etc.
 #     #     + Makefile: Go tools no handled using the tools pattern, etc. + make mocks
 #     #   - Go:
-#     #     + go get -u ./... + make mod fmt lint vet test
+#     #     + go get -u ./... + make mod fmt lint vet modernize test
 #     #   - Node.js:
 #     #     + rm -rf package-lock.json node_modules && npm update --save && npm audit fix
 #     #     + npm outdated && npm install --save-dev <package>@latest

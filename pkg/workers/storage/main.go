@@ -62,7 +62,7 @@ type MetricSample struct {
 	Flag        string
 	Format      string
 	Description string
-	Value       interface{}
+	Value       any
 }
 
 func NewStorage(app Application) *Storage {

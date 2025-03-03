@@ -185,7 +185,7 @@ func (suite *MetricsTestSuite) TestPushSamplesBasics() {
 			assert.Equal(sample.Description, description)
 			assert.Equal(sampleClass, class)
 
-			var value interface{}
+			var value any
 			err = suite.stg.db.QueryRow(`
 				SELECT value.`+sampleClass+`
 				FROM metric_values
@@ -223,7 +223,7 @@ func (suite *MetricsTestSuite) TestGetMetricsBasics() {
 	assert.Equal(from.Unix(), metrics["from"])
 	assert.Equal(from.Unix()+int64(step), metrics["to"])
 	assert.Equal(step, metrics["step"])
-	assert.ElementsMatch([]map[string]interface{}{
+	assert.ElementsMatch([]map[string]any{
 		{
 			"id":          suite.stg.cache.metricsByName["foo"].ID,
 			"name":        suite.stg.cache.metricsByName["foo"].Name,
@@ -259,7 +259,7 @@ func (suite *MetricsTestSuite) TestGetMetricBasics() {
 	assert.Equal(from.Unix(), metric["from"])
 	assert.Equal(from.Unix()+int64(step), metric["to"])
 	assert.Equal(step, metric["step"])
-	assert.ElementsMatch([][2]interface{}{
+	assert.ElementsMatch([][2]any{
 		{from.Unix(), int64(2)},
 	}, metric["samples"])
 }

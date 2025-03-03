@@ -1,62 +1,66 @@
-import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
+import AirDatepicker from 'air-datepicker';
+import 'air-datepicker/air-datepicker.css';
+import localeEn from 'air-datepicker/locale/en';
 
 import * as helpers from './helpers';
 
 /**
-* A basic time picker that wraps Flatpickr to support very simple relative
+* A basic time picker that wraps Air Datepicker to support very simple relative
 * expressions such as 'now', 'now-1h', 'now-30m', etc.
 */
 class TimePicker {
   constructor(element) {
     this.element = element;
-    this.flatpickr = null;
-    this.expression = null;
+    this.datepicker = null;
     this.init();
   }
 
   init() {
-    this.flatpickr = flatpickr(this.element, {
-      enableTime: true,
-      dateFormat: 'Y-m-d H:i',
-      allowInput: true,
-      allowInvalidPreload: true,
-      clickOpens: true,
-      parseDate: this.handleParseDate.bind(this),
-      onValueUpdate: this.handleValueUpdate.bind(this),
-      onChange: this.handleChange.bind(this),
-      errorHandler: this.handleError.bind(this),
+    this.element.addEventListener('keydown', this.handleKeyDown.bind(this));
+    this.element.addEventListener('blur', this.handleOnBlur.bind(this));
+
+    this.datepicker = new AirDatepicker(this.element, {
+      timepicker: true,
+      dateFormat: 'yyyy-MM-dd',
+      timeFormat: 'HH:mm',
+      locale: localeEn,
+      firstDay: 1,
+      autoClose: false,
+      keyboardNav: false,
+      // onSelect: this.handleOnSelect.bind(this),
     });
   }
 
   //
-  // Handlers for the wrapped Flatpickr instance. This is where the dirty hacks
-  // to support relative expressions are.
+  // Handlers for the wrapped Air Datepicker instance & input field. This
+  // contains the main dirty hack to support relative expressions.
   //
 
-  handleParseDate(datestr, format) {
-    const parsed = this.parseExpression(datestr);
-    if (parsed != null) {
-      this.expression = datestr;
-      return null;
+  handleKeyDown(event) {
+    if (event.key === 'Enter') {
+      this.element.blur();
     }
-    this.expression = null;
-    return flatpickr.parseDate(datestr, format);
   }
 
-  handleValueUpdate(_selectedDates, _dateStr, _instance) {
-  }
+  handleOnBlur() {
+    this.datepicker.selectedDates = [];
 
-  handleChange(_selectedDates, _dateStr, _instance) {
-    this.element.classList.remove('is-invalid');
-  }
-
-  handleError(_error) {
-    this.flatpickr.close();
-    if (this.expression == null) {
-      this.element.classList.add('is-invalid');
-    } else {
+    if (this.parseExpression(this.element.value) != null) {
       this.element.classList.remove('is-invalid');
+    } else {
+      const value = this.element.value.trim();
+      if (value) {
+        const date = new Date(value);
+        if (!Number.isNaN(date.valueOf())) {
+          this.datepicker.setViewDate(date);
+          this.datepicker.selectDate([date], { silent: true, updateTime: true });
+          this.element.classList.remove('is-invalid');
+        } else {
+          this.element.classList.add('is-invalid');
+        }
+      } else {
+        this.element.classList.remove('is-invalid');
+      }
     }
   }
 
@@ -67,46 +71,48 @@ class TimePicker {
   // Tries to set the date of the picker. The date can be a Date object, a
   // string in ISO format, or a relative expression like 'now-1h'.
   setDate(date) {
-    if (typeof date === 'string') {
-      const parsed = this.parseExpression(date);
-      if (parsed != null) {
-        this.expression = date;
-        this.element.value = date;
-        this.flatpickr.selectedDates = [];
-        return;
+    if (date == null) {
+      this.datepicker.clear();
+      this.element.classList.remove('is-invalid');
+    } else if (typeof date === 'string' && this.parseExpression(date) != null) {
+      this.element.value = date;
+      this.element.classList.remove('is-invalid');
+    } else {
+      this.datepicker.selectDate([date], { silent: true, updateTime: true});
+      if (this.datepicker.selectedDates.length > 0) {
+        this.element.classList.remove('is-invalid');
+      } else {
+        this.element.classList.add('is-invalid');
       }
     }
-    this.flatpickr.setDate(date, false);
   }
 
   // Returns the selected date as a Date object, or null if no date is selected.
   // For relative expressions, the returned date is the result of evaluating the
   // expression.
   getDate() {
-    if (this.flatpickr.selectedDates[0] != null) {
-      return this.flatpickr.selectedDates[0];
+    let date = this.parseExpression(this.element.value);
+    if (date == null && this.datepicker.selectedDates.length > 0) {
+      date = this.datepicker.selectedDates[0];
     }
-    if (this.expression != null) {
-      return this.parseExpression(this.expression);
-    }
-    return null;
+    return date;
   }
 
   // Returns the selected date as a Date object, or null if no date is selected.
   // For relative expressions, the returned date is the raw expression string.
   getRawDate() {
-    if (this.flatpickr.selectedDates[0] != null) {
-      return this.flatpickr.selectedDates[0];
+    if (this.parseExpression(this.element.value) != null) {
+      return this.element.value;
     }
-    if (this.expression != null) {
-      return this.expression;
+    if (this.datepicker.selectedDates.length > 0) {
+      return this.datepicker.selectedDates[0];
     }
     return null;
   }
 
   // Returns true if the selected date is a relative expression, false otherwise.
   isRelativeDate() {
-    return this.flatpickr.selectedDates[0] == null && this.expression != null;
+    return this.parseExpression(this.element.value) != null;
   }
 
   // Returns a factory function that returns the currently selected date as a
@@ -115,15 +121,21 @@ class TimePicker {
   // returns the same value; for relative expressions, it always evaluates the
   // expression relative to the current time when called.
   getDateFactory() {
-    if (this.flatpickr.selectedDates[0] != null) {
-      const date = this.flatpickr.selectedDates[0];
-      return () => date;
-    }
-    if (this.expression != null) {
-      const expression = this.expression;
+    if (this.parseExpression(this.element.value) != null) {
+      const expression = this.element.value;
       return () => this.parseExpression(expression);
     }
+    if (this.datepicker.selectedDates.length > 0) {
+      const date = this.datepicker.selectedDates[0];
+      return () => date;
+    }
     return null;
+  }
+
+  destroy() {
+    this.element.removeEventListener('keydown', this.handleKeyDown);
+    this.element.removeEventListener('blur', this.handleOnBlur);
+    this.datepicker.destroy();
   }
 
   //
@@ -203,6 +215,11 @@ class TimeRangePicker {
     const from = this.fromPicker.getDate();
     const to = this.toPicker.getDate();
     return from != null && to != null && from <= to;
+  }
+
+  destroy() {
+    this.fromPicker.destroy();
+    this.toPicker.destroy();
   }
 }
 

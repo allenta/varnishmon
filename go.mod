@@ -7,7 +7,7 @@ toolchain go1.24.0
 require (
 	github.com/fasthttp/router v1.5.4
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
-	github.com/marcboeker/go-duckdb v1.8.4
+	github.com/marcboeker/go-duckdb v1.8.5
 	github.com/prometheus/client_golang v1.21.0
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.9.1
@@ -70,7 +70,8 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/term v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
-	golang.org/x/tools v0.30.0 // indirect
+	golang.org/x/tools v0.30.1-0.20250220174815-31e3bb2b8fd1 // indirect
+	golang.org/x/tools/gopls v0.18.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -80,4 +81,5 @@ require (
 tool (
 	github.com/vektra/mockery/v2
 	golang.org/x/tools/cmd/goimports
+	golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize
 )

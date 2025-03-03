@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func NewConfig(tl zerolog.TestingLog, cfg ...interface{}) *config.Config {
+func NewConfig(tl zerolog.TestingLog, cfg ...any) *config.Config {
 	tl.Helper()
 
 	var key string

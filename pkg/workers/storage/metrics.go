@@ -15,7 +15,7 @@ var (
 	ErrUnknownMetricID   = errors.New("unknown metric ID")
 )
 
-func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]interface{}, error) {
+func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]any, error) {
 	// Validate 'from' and 'to' parameters.
 	if from.After(to) {
 		return nil, ErrInvalidFromTo
@@ -57,7 +57,7 @@ func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]interfa
 	defer stg.cache.mutex.RUnlock()
 
 	// Decide metrics to be included in the response.
-	metrics := make([]map[string]interface{}, 0, len(stg.cache.metricsByID))
+	metrics := make([]map[string]any, 0, len(stg.cache.metricsByID))
 	for _, id := range ids {
 		metric := stg.cache.metricsByID[id]
 		if metric == nil {
@@ -66,7 +66,7 @@ func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]interfa
 				Msg("Unknown metric ID in 'metric_values' table")
 			continue
 		}
-		metrics = append(metrics, map[string]interface{}{
+		metrics = append(metrics, map[string]any{
 			"id":          metric.ID,
 			"name":        metric.Name,
 			"description": metric.Description,
@@ -76,7 +76,7 @@ func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]interfa
 	}
 
 	// Done!
-	return map[string]interface{}{
+	return map[string]any{
 		"from":    from.Unix(),
 		"to":      to.Unix(),
 		"step":    step,
@@ -86,7 +86,7 @@ func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]interfa
 
 func (stg *Storage) GetMetric(
 	id int, from, to time.Time, step int,
-	aggregator string) (map[string]interface{}, error) {
+	aggregator string) (map[string]any, error) {
 	// Validate 'from' and 'to' parameters.
 	if from.After(to) {
 		return nil, ErrInvalidFromTo
@@ -154,14 +154,14 @@ func (stg *Storage) GetMetric(
 	defer rows.Close()
 
 	// Fetch rows.
-	samples := make([][2]interface{}, 0)
+	samples := make([][2]any, 0)
 	for rows.Next() {
 		var timestamp time.Time
-		var value interface{}
+		var value any
 		if err := rows.Scan(&timestamp, &value); err != nil {
 			return nil, fmt.Errorf("failed to scan 'metric_values' rows: %w", err)
 		}
-		samples = append(samples, [2]interface{}{
+		samples = append(samples, [2]any{
 			// In the client side, seconds gives more than enough granularity,
 			// specially taking into account the minimum 'step' value is '1'
 			// (because of  the minimum scraper period).
@@ -178,7 +178,7 @@ func (stg *Storage) GetMetric(
 	}
 
 	// Done!
-	return map[string]interface{}{
+	return map[string]any{
 		"from":    from.Unix(),
 		"to":      to.Unix(),
 		"step":    step,
@@ -337,7 +337,7 @@ func (stg *Storage) unsafeNormalizeFromToAndStep(
 	return from, to, step, nil
 }
 
-func (cm *CachedMetric) FormatValue(value interface{}) interface{} {
+func (cm *CachedMetric) FormatValue(value any) any {
 	if cm.Format == "b" {
 		// Once aggregated, bitmaps can be returned as 'uint64' (e.g., 'last')
 		// or 'int64' (e.g., 'count'). Hex representation is only useful for

@@ -1,3 +1,16 @@
+- 0.6.0-1 (2025-03-03):
+    + Replaced the vanilla JavaScript-based UI with React.
+    + Replaced Flatpickr with Air Datepicker.
+    + Fixed rendering of bitmap metrics when gaps are present.
+    + Updated dependencies.
+        * Go
+            - go-duckdb 1.8.4 ➙ 1.8.5
+        * Node.js
+            - eslint 9.20.1 ➙ 9.21.0
+            - eslint-webpack-plugin 4.2.0 ➙ 5.0.0
+            - sass 1.85.0 ➙ 1.85.1
+            - terser-webpack-plugin 5.3.11 ➙ 5.3.12
+
 - 0.5.4-1 (2025-02-19):
     + Updated dependencies.
         * DuckDB 1.1.3 ➙ 1.2.0

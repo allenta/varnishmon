@@ -4,9 +4,9 @@ import Tooltip from 'bootstrap/js/dist/tooltip';
 import * as storage from './storage';
 import * as helpers from './helpers';
 
-// Charts are aware of their visibility to avoid rendering when not visible and
-// to start/stop refresh loops accordingly. A global 'IntersectionObserver' is
-// used to monitor their visibility status.
+// Charts are aware of their visibility to delay initialization until visible
+// and to start/stop refresh loops accordingly. A global 'IntersectionObserver'
+// is used to monitor their visibility status.
 const intersectionObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     entry.target.chart.handleVisibilityChange(entry.isIntersecting);
@@ -45,6 +45,8 @@ class Chart {
     this.aggregator = aggregator;
     this.step = step;
 
+    this.container.chart = this;
+
     this.listeners = {};
 
     this.initializing = false;
@@ -56,6 +58,7 @@ class Chart {
     this.interval = null;
     this.lastRefresh = 0;
     this.pendingRefresh = false;
+    this.pendingUpdate = false;
     this.error = null;
 
     this.graph = {
@@ -196,6 +199,9 @@ class Chart {
             (this.refreshInterval > 0 && helpers.dateToUnix(new Date()) - this.lastRefresh > this.refreshInterval)) {
           // Note that the debounced refresh handler is used here.
           this.debouncedHandleRefresh();
+        } else if (this.pendingUpdate) {
+          this.pendingUpdate = false;
+          this.updateGraph(true);
         }
       }
     } else {
@@ -286,30 +292,6 @@ class Chart {
   // Public API.
   //
 
-  redraw(filter, verbosity, columns) {
-    // Hide the chart if the metric name does not match the filter & verbosity.
-    let hidden = verbosity === 'normal' && this.metric.debug;
-    if (!hidden) {
-      const terms = filter.split(/\s+/).filter(term => term.length > 0);
-      if (terms.length > 0) {
-        hidden = !terms.some(term => this.metric.name.includes(term));
-      }
-    }
-    this.container.classList.toggle('d-none', hidden);
-
-    // Rearrange CSS classes to adjust to the number of columns.
-    this.container.classList.forEach(className => {
-      if (className.startsWith('col-')) {
-        this.container.classList.remove(className);
-      }
-    });
-    this.container.classList.add(`col-${12 / columns}`);
-
-    // No need to call 'handleRefresh()' here: visibility changes are managed by
-    // 'handleVisibilityChange()', and size changes are managed by
-    // 'handleSizeChange()'.
-  }
-
   setRefreshInterval(interval) {
     this.refreshInterval = interval;
     if (this.visible && this.graph.element != null) {
@@ -354,7 +336,11 @@ class Chart {
     // Beware 'handleRefresh()' is not called here, as we are not fetching new
     // samples, just updating the graph with the current data.
     if (this.graph.element != null) {
-      this.updateGraph(true);
+      if (this.visible) {
+        this.updateGraph(true);
+      } else {
+        this.pendingUpdate = true;
+      }
     }
   }
 
@@ -365,6 +351,7 @@ class Chart {
     this.clearError();
     if (this.graph.element != null) {
       Plotly.purge(this.graph.element);
+      this.container.chart = null;
     }
   }
 
@@ -456,7 +443,8 @@ class Chart {
     const maxSamples = Math.floor(0.9 * containerWidth);
 
     // Stop here if the maximum number of samples cannot be calculated (most
-    // likely because the container is not visible due to a race condition).
+    // likely because the container is not visible due to a race condition or
+    // being collapsed).
     if (maxSamples <= 0) {
       throw new Error('Failed to estimate the optimal step');
     }
@@ -486,7 +474,7 @@ class Chart {
       // improved in the future using a different visualization for bitmap
       // metrics.
       this.graph.y.push(
-        this.metric.flag === 'b' ?
+        this.metric.flag === 'b' && sample[1] != null ?
           BigInt(`0x${sample[1]}`).toString(2).split('').filter(bit => bit === '1').length :
           sample[1]);
     });

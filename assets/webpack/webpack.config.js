@@ -78,6 +78,7 @@ module.exports = {
       filename: 'styles.css',
     }),
     new ESLintPlugin({
+      configType: 'eslintrc',
       extensions: ['js'],
       failOnError: false,
     }),

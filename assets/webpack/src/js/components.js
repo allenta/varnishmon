@@ -445,9 +445,7 @@ export function Actions() {
  * Clusters.
  ******************************************************************************/
 
-export function Clusters(props) {
-  const { setFilterStats, metrics, ...otherProps } = props;
-
+export function Clusters({ setFilterStats, metrics, ...props }) {
   const containerRef = React.useRef(null);
 
   // Beware this will be executed on every render in order to update the filter
@@ -479,7 +477,7 @@ export function Clusters(props) {
         <Cluster
           key={cluster.name}
           setFilterStats={setFilterStats}
-          {...otherProps}
+          {...props}
           cluster={cluster} />
       ))}
     </div>
@@ -503,9 +501,7 @@ Clusters.propTypes = {
  * Cluster.
  ******************************************************************************/
 
-export function Cluster(props) {
-  const { filter, verbosity, cluster, ...otherProps } = props;
-
+export function Cluster({ filter, verbosity, cluster, ...props }) {
   const containerRef = React.useRef(null);
   const [accordion, setAccordion] = React.useState(null);
   const [isAccordionCollapsed, setIsAccordionCollapsed] = React.useState(false);
@@ -594,7 +590,7 @@ export function Cluster(props) {
           {visibleMetrics.map((metric) => (
             <Metric
               key={metric.id}
-              {...otherProps}
+              {...props}
               metric={metric} />
           ))}
         </div>

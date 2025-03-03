@@ -159,6 +159,7 @@ Refresh.propTypes = {
 export function Filter({ filter, setFilter }) {
   const [localFilter, setLocalFilter] = React.useState(filter);
   const [history, setHistory] = React.useState(config.getFilterHistory());
+  const filterId = React.useId();
 
   const debouncedSetFilter = React.useCallback(
     helpers.debounce(setFilter, 500), []);
@@ -199,13 +200,13 @@ export function Filter({ filter, setFilter }) {
 
   return (
     <>
-      <label className='form-label'>Filter</label>
+      <label className='form-label' htmlFor={filterId}>Filter</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-solid fa-magnifying-glass'></i>
         </span>
         <input type='text' className='form-control' placeholder='type here to filter metrics by name'
-          onBlur={onBlur} onChange={onChange} value={localFilter} />
+          onBlur={onBlur} onChange={onChange} value={localFilter} id={filterId} />
         <button className='btn border-secondary-subtle bg-body-tertiary dropdown-toggle'
           type='button' data-bs-toggle='dropdown' aria-expanded='false'></button>
         <ul className='dropdown-menu dropdown-menu-end w-100' aria-labelledby='historyDropdown'>
@@ -228,6 +229,8 @@ Filter.propTypes = {
  ******************************************************************************/
 
 export function Verbosity({ verbosity, setVerbosity }) {
+  const verbosityId = React.useId();
+
   const onChange = (event) => {
     const value = event.target.value;
     config.setVerbosity(value);
@@ -236,12 +239,12 @@ export function Verbosity({ verbosity, setVerbosity }) {
 
   return (
     <>
-      <label className='form-label'>Verbosity</label>
+      <label className='form-label' htmlFor={verbosityId}>Verbosity</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-regular fa-comments'></i>
         </span>
-        <select className='form-select' value={verbosity} onChange={onChange}>
+        <select className='form-select' value={verbosity} onChange={onChange} id={verbosityId}>
           {config.getVerbosityValues().map((value) => (
             <option key={value} value={value}>{value}</option>
           ))}
@@ -261,6 +264,8 @@ Verbosity.propTypes = {
  ******************************************************************************/
 
 export function Columns({ columns, setColumns }) {
+  const columnsId = React.useId();
+
   const onChange = (event) => {
     const value = parseInt(event.target.value, 10);
     config.setColumns(value);
@@ -269,12 +274,12 @@ export function Columns({ columns, setColumns }) {
 
   return (
     <>
-      <label className='form-label'>Columns</label>
+      <label className='form-label' htmlFor={columnsId}>Columns</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-solid fa-table-cells-large'></i>
         </span>
-        <select className='form-select' value={columns} onChange={onChange}>
+        <select className='form-select' value={columns} onChange={onChange} id={columnsId}>
           {config.getColumnsValues().map((value) => (
             <option key={value} value={value}>{value}</option>
           ))}
@@ -294,6 +299,8 @@ Columns.propTypes = {
  ******************************************************************************/
 
 export function Aggregator({ aggregator, setAggregator }) {
+  const aggregatorId = React.useId();
+
   const onChange = (event) => {
     const value = event.target.value;
     config.setAggregator(value);
@@ -302,12 +309,12 @@ export function Aggregator({ aggregator, setAggregator }) {
 
   return (
     <>
-      <label className='form-label'>Aggregator</label>
+      <label className='form-label' htmlFor={aggregatorId}>Aggregator</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-solid fa-filter'></i>
         </span>
-        <select className='form-select' value={aggregator} onChange={onChange}>
+        <select className='form-select' value={aggregator} onChange={onChange} id={aggregatorId}>
           {config.getAggregatorValues().map((value) => (
             <option key={value} value={value}>{value}</option>
           ))}
@@ -327,6 +334,7 @@ Aggregator.propTypes = {
  ******************************************************************************/
 
 export function Step({ step, setStep }) {
+  const stepId = React.useId();
   const [localStep, setLocalStep] = React.useState(step);
 
   const onChange = (event) => {
@@ -352,14 +360,14 @@ export function Step({ step, setStep }) {
 
   return (
     <>
-      <label className='form-label'>Step</label>
+      <label className='form-label' htmlFor={stepId}>Step</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-solid fa-arrows-left-right-to-line'></i>
         </span>
         <input type='number' className='form-control'
-          min={config.getMinimumStep()} value={localStep} onChange={onChange}
-          onBlur={onBlur} />
+          id={stepId} min={config.getMinimumStep()} value={localStep}
+          onChange={onChange} onBlur={onBlur} />
       </div>
     </>
   );

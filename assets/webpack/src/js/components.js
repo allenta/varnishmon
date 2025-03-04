@@ -445,38 +445,12 @@ export function Actions() {
  * Clusters.
  ******************************************************************************/
 
-export function Clusters({ setFilterStats, metrics, ...props }) {
-  const containerRef = React.useRef(null);
-
-  // Beware this will be executed on every render in order to update the filter
-  // stats. This is a lightweight operation, as it only counts the number of
-  // visible metrics and clusters.
-  React.useEffect(() => {
-    if (containerRef.current != null) {
-      let numClusters = 0, numVisibleClusters = 0, numMetrics = 0, numVisibleMetrics = 0;
-      containerRef.current.querySelectorAll('.cluster').forEach((cluster) => {
-        numClusters++;
-        if (!cluster.classList.contains('d-none')) {
-          numVisibleClusters++;
-          const clusterVisibleMetrics = parseInt(cluster.getAttribute('data-visible-metrics'), 10);
-          numMetrics += clusterVisibleMetrics;
-          numVisibleMetrics += clusterVisibleMetrics;
-        }
-        numMetrics += parseInt(cluster.getAttribute('data-hidden-metrics'), 10);
-      });
-      setFilterStats(
-        `${numVisibleMetrics} metrics found (${numMetrics-numVisibleMetrics} hidden),` +
-        ` organized in ${numVisibleClusters} clusters (${numClusters-numVisibleClusters}` +
-        ' hidden)');
-    }
-  });
-
+export function Clusters({ filteredMetrics, ...props }) {
   return (
-    <div ref={containerRef} className='accordion accordion-flush flex-grow-1 d-flex flex-column'>
-      {metrics != null && metrics.clusters.map((cluster) => (
+    <div className='accordion accordion-flush flex-grow-1 d-flex flex-column'>
+      {filteredMetrics != null && filteredMetrics.clusters.map((cluster) => (
         <Cluster
           key={cluster.name}
-          setFilterStats={setFilterStats}
           {...props}
           cluster={cluster} />
       ))}
@@ -488,20 +462,17 @@ Clusters.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
   initialRange: PropTypes.object.isRequired,
   refreshInterval: PropTypes.number.isRequired,
-  filter: PropTypes.string.isRequired,
-  setFilterStats: PropTypes.func.isRequired,
-  verbosity: PropTypes.string.isRequired,
   columns: PropTypes.number.isRequired,
   aggregator: PropTypes.string.isRequired,
   step: PropTypes.number.isRequired,
-  metrics: PropTypes.object,
+  filteredMetrics: PropTypes.object,
 };
 
 /******************************************************************************
  * Cluster.
  ******************************************************************************/
 
-export function Cluster({ filter, verbosity, cluster, ...props }) {
+export function Cluster({ cluster, ...props }) {
   const containerRef = React.useRef(null);
   const [accordion, setAccordion] = React.useState(null);
   const [isAccordionCollapsed, setIsAccordionCollapsed] = React.useState(false);
@@ -547,36 +518,12 @@ export function Cluster({ filter, verbosity, cluster, ...props }) {
     }
   }, [accordion, isAccordionCollapsed]);
 
-  const visibleMetrics = React.useMemo(() => {
-    return cluster.metrics.filter((metric) => {
-      if (verbosity === 'normal' && metric.debug) {
-        return false;
-      }
-
-      const terms = filter.split(/\s+/).filter((term) => term.length > 0);
-      if (terms.length > 0) {
-        return terms.some((term) => metric.name.includes(term));
-      }
-
-      return true;
-    });
-  }, [filter, verbosity, cluster]);
-
   const onClick = () => {
     setIsAccordionCollapsed(!isAccordionCollapsed);
   };
 
-  // Beware conditional rendering (i.e., render an empty 'div' when there are no
-  // visible metrics) cannot be used here because that will interfere with the
-  // 'Collapse' instance. For example, if the cluster is initially not empty,
-  // the empty because of a filter, and then not empty again, the 'Collapse'
-  // behavior will be lost.
   return (
-    <div
-      ref={containerRef}
-      className={`cluster accordion-item ${visibleMetrics.length === 0 ? 'd-none' : ''}`}
-      data-visible-metrics={visibleMetrics.length}
-      data-hidden-metrics={cluster.metrics.length - visibleMetrics.length}>
+    <div ref={containerRef}>
       <div className='accordion-header'>
         <button
           className={`accordion-button bg-light text-dark fs-5 border-0 font-monospace ${isAccordionCollapsed ? 'collapsed' : ''}`}
@@ -587,7 +534,7 @@ export function Cluster({ filter, verbosity, cluster, ...props }) {
       </div>
       <div className='accordion-collapse'>
         <div className='row g-4 py-4'>
-          {visibleMetrics.map((metric) => (
+          {cluster.metrics.map((metric) => (
             <Metric
               key={metric.id}
               {...props}
@@ -603,8 +550,6 @@ Cluster.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
   initialRange: PropTypes.object.isRequired,
   refreshInterval: PropTypes.number.isRequired,
-  filter: PropTypes.string.isRequired,
-  verbosity: PropTypes.string.isRequired,
   columns: PropTypes.number.isRequired,
   aggregator: PropTypes.string.isRequired,
   step: PropTypes.number.isRequired,

@@ -41,18 +41,68 @@ const useReload = ({ timeRangePicker, initialRange, step }) => {
   return [metrics, loadProgress, reload];
 };
 
-const App = () => {
-  const [timeRangePicker, setTimeRangePicker] = React.useState(null);
-  const [refreshInterval, setRefreshInterval] = React.useState(config.getRefreshInterval());
+const useFilter = ({ metrics }) => {
   const [filter, setFilter] = React.useState(config.getFilter());
   const [filterStats, setFilterStats] = React.useState('');
   const [verbosity, setVerbosity] = React.useState(config.getVerbosity());
+  const [filteredMetrics, setFilteredMetrics] = React.useState(metrics);
+
+  React.useEffect(() => {
+    if (metrics == null) {
+      setFilterStats('');
+      setFilteredMetrics(null);
+      return;
+    }
+
+    const newFilteredMetrics = { ...metrics, clusters: [] };
+    const filterTerms = filter.split(/\s+/).filter((term) => term.length > 0);
+    let numClusters = 0, numVisibleClusters = 0, numMetrics = 0, numVisibleMetrics = 0;
+    metrics.clusters.forEach((cluster) => {
+      numClusters += 1;
+      numMetrics += cluster.metrics.length;
+
+      const newCluster = { ...cluster, metrics: [] };
+      newCluster.metrics = cluster.metrics.filter((metric) => {
+        if (verbosity === 'normal' && metric.debug) {
+          return false;
+        }
+
+        if (filterTerms.length > 0) {
+          return filterTerms.some((term) => metric.name.includes(term));
+        }
+
+        return true;
+      });
+
+      if (newCluster.metrics.length > 0) {
+        numVisibleClusters += 1;
+        numVisibleMetrics += newCluster.metrics.length;
+        newFilteredMetrics.clusters.push(newCluster);
+      }
+    });
+
+    setFilterStats(
+      `${numVisibleMetrics} metrics found (${numMetrics-numVisibleMetrics} hidden),` +
+      ` organized in ${numVisibleClusters} clusters (${numClusters-numVisibleClusters}` +
+      ' hidden)');
+    setFilteredMetrics(newFilteredMetrics);
+  }, [metrics, filter, verbosity]);
+
+  return [filteredMetrics, filter, setFilter, filterStats, verbosity, setVerbosity];
+};
+
+const App = () => {
+  const [timeRangePicker, setTimeRangePicker] = React.useState(null);
+  const [refreshInterval, setRefreshInterval] = React.useState(config.getRefreshInterval());
   const [columns, setColumns] = React.useState(config.getColumns());
   const [aggregator, setAggregator] = React.useState(config.getAggregator());
   const [step, setStep] = React.useState(config.getStep());
+
   const initialRange = React.useRef(null);
   const initialLoadDone = React.useRef(false);
+
   const [metrics, loadProgress, reload] = useReload({ timeRangePicker, initialRange, step });
+  const [filteredMetrics, filter, setFilter, filterStats, verbosity, setVerbosity] = useFilter({ metrics });
 
   // Override Plotly notifications system to use our own. This will be executed
   // only once, when the component is mounted.
@@ -119,13 +169,10 @@ const App = () => {
             timeRangePicker={timeRangePicker}
             initialRange={initialRange}
             refreshInterval={refreshInterval}
-            filter={filter}
-            setFilterStats={setFilterStats}
-            verbosity={verbosity}
             columns={columns}
             aggregator={aggregator}
             step={step}
-            metrics={metrics} />}
+            filteredMetrics={filteredMetrics} />}
           {loadProgress === 'loading' && (
             <div className='d-flex justify-content-center flex-grow-1 align-items-center'>
               <div className='spinner-border fs-2 opacity-50' role='status'>

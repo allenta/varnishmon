@@ -539,23 +539,29 @@ class Chart {
         griddash: 'dash',
         rangemode: 'normal',
         // tickformat: '.1s',
-        title: (() => {
-          if (this.metric.flag === 'c') {
-            if (this.metric.format === 'd') {
-              return 'seconds';
-            } else if (this.metric.format === 'B') {
-              return 'Bps';
+        title: {
+          text: (() => {
+            if (this.metric.flag === 'c') {
+              if (this.metric.format === 'd') {
+                return 'seconds';
+              } else if (this.metric.format === 'B') {
+                return 'Bps';
+              }
+              return 'eps';
+            } else if (this.metric.flag === 'g') {
+              if (this.metric.format === 'd') {
+                return 'seconds';
+              } else if (this.metric.format === 'B') {
+                return 'bytes';
+              }
+            } else if (this.metric.flag === 'b') {
+              if (this.metric.format === 'b') {
+                return 'bits';
+              }
             }
-            return 'eps';
-          } else if (this.metric.flag === 'g') {
-            if (this.metric.format === 'd') {
-              return 'seconds';
-            } else if (this.metric.format === 'B') {
-              return 'bytes';
-            }
-          }
-          return '';
-        })(),
+            return '';
+          })(),
+        },
       },
     };
 

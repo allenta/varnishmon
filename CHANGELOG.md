@@ -1,3 +1,6 @@
+- 0.6.1-1 (2025-03-05):
+    + Applied assorted improvements to the new React-based UI.
+
 - 0.6.0-1 (2025-03-03):
     + Replaced the vanilla JavaScript-based UI with React.
     + Replaced Flatpickr with Air Datepicker.

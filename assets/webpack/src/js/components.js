@@ -159,6 +159,7 @@ Refresh.propTypes = {
 export function Filter({ filter, setFilter }) {
   const [localFilter, setLocalFilter] = React.useState(filter);
   const [history, setHistory] = React.useState(config.getFilterHistory());
+  const filterId = React.useId();
 
   const debouncedSetFilter = React.useCallback(
     helpers.debounce(setFilter, 500), []);
@@ -199,13 +200,13 @@ export function Filter({ filter, setFilter }) {
 
   return (
     <>
-      <label className='form-label'>Filter</label>
+      <label className='form-label' htmlFor={filterId}>Filter</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-solid fa-magnifying-glass'></i>
         </span>
         <input type='text' className='form-control' placeholder='type here to filter metrics by name'
-          onBlur={onBlur} onChange={onChange} value={localFilter} />
+          onBlur={onBlur} onChange={onChange} value={localFilter} id={filterId} />
         <button className='btn border-secondary-subtle bg-body-tertiary dropdown-toggle'
           type='button' data-bs-toggle='dropdown' aria-expanded='false'></button>
         <ul className='dropdown-menu dropdown-menu-end w-100' aria-labelledby='historyDropdown'>
@@ -228,6 +229,8 @@ Filter.propTypes = {
  ******************************************************************************/
 
 export function Verbosity({ verbosity, setVerbosity }) {
+  const verbosityId = React.useId();
+
   const onChange = (event) => {
     const value = event.target.value;
     config.setVerbosity(value);
@@ -236,12 +239,12 @@ export function Verbosity({ verbosity, setVerbosity }) {
 
   return (
     <>
-      <label className='form-label'>Verbosity</label>
+      <label className='form-label' htmlFor={verbosityId}>Verbosity</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-regular fa-comments'></i>
         </span>
-        <select className='form-select' value={verbosity} onChange={onChange}>
+        <select className='form-select' value={verbosity} onChange={onChange} id={verbosityId}>
           {config.getVerbosityValues().map((value) => (
             <option key={value} value={value}>{value}</option>
           ))}
@@ -261,6 +264,8 @@ Verbosity.propTypes = {
  ******************************************************************************/
 
 export function Columns({ columns, setColumns }) {
+  const columnsId = React.useId();
+
   const onChange = (event) => {
     const value = parseInt(event.target.value, 10);
     config.setColumns(value);
@@ -269,12 +274,12 @@ export function Columns({ columns, setColumns }) {
 
   return (
     <>
-      <label className='form-label'>Columns</label>
+      <label className='form-label' htmlFor={columnsId}>Columns</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-solid fa-table-cells-large'></i>
         </span>
-        <select className='form-select' value={columns} onChange={onChange}>
+        <select className='form-select' value={columns} onChange={onChange} id={columnsId}>
           {config.getColumnsValues().map((value) => (
             <option key={value} value={value}>{value}</option>
           ))}
@@ -294,6 +299,8 @@ Columns.propTypes = {
  ******************************************************************************/
 
 export function Aggregator({ aggregator, setAggregator }) {
+  const aggregatorId = React.useId();
+
   const onChange = (event) => {
     const value = event.target.value;
     config.setAggregator(value);
@@ -302,12 +309,12 @@ export function Aggregator({ aggregator, setAggregator }) {
 
   return (
     <>
-      <label className='form-label'>Aggregator</label>
+      <label className='form-label' htmlFor={aggregatorId}>Aggregator</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-solid fa-filter'></i>
         </span>
-        <select className='form-select' value={aggregator} onChange={onChange}>
+        <select className='form-select' value={aggregator} onChange={onChange} id={aggregatorId}>
           {config.getAggregatorValues().map((value) => (
             <option key={value} value={value}>{value}</option>
           ))}
@@ -327,6 +334,7 @@ Aggregator.propTypes = {
  ******************************************************************************/
 
 export function Step({ step, setStep }) {
+  const stepId = React.useId();
   const [localStep, setLocalStep] = React.useState(step);
 
   const onChange = (event) => {
@@ -352,14 +360,14 @@ export function Step({ step, setStep }) {
 
   return (
     <>
-      <label className='form-label'>Step</label>
+      <label className='form-label' htmlFor={stepId}>Step</label>
       <div className='input-group'>
         <span className='input-group-text'>
           <i className='fa-solid fa-arrows-left-right-to-line'></i>
         </span>
         <input type='number' className='form-control'
-          min={config.getMinimumStep()} value={localStep} onChange={onChange}
-          onBlur={onBlur} />
+          id={stepId} min={config.getMinimumStep()} value={localStep}
+          onChange={onChange} onBlur={onBlur} />
       </div>
     </>
   );
@@ -437,41 +445,13 @@ export function Actions() {
  * Clusters.
  ******************************************************************************/
 
-export function Clusters(props) {
-  const { setFilterStats, metrics, ...otherProps } = props;
-
-  const containerRef = React.useRef(null);
-
-  // Beware this will be executed on every render in order to update the filter
-  // stats. This is a lightweight operation, as it only counts the number of
-  // visible metrics and clusters.
-  React.useEffect(() => {
-    if (containerRef.current != null) {
-      let numClusters = 0, numVisibleClusters = 0, numMetrics = 0, numVisibleMetrics = 0;
-      containerRef.current.querySelectorAll('.cluster').forEach((cluster) => {
-        numClusters++;
-        if (!cluster.classList.contains('d-none')) {
-          numVisibleClusters++;
-          const clusterVisibleMetrics = parseInt(cluster.getAttribute('data-visible-metrics'), 10);
-          numMetrics += clusterVisibleMetrics;
-          numVisibleMetrics += clusterVisibleMetrics;
-        }
-        numMetrics += parseInt(cluster.getAttribute('data-hidden-metrics'), 10);
-      });
-      setFilterStats(
-        `${numVisibleMetrics} metrics found (${numMetrics-numVisibleMetrics} hidden),` +
-        ` organized in ${numVisibleClusters} clusters (${numClusters-numVisibleClusters}` +
-        ' hidden)');
-    }
-  });
-
+export function Clusters({ filteredMetrics, ...props }) {
   return (
-    <div ref={containerRef} className='accordion accordion-flush flex-grow-1 d-flex flex-column'>
-      {metrics != null && metrics.clusters.map((cluster) => (
+    <div className='accordion accordion-flush flex-grow-1 d-flex flex-column'>
+      {filteredMetrics != null && filteredMetrics.clusters.map((cluster) => (
         <Cluster
           key={cluster.name}
-          setFilterStats={setFilterStats}
-          {...otherProps}
+          {...props}
           cluster={cluster} />
       ))}
     </div>
@@ -482,22 +462,17 @@ Clusters.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
   initialRange: PropTypes.object.isRequired,
   refreshInterval: PropTypes.number.isRequired,
-  filter: PropTypes.string.isRequired,
-  setFilterStats: PropTypes.func.isRequired,
-  verbosity: PropTypes.string.isRequired,
   columns: PropTypes.number.isRequired,
   aggregator: PropTypes.string.isRequired,
   step: PropTypes.number.isRequired,
-  metrics: PropTypes.object,
+  filteredMetrics: PropTypes.object,
 };
 
 /******************************************************************************
  * Cluster.
  ******************************************************************************/
 
-export function Cluster(props) {
-  const { filter, verbosity, cluster, ...otherProps } = props;
-
+export function Cluster({ cluster, ...props }) {
   const containerRef = React.useRef(null);
   const [accordion, setAccordion] = React.useState(null);
   const [isAccordionCollapsed, setIsAccordionCollapsed] = React.useState(false);
@@ -543,36 +518,12 @@ export function Cluster(props) {
     }
   }, [accordion, isAccordionCollapsed]);
 
-  const visibleMetrics = React.useMemo(() => {
-    return cluster.metrics.filter((metric) => {
-      if (verbosity === 'normal' && metric.debug) {
-        return false;
-      }
-
-      const terms = filter.split(/\s+/).filter((term) => term.length > 0);
-      if (terms.length > 0) {
-        return terms.some((term) => metric.name.includes(term));
-      }
-
-      return true;
-    });
-  }, [filter, verbosity, cluster]);
-
   const onClick = () => {
     setIsAccordionCollapsed(!isAccordionCollapsed);
   };
 
-  // Beware conditional rendering (i.e., render an empty 'div' when there are no
-  // visible metrics) cannot be used here because that will interfere with the
-  // 'Collapse' instance. For example, if the cluster is initially not empty,
-  // the empty because of a filter, and then not empty again, the 'Collapse'
-  // behavior will be lost.
   return (
-    <div
-      ref={containerRef}
-      className={`cluster accordion-item ${visibleMetrics.length === 0 ? 'd-none' : ''}`}
-      data-visible-metrics={visibleMetrics.length}
-      data-hidden-metrics={cluster.metrics.length - visibleMetrics.length}>
+    <div ref={containerRef}>
       <div className='accordion-header'>
         <button
           className={`accordion-button bg-light text-dark fs-5 border-0 font-monospace ${isAccordionCollapsed ? 'collapsed' : ''}`}
@@ -583,10 +534,10 @@ export function Cluster(props) {
       </div>
       <div className='accordion-collapse'>
         <div className='row g-4 py-4'>
-          {visibleMetrics.map((metric) => (
+          {cluster.metrics.map((metric) => (
             <Metric
               key={metric.id}
-              {...otherProps}
+              {...props}
               metric={metric} />
           ))}
         </div>
@@ -599,8 +550,6 @@ Cluster.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
   initialRange: PropTypes.object.isRequired,
   refreshInterval: PropTypes.number.isRequired,
-  filter: PropTypes.string.isRequired,
-  verbosity: PropTypes.string.isRequired,
   columns: PropTypes.number.isRequired,
   aggregator: PropTypes.string.isRequired,
   step: PropTypes.number.isRequired,

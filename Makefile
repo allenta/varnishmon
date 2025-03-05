@@ -276,22 +276,22 @@ else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
 	)
 endif
 
-.PHONY: webpack-watch
-webpack-watch:
+.PHONY: web-watch
+web-watch:
 	@( \
 		set -e; \
 		\
-		cd '$(ROOT)/assets/webpack'; \
+		cd '$(ROOT)/assets/web'; \
 		npm install; \
 		npm run watch; \
 	)
 
-.PHONY: webpack-build
-webpack-build:
+.PHONY: web-build
+web-build:
 	@( \
 		set -e; \
 		\
-		cd '$(ROOT)/assets/webpack'; \
+		cd '$(ROOT)/assets/web'; \
 		npm install; \
 		npm run build; \
 	)
@@ -330,5 +330,5 @@ mrproper:
 	@( \
 		echo '> Cleaning up...'; \
 		rm -rf '$(ROOT)/build'; \
-		git clean -f -x -d -e .env -e assets/webpack/node_modules -e duckdb-static-bundle -e varnishmon.db $(ROOT); \
+		git clean -f -x -d -e .env -e assets/web/node_modules -e duckdb-static-bundle -e varnishmon.db $(ROOT); \
 	)

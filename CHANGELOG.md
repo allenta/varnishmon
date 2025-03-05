@@ -1,3 +1,6 @@
+- 0.6.2-1 (2025-03-05):
+    + Fixed rendering of Y-axis labels in charts.
+
 - 0.6.1-1 (2025-03-05):
     + Applied assorted improvements to the new React-based UI.
 

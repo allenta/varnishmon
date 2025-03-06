@@ -7,11 +7,14 @@ import * as helpers from './helpers';
 // Charts are aware of their visibility to delay initialization until visible
 // and to start/stop refresh loops accordingly. A global 'IntersectionObserver'
 // is used to monitor their visibility status.
-const intersectionObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    entry.target.chart.handleVisibilityChange(entry.isIntersecting);
-  });
-}, { threshold: 0.1 });
+const intersectionObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      entry.target.chart.handleVisibilityChange(entry.isIntersecting);
+    });
+  },
+  { threshold: 0.1 },
+);
 
 // Charts need to be notified about changes in their container size to adjust
 // the graph accordingly. This might require a full data refresh (e.g., less
@@ -20,7 +23,7 @@ const intersectionObserver = new IntersectionObserver((entries) => {
 // space is available, allowing the use of lines and markers instead of just
 // lines).
 const resizeObserver = new ResizeObserver((entries) => {
-  entries.forEach(entry => {
+  entries.forEach((entry) => {
     entry.target.chart.handleSizeChange();
   });
 });
@@ -37,7 +40,14 @@ const xaxisLayout = {
 };
 
 class Chart {
-  constructor(container, metric, rangeFactory, refreshInterval, aggregator, step) {
+  constructor(
+    container,
+    metric,
+    rangeFactory,
+    refreshInterval,
+    aggregator,
+    step,
+  ) {
     this.container = container;
     this.metric = metric;
     this.rangeFactory = rangeFactory;
@@ -52,7 +62,10 @@ class Chart {
     this.initializing = false;
     this.refreshing = false;
 
-    this.debouncedHandleRefresh = helpers.debounce(this.handleRefresh.bind(this), 500);
+    this.debouncedHandleRefresh = helpers.debounce(
+      this.handleRefresh.bind(this),
+      500,
+    );
 
     this.visible = false;
     this.interval = null;
@@ -195,8 +208,12 @@ class Chart {
         if (this.interval == null) {
           this.setupInterval();
         }
-        if (this.pendingRefresh ||
-            (this.refreshInterval > 0 && helpers.dateToUnix(new Date()) - this.lastRefresh > this.refreshInterval)) {
+        if (
+          this.pendingRefresh ||
+          (this.refreshInterval > 0 &&
+            helpers.dateToUnix(new Date()) - this.lastRefresh >
+              this.refreshInterval)
+        ) {
           // Note that the debounced refresh handler is used here.
           this.debouncedHandleRefresh();
         } else if (this.pendingUpdate) {
@@ -224,7 +241,11 @@ class Chart {
         new Date(event['xaxis.range[0]']),
         new Date(event['xaxis.range[1]']),
       ];
-    } else if (event['xaxis.range'] && Array.isArray(event['xaxis.range']) && event['xaxis.range'].length === 2) {
+    } else if (
+      event['xaxis.range'] &&
+      Array.isArray(event['xaxis.range']) &&
+      event['xaxis.range'].length === 2
+    ) {
       this.graph.zoomRange = null;
     } else {
       this.graph.zoomRange = null;
@@ -233,19 +254,29 @@ class Chart {
     // If the zoom range goes beyond the current range, adjust it to the
     // current range.
     if (this.graph.zoomRange != null) {
-      if (helpers.dateToUnix(this.graph.zoomRange[0]) < helpers.dateToUnix(this.graph.range[0])) {
+      if (
+        helpers.dateToUnix(this.graph.zoomRange[0]) <
+        helpers.dateToUnix(this.graph.range[0])
+      ) {
         this.graph.zoomRange[0] = this.graph.range[0];
       }
-      if (helpers.dateToUnix(this.graph.zoomRange[1]) > helpers.dateToUnix(this.graph.range[1])) {
+      if (
+        helpers.dateToUnix(this.graph.zoomRange[1]) >
+        helpers.dateToUnix(this.graph.range[1])
+      ) {
         this.graph.zoomRange[1] = this.graph.range[1];
       }
     }
 
     // If the zoom range is too small, adjust it to a reasonable range.
     if (this.graph.zoomRange != null) {
-      const difference = helpers.dateToUnix(this.graph.zoomRange[1]) - helpers.dateToUnix(this.graph.zoomRange[0]);
+      const difference =
+        helpers.dateToUnix(this.graph.zoomRange[1]) -
+        helpers.dateToUnix(this.graph.zoomRange[0]);
       if (difference < this.graph.step) {
-        const center = helpers.dateToUnix(this.graph.zoomRange[0]) + Math.round(difference / 2);
+        const center =
+          helpers.dateToUnix(this.graph.zoomRange[0]) +
+          Math.round(difference / 2);
         this.graph.zoomRange = [
           helpers.unixToDate(center - this.graph.step),
           helpers.unixToDate(center + this.graph.step),
@@ -278,13 +309,15 @@ class Chart {
 
   removeEventListener(event, callback) {
     if (this.listeners[event]) {
-      this.listeners[event] = this.listeners[event].filter(listener => listener !== callback);
+      this.listeners[event] = this.listeners[event].filter(
+        (listener) => listener !== callback,
+      );
     }
   }
 
   notifyEventListeners(event, data) {
     if (this.listeners[event]) {
-      this.listeners[event].forEach(callback => callback(data));
+      this.listeners[event].forEach((callback) => callback(data));
     }
   }
 
@@ -363,7 +396,9 @@ class Chart {
     this.stopInterval();
     if (this.refreshInterval > 0) {
       this.interval = setInterval(
-        this.handleRefresh.bind(this), this.refreshInterval * 1000);
+        this.handleRefresh.bind(this),
+        this.refreshInterval * 1000,
+      );
     }
   }
 
@@ -425,7 +460,13 @@ class Chart {
       const [from, to] = this.rangeFactory();
       const optimalStep = this.estimateOptimalStep(from, to);
       const aggregator = this.metric.flag === 'b' ? 'bit_and' : this.aggregator;
-      return await storage.getMetric(this.metric.id, from, to, optimalStep, aggregator);
+      return await storage.getMetric(
+        this.metric.id,
+        from,
+        to,
+        optimalStep,
+        aggregator,
+      );
     } finally {
       loadingIcon.classList.add('d-none');
     }
@@ -434,7 +475,8 @@ class Chart {
   estimateOptimalStep(from, to) {
     // Calculate the number of samples that would be required to cover the
     // whole 'from' - 'to' range with the selected step.
-    const samples = (helpers.dateToUnix(to) - helpers.dateToUnix(from)) / this.step;
+    const samples =
+      (helpers.dateToUnix(to) - helpers.dateToUnix(from)) / this.step;
 
     // Estimate the number of samples that would fit reasonably within the
     // graph, estimated as 90% of the container width. Ideally we'd prefer to
@@ -467,16 +509,20 @@ class Chart {
     // Prepare X & Y data for Plotly.
     this.graph.x = [];
     this.graph.y = [];
-    metric.samples.forEach(sample => {
+    metric.samples.forEach((sample) => {
       this.graph.x.push(sample[0]);
       // Bitmap metrics are returned as an hex string. For now, we represent the
       // number of bits set to 1 in the bitmap as the Y value. This will be
       // improved in the future using a different visualization for bitmap
       // metrics.
       this.graph.y.push(
-        this.metric.flag === 'b' && sample[1] != null ?
-          BigInt(`0x${sample[1]}`).toString(2).split('').filter(bit => bit === '1').length :
-          sample[1]);
+        this.metric.flag === 'b' && sample[1] != null
+          ? BigInt(`0x${sample[1]}`)
+              .toString(2)
+              .split('')
+              .filter((bit) => bit === '1').length
+          : sample[1],
+      );
     });
 
     // Store the step (already adjusted to be optimal for the space available)
@@ -495,8 +541,7 @@ class Chart {
     const stepFactor = this.container.querySelector('.card .step-factor');
     if (this.graph.step !== this.step) {
       const factor = Math.round(this.graph.step / this.step);
-      stepFactor.innerHTML =
-        `<i class="fa-solid fa-arrows-left-right-to-line"></i> ${factor}x`;
+      stepFactor.innerHTML = `<i class="fa-solid fa-arrows-left-right-to-line"></i> ${factor}x`;
     } else {
       stepFactor.innerHTML = '';
     }
@@ -504,7 +549,8 @@ class Chart {
 
   renderGraph() {
     // Decide range to be used in the X axis.
-    const range = this.graph.zoomRange != null ? this.graph.zoomRange : this.graph.range;
+    const range =
+      this.graph.zoomRange != null ? this.graph.zoomRange : this.graph.range;
 
     // Prepare data for Plotly.
     const data = [
@@ -514,10 +560,11 @@ class Chart {
         type: 'scatter',
         mode: this.estimatePlotlyDataMode(...range, this.graph.step),
         marker: { size: 4 },
-        hovertemplate: '<b>X:</b> %{x|%Y-%m-%d %H:%M:%S}<br><b>Y:</b> %{y:,.1f}<extra></extra>',
+        hovertemplate:
+          '<b>X:</b> %{x|%Y-%m-%d %H:%M:%S}<br><b>Y:</b> %{y:,.1f}<extra></extra>',
         connectgaps: false,
         line: { shape: 'linear', width: 2 },
-      }
+      },
     ];
 
     // Prepare layout for Plotly.
@@ -577,11 +624,13 @@ class Chart {
           width: null,
           height: null,
           scale: 1,
-        }).then(() => {
-          helpers.notify('info', 'Plot ready for download');
-        }).catch((error) => {
-          helpers.notify('error', `Failed to download plot: ${error}`);
-        });
+        })
+          .then(() => {
+            helpers.notify('info', 'Plot ready for download');
+          })
+          .catch((error) => {
+            helpers.notify('error', `Failed to download plot: ${error}`);
+          });
       },
     };
     const copyToClipboardButton = {
@@ -597,13 +646,17 @@ class Chart {
         }).then((url) => {
           fetch(url).then((response) => {
             response.blob().then((blob) => {
-              navigator.clipboard.write([
-                new ClipboardItem({'image/png': blob})
-              ]).then(() => {
-                helpers.notify('info', 'Plot copied to clipboard');
-              }).catch((error) => {
-                helpers.notify('error', `Failed to copy plot to clipboard: ${error}`);
-              });
+              navigator.clipboard
+                .write([new ClipboardItem({ 'image/png': blob })])
+                .then(() => {
+                  helpers.notify('info', 'Plot copied to clipboard');
+                })
+                .catch((error) => {
+                  helpers.notify(
+                    'error',
+                    `Failed to copy plot to clipboard: ${error}`,
+                  );
+                });
             });
           });
         });
@@ -632,7 +685,8 @@ class Chart {
 
   updateGraph(sameData) {
     // Decide range to be used in the X axis.
-    const range = this.graph.zoomRange != null ? this.graph.zoomRange : this.graph.range;
+    const range =
+      this.graph.zoomRange != null ? this.graph.zoomRange : this.graph.range;
 
     // Prepare data for Plotly.
     const data = {
@@ -659,7 +713,7 @@ class Chart {
     const samples = (helpers.dateToUnix(to) - helpers.dateToUnix(from)) / step;
     const containerWidth = this.container.clientWidth;
     const minSpacing = 6;
-    const maxSamples = Math.floor(0.9 * containerWidth / minSpacing);
+    const maxSamples = Math.floor((0.9 * containerWidth) / minSpacing);
     if (samples > maxSamples) {
       return 'lines';
     }

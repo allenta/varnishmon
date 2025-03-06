@@ -13,13 +13,13 @@ import Chart from './chart';
 
 export function Host() {
   return (
-    <div className='me-4 align-self-center'>
-      <span className='navbar-text font-monospace text-white'>
-        <i className='fa-solid fa-computer'></i> {varnishmon.storage.hostname}
+    <div className="me-4 align-self-center">
+      <span className="navbar-text font-monospace text-white">
+        <i className="fa-solid fa-computer"></i> {varnishmon.storage.hostname}
       </span>
     </div>
   );
-};
+}
 
 /******************************************************************************
  * TimeRange.
@@ -59,7 +59,8 @@ export function TimeRange({ timeRangePicker, setTimeRangePicker, reload }) {
       helpers.notify(
         'error',
         'The selected time range is invalid. ISO 8601 and relative expressions' +
-        ' like \'now-1h\', \'now\', \'now-1d\', etc. are allowed.');
+          " like 'now-1h', 'now', 'now-1d', etc. are allowed.",
+      );
       return;
     }
 
@@ -78,36 +79,47 @@ export function TimeRange({ timeRangePicker, setTimeRangePicker, reload }) {
 
   return (
     <div ref={containerRef} style={{ display: 'contents' }}>
-      <div className='me-2'>
-        <div className='input-group'>
-          <span className='input-group-text'>
-            <i className='fas fa-calendar-alt'></i>
+      <div className="me-2">
+        <div className="input-group">
+          <span className="input-group-text">
+            <i className="fas fa-calendar-alt"></i>
           </span>
-          <input type='text' className='form-control time-range-from'
-            placeholder='from' onKeyDown={onKeyDown} />
+          <input
+            type="text"
+            className="form-control time-range-from"
+            placeholder="from"
+            onKeyDown={onKeyDown}
+          />
         </div>
       </div>
-      <div className='me-2 align-self-center text-light'>
-        <i className='fa-solid fa-arrow-right'></i>
+      <div className="me-2 align-self-center text-light">
+        <i className="fa-solid fa-arrow-right"></i>
       </div>
-      <div className='me-2'>
-        <div className='input-group'>
-          <span className='input-group-text'>
-            <i className='fas fa-calendar-alt'></i>
+      <div className="me-2">
+        <div className="input-group">
+          <span className="input-group-text">
+            <i className="fas fa-calendar-alt"></i>
           </span>
-          <input type='text' className='form-control time-range-to'
-            placeholder='to' onKeyDown={onKeyDown} />
+          <input
+            type="text"
+            className="form-control time-range-to"
+            placeholder="to"
+            onKeyDown={onKeyDown}
+          />
         </div>
       </div>
-      <div className='me-4 align-self-center align-self-end'>
-        <button className='btn btn-primary' title='Apply the selected time range'
-          onClick={onClick}>
-          <i className='fa-solid fa-play'></i>
+      <div className="me-4 align-self-center align-self-end">
+        <button
+          className="btn btn-primary"
+          title="Apply the selected time range"
+          onClick={onClick}
+        >
+          <i className="fa-solid fa-play"></i>
         </button>
       </div>
     </div>
   );
-};
+}
 
 TimeRange.propTypes = {
   timeRangePicker: PropTypes.object,
@@ -132,20 +144,31 @@ export function Refresh({ refreshInterval, setRefreshInterval }) {
 
   return (
     <>
-      <div className='me-2'>
-        <select className='form-select' value={refreshInterval} onChange={onChange}>
+      <div className="me-2">
+        <select
+          className="form-select"
+          value={refreshInterval}
+          onChange={onChange}
+        >
           {config.getRefreshIntervalValues().map((value) => (
-            <option key={value[0]} value={value[0]}>{value[1]}</option>
+            <option key={value[0]} value={value[0]}>
+              {value[1]}
+            </option>
           ))}
         </select>
       </div>
-      <div className='align-self-center align-self-end'>
-        <button className='btn btn-primary' title='Trigger refresh now' onClick={onClick}>
-          <i className='fa-solid fa-sync'></i>
+      <div className="align-self-center align-self-end">
+        <button
+          className="btn btn-primary"
+          title="Trigger refresh now"
+          onClick={onClick}
+        >
+          <i className="fa-solid fa-sync"></i>
         </button>
       </div>
-    </>);
-};
+    </>
+  );
+}
 
 Refresh.propTypes = {
   refreshInterval: PropTypes.number.isRequired,
@@ -162,7 +185,9 @@ export function Filter({ filter, setFilter }) {
   const filterId = React.useId();
 
   const debouncedSetFilter = React.useCallback(
-    helpers.debounce(setFilter, 500), []);
+    helpers.debounce(setFilter, 500),
+    [],
+  );
 
   const updateLocalState = (newFilter, updateHistory) => {
     config.setFilter(newFilter);
@@ -200,24 +225,42 @@ export function Filter({ filter, setFilter }) {
 
   return (
     <>
-      <label className='form-label' htmlFor={filterId}>Filter</label>
-      <div className='input-group'>
-        <span className='input-group-text'>
-          <i className='fa-solid fa-magnifying-glass'></i>
+      <label className="form-label" htmlFor={filterId}>
+        Filter
+      </label>
+      <div className="input-group">
+        <span className="input-group-text">
+          <i className="fa-solid fa-magnifying-glass"></i>
         </span>
-        <input type='text' className='form-control' placeholder='type here to filter metrics by name'
-          onBlur={onBlur} onChange={onChange} value={localFilter} id={filterId} />
-        <button className='btn border-secondary-subtle bg-body-tertiary dropdown-toggle'
-          type='button' data-bs-toggle='dropdown' aria-expanded='false'></button>
-        <ul className='dropdown-menu dropdown-menu-end w-100' aria-labelledby='historyDropdown'>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="type here to filter metrics by name"
+          onBlur={onBlur}
+          onChange={onChange}
+          value={localFilter}
+          id={filterId}
+        />
+        <button
+          className="btn border-secondary-subtle bg-body-tertiary dropdown-toggle"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        ></button>
+        <ul
+          className="dropdown-menu dropdown-menu-end w-100"
+          aria-labelledby="historyDropdown"
+        >
           {history.map((item) => (
-            <li key={item} className='dropdown-item' onClick={onHistoryClick}>{item}</li>
+            <li key={item} className="dropdown-item" onClick={onHistoryClick}>
+              {item}
+            </li>
           ))}
         </ul>
       </div>
     </>
   );
-};
+}
 
 Filter.propTypes = {
   filter: PropTypes.string.isRequired,
@@ -239,20 +282,29 @@ export function Verbosity({ verbosity, setVerbosity }) {
 
   return (
     <>
-      <label className='form-label' htmlFor={verbosityId}>Verbosity</label>
-      <div className='input-group'>
-        <span className='input-group-text'>
-          <i className='fa-regular fa-comments'></i>
+      <label className="form-label" htmlFor={verbosityId}>
+        Verbosity
+      </label>
+      <div className="input-group">
+        <span className="input-group-text">
+          <i className="fa-regular fa-comments"></i>
         </span>
-        <select className='form-select' value={verbosity} onChange={onChange} id={verbosityId}>
+        <select
+          className="form-select"
+          value={verbosity}
+          onChange={onChange}
+          id={verbosityId}
+        >
           {config.getVerbosityValues().map((value) => (
-            <option key={value} value={value}>{value}</option>
+            <option key={value} value={value}>
+              {value}
+            </option>
           ))}
         </select>
       </div>
     </>
   );
-};
+}
 
 Verbosity.propTypes = {
   verbosity: PropTypes.string.isRequired,
@@ -274,20 +326,29 @@ export function Columns({ columns, setColumns }) {
 
   return (
     <>
-      <label className='form-label' htmlFor={columnsId}>Columns</label>
-      <div className='input-group'>
-        <span className='input-group-text'>
-          <i className='fa-solid fa-table-cells-large'></i>
+      <label className="form-label" htmlFor={columnsId}>
+        Columns
+      </label>
+      <div className="input-group">
+        <span className="input-group-text">
+          <i className="fa-solid fa-table-cells-large"></i>
         </span>
-        <select className='form-select' value={columns} onChange={onChange} id={columnsId}>
+        <select
+          className="form-select"
+          value={columns}
+          onChange={onChange}
+          id={columnsId}
+        >
           {config.getColumnsValues().map((value) => (
-            <option key={value} value={value}>{value}</option>
+            <option key={value} value={value}>
+              {value}
+            </option>
           ))}
         </select>
       </div>
     </>
   );
-};
+}
 
 Columns.propTypes = {
   columns: PropTypes.number.isRequired,
@@ -309,20 +370,29 @@ export function Aggregator({ aggregator, setAggregator }) {
 
   return (
     <>
-      <label className='form-label' htmlFor={aggregatorId}>Aggregator</label>
-      <div className='input-group'>
-        <span className='input-group-text'>
-          <i className='fa-solid fa-filter'></i>
+      <label className="form-label" htmlFor={aggregatorId}>
+        Aggregator
+      </label>
+      <div className="input-group">
+        <span className="input-group-text">
+          <i className="fa-solid fa-filter"></i>
         </span>
-        <select className='form-select' value={aggregator} onChange={onChange} id={aggregatorId}>
+        <select
+          className="form-select"
+          value={aggregator}
+          onChange={onChange}
+          id={aggregatorId}
+        >
           {config.getAggregatorValues().map((value) => (
-            <option key={value} value={value}>{value}</option>
+            <option key={value} value={value}>
+              {value}
+            </option>
           ))}
         </select>
       </div>
     </>
   );
-};
+}
 
 Aggregator.propTypes = {
   aggregator: PropTypes.string.isRequired,
@@ -360,18 +430,26 @@ export function Step({ step, setStep }) {
 
   return (
     <>
-      <label className='form-label' htmlFor={stepId}>Step</label>
-      <div className='input-group'>
-        <span className='input-group-text'>
-          <i className='fa-solid fa-arrows-left-right-to-line'></i>
+      <label className="form-label" htmlFor={stepId}>
+        Step
+      </label>
+      <div className="input-group">
+        <span className="input-group-text">
+          <i className="fa-solid fa-arrows-left-right-to-line"></i>
         </span>
-        <input type='number' className='form-control'
-          id={stepId} min={config.getMinimumStep()} value={localStep}
-          onChange={onChange} onBlur={onBlur} />
+        <input
+          type="number"
+          className="form-control"
+          id={stepId}
+          min={config.getMinimumStep()}
+          value={localStep}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
       </div>
     </>
   );
-};
+}
 
 Step.propTypes = {
   step: PropTypes.number.isRequired,
@@ -384,11 +462,9 @@ Step.propTypes = {
 
 export function FilterStats({ filterStats }) {
   return (
-    <div className='col align-content-center text-muted'>
-      {filterStats}
-    </div>
+    <div className="col align-content-center text-muted">{filterStats}</div>
   );
-};
+}
 
 FilterStats.propTypes = {
   filterStats: PropTypes.string.isRequired,
@@ -415,31 +491,43 @@ export function Actions() {
   return (
     <>
       <a
-        className='btn btn-link'
-        href='/metrics'
-        role='button'
-        title='View internal Prometheus metrics'>internal metrics</a> |
-
+        className="btn btn-link"
+        href="/metrics"
+        role="button"
+        title="View internal Prometheus metrics"
+      >
+        internal metrics
+      </a>{' '}
+      |
       <button
-        type='button'
-        className='btn btn-link'
-        title='Discard saved state & reload'
-        onClick={onResetClick}>reset</button> |
-
+        type="button"
+        className="btn btn-link"
+        title="Discard saved state & reload"
+        onClick={onResetClick}
+      >
+        reset
+      </button>{' '}
+      |
       <button
-        type='button'
-        className='btn btn-link'
-        title='Collapse all clusters'
-        onClick={onCollapseClick}>collapse</button> |
-
+        type="button"
+        className="btn btn-link"
+        title="Collapse all clusters"
+        onClick={onCollapseClick}
+      >
+        collapse
+      </button>{' '}
+      |
       <button
-        type='button'
-        className='btn btn-link'
-        title='Expand all clusters'
-        onClick={onExpandClick}>expand</button>
+        type="button"
+        className="btn btn-link"
+        title="Expand all clusters"
+        onClick={onExpandClick}
+      >
+        expand
+      </button>
     </>
   );
-};
+}
 
 /******************************************************************************
  * Clusters.
@@ -447,16 +535,14 @@ export function Actions() {
 
 export function Clusters({ filteredMetrics, ...props }) {
   return (
-    <div className='accordion accordion-flush flex-grow-1 d-flex flex-column'>
-      {filteredMetrics != null && filteredMetrics.clusters.map((cluster) => (
-        <Cluster
-          key={cluster.name}
-          {...props}
-          cluster={cluster} />
-      ))}
+    <div className="accordion accordion-flush flex-grow-1 d-flex flex-column">
+      {filteredMetrics != null &&
+        filteredMetrics.clusters.map((cluster) => (
+          <Cluster key={cluster.name} {...props} cluster={cluster} />
+        ))}
     </div>
   );
-};
+}
 
 Clusters.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
@@ -479,23 +565,37 @@ export function Cluster({ cluster, ...props }) {
 
   React.useEffect(() => {
     if (containerRef.current != null) {
-      const accordionCollapse = containerRef.current.querySelector('.accordion-collapse');
+      const accordionCollapse = containerRef.current.querySelector(
+        '.accordion-collapse',
+      );
       const newAccordion = new Collapse(accordionCollapse);
       setAccordion(newAccordion);
 
       const onCollapseAllClustersListener = () => {
         setIsAccordionCollapsed(true);
       };
-      document.addEventListener('onCollapseAllClusters', onCollapseAllClustersListener);
+      document.addEventListener(
+        'onCollapseAllClusters',
+        onCollapseAllClustersListener,
+      );
 
       const onExpandAllClustersListener = () => {
         setIsAccordionCollapsed(false);
       };
-      document.addEventListener('onExpandAllClusters', onExpandAllClustersListener);
+      document.addEventListener(
+        'onExpandAllClusters',
+        onExpandAllClustersListener,
+      );
 
       return () => {
-        document.removeEventListener('onCollapseAllClusters', onCollapseAllClustersListener);
-        document.removeEventListener('onExpandAllClusters', onExpandAllClustersListener);
+        document.removeEventListener(
+          'onCollapseAllClusters',
+          onCollapseAllClustersListener,
+        );
+        document.removeEventListener(
+          'onExpandAllClusters',
+          onExpandAllClustersListener,
+        );
         // When mounting and then unmounting the component too quickly (e.g.,
         // due to fast reloads of metrics, strict mode, etc.), calling
         // 'newAccordion.dispose()' immediately after 'newAccordion' is created
@@ -524,27 +624,25 @@ export function Cluster({ cluster, ...props }) {
 
   return (
     <div ref={containerRef}>
-      <div className='accordion-header'>
+      <div className="accordion-header">
         <button
           className={`accordion-button bg-light text-dark fs-5 border-0 font-monospace ${isAccordionCollapsed ? 'collapsed' : ''}`}
-          type='button'
-          onClick={onClick}>
+          type="button"
+          onClick={onClick}
+        >
           {cluster.name}
         </button>
       </div>
-      <div className='accordion-collapse'>
-        <div className='row g-4 py-4'>
+      <div className="accordion-collapse">
+        <div className="row g-4 py-4">
           {cluster.metrics.map((metric) => (
-            <Metric
-              key={metric.id}
-              {...props}
-              metric={metric} />
+            <Metric key={metric.id} {...props} metric={metric} />
           ))}
         </div>
       </div>
     </div>
   );
-};
+}
 
 Cluster.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
@@ -561,8 +659,14 @@ Cluster.propTypes = {
  ******************************************************************************/
 
 export function Metric({
-  timeRangePicker, initialRange, refreshInterval, columns, aggregator, step,
-  metric }) {
+  timeRangePicker,
+  initialRange,
+  refreshInterval,
+  columns,
+  aggregator,
+  step,
+  metric,
+}) {
   const containerRef = React.useRef(null);
   const [chart, setChart] = React.useState(null);
 
@@ -572,16 +676,23 @@ export function Metric({
     if (containerRef.current != null) {
       const rangeFactory = timeRangePicker.getDatesFactory();
       const newChart = new Chart(
-        containerRef.current, metric, rangeFactory, getRefreshInterval(),
-        aggregator, step);
+        containerRef.current,
+        metric,
+        rangeFactory,
+        getRefreshInterval(),
+        aggregator,
+        step,
+      );
       setChart(newChart);
 
       newChart.addEventListener('zoom', (event) => {
         // Apply the zoom range to all the charts except the one that triggered
         // the event.
-        document.dispatchEvent(new CustomEvent(
-          'onZoom',
-          { detail: { source: newChart, range: event.range } }));
+        document.dispatchEvent(
+          new CustomEvent('onZoom', {
+            detail: { source: newChart, range: event.range },
+          }),
+        );
 
         // Update the time range picker with the zoom range.
         if (event.range != null) {
@@ -641,28 +752,27 @@ export function Metric({
 
   return (
     <div ref={containerRef} className={`chart col col-${12 / columns}`}>
-      <div className='card position-relative'>
+      <div className="card position-relative">
         <span
-          className='loading-icon spinner-grow spinner-grow-sm text-secondary position-absolute top-0 m-2 z-1 d-none'
-          role='status'>
-          <span className='visually-hidden'>Loading...</span>
+          className="loading-icon spinner-grow spinner-grow-sm text-secondary position-absolute top-0 m-2 z-1 d-none"
+          role="status"
+        >
+          <span className="visually-hidden">Loading...</span>
         </span>
-        <span
-          className='error-icon text-danger position-absolute top-0 end-0 m-2 z-1 d-none'>
-          <i className='fas fa-exclamation-circle'></i>
+        <span className="error-icon text-danger position-absolute top-0 end-0 m-2 z-1 d-none">
+          <i className="fas fa-exclamation-circle"></i>
         </span>
-        <div className='card-body'>
-          <div className='graph' style={{ height: '300px' }}>
-          </div>
+        <div className="card-body">
+          <div className="graph" style={{ height: '300px' }}></div>
         </div>
         <span
-          className='step-factor text-secondary text-opacity-25 position-absolute bottom-0 end-0 me-2 mb-1 z-1 small'
-          title='Effective step factor'>
-        </span>
+          className="step-factor text-secondary text-opacity-25 position-absolute bottom-0 end-0 me-2 mb-1 z-1 small"
+          title="Effective step factor"
+        ></span>
       </div>
     </div>
   );
-};
+}
 
 Metric.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,

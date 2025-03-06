@@ -296,6 +296,16 @@ web-build:
 		npm run build; \
 	)
 
+.PHONY: web-prettier
+web-prettier:
+	@( \
+		set -e; \
+		\
+		cd '$(ROOT)/assets/web'; \
+		npm install; \
+		npm run prettier; \
+	)
+
 # Beware of the hardcoded DuckDB version in the 'git clone' command. See:
 # https://github.com/marcboeker/go-duckdb/blob/main/.github/workflows/deps.yaml.
 .PHONY: duckdb-static-bundle

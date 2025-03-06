@@ -5,9 +5,9 @@ import localeEn from 'air-datepicker/locale/en';
 import * as helpers from './helpers';
 
 /**
-* A basic time picker that wraps Air Datepicker to support very simple relative
-* expressions such as 'now', 'now-1h', 'now-30m', etc.
-*/
+ * A basic time picker that wraps Air Datepicker to support very simple relative
+ * expressions such as 'now', 'now-1h', 'now-30m', etc.
+ */
 class TimePicker {
   constructor(element) {
     this.element = element;
@@ -53,7 +53,10 @@ class TimePicker {
         const date = new Date(value);
         if (!Number.isNaN(date.valueOf())) {
           this.datepicker.setViewDate(date);
-          this.datepicker.selectDate([date], { silent: true, updateTime: true });
+          this.datepicker.selectDate([date], {
+            silent: true,
+            updateTime: true,
+          });
           this.element.classList.remove('is-invalid');
         } else {
           this.element.classList.add('is-invalid');
@@ -78,7 +81,10 @@ class TimePicker {
       this.element.value = date;
       this.element.classList.remove('is-invalid');
     } else {
-      this.datepicker.selectDate([date], { silent: true, updateTime: true});
+      this.datepicker.selectDate([date], {
+        silent: true,
+        updateTime: true,
+      });
       if (this.datepicker.selectedDates.length > 0) {
         this.element.classList.remove('is-invalid');
       } else {
@@ -157,20 +163,20 @@ class TimePicker {
       const [, operation, offset, unit] = match;
       let offsetInSeconds;
       switch (unit.toLowerCase()) {
-      case 'd':
-        offsetInSeconds = offset * 60 * 60 * 24;
-        break;
-      case 'h':
-        offsetInSeconds = offset * 60 * 60;
-        break;
-      case 'm':
-        offsetInSeconds = offset * 60;
-        break;
-      case 's':
-        offsetInSeconds = offset;
-        break;
-      default:
-        return null;
+        case 'd':
+          offsetInSeconds = offset * 60 * 60 * 24;
+          break;
+        case 'h':
+          offsetInSeconds = offset * 60 * 60;
+          break;
+        case 'm':
+          offsetInSeconds = offset * 60;
+          break;
+        case 's':
+          offsetInSeconds = offset;
+          break;
+        default:
+          return null;
       }
       if (operation === '-') {
         offsetInSeconds = -offsetInSeconds;
@@ -183,9 +189,9 @@ class TimePicker {
 }
 
 /**
-* A time range picker that wraps two TimePicker instances to provide a
-* convenient way to select a time range.
-*/
+ * A time range picker that wraps two TimePicker instances to provide a
+ * convenient way to select a time range.
+ */
 class TimeRangePicker {
   constructor(fromElement, toElement) {
     this.fromPicker = new TimePicker(fromElement);

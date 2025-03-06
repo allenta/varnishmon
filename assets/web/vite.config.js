@@ -7,13 +7,15 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { ViteMinifyPlugin } from 'vite-plugin-minify'
 
 export default defineConfig(({ mode }) => {
+  const isDevelopment = mode === 'development';
+
   return {
     plugins: [
       eslint({
         failOnError: false,
       }),
       react(),
-      ViteMinifyPlugin({}),
+      !isDevelopment && ViteMinifyPlugin({}),
       viteStaticCopy({
         targets: [
           {
@@ -47,7 +49,10 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: path.resolve(__dirname, '../static'),
-      chunkSizeWarningLimit: 2048,
+      emptyOutDir: true,
+      chunkSizeWarningLimit: 1024 * 16,
+      reportCompressedSize: !isDevelopment,
+      minify: !isDevelopment,
       rollupOptions: {
         input: './index.html',
         output: {
@@ -67,7 +72,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       watch:
-        mode === 'development'
+        isDevelopment
           ? {
               chokidar: {
                 usePolling: true,

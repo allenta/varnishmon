@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "watch": "NODE_ENV=development vite build --emptyOutDir --mode development",
-    "build": "vite build --emptyOutDir",
+    "watch": "NODE_ENV=development vite build --mode development",
+    "build": "vite build",
     "lint": "eslint 'src/**/*.{js,jsx}'",
     "prettier": "prettier --write src/**/*.{js,jsx}"
   },

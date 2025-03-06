@@ -1,3 +1,7 @@
+- 0.6.3-1 (2025-03-06):
+    + Replaced Webpack with Vite for the frontend build.
+    + Used a smaller bundle of Plotly.js.
+
 - 0.6.2-1 (2025-03-05):
     + Fixed rendering of Y-axis labels in charts.
 

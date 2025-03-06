@@ -1,4 +1,4 @@
-import Plotly from 'plotly.js-dist';
+import Plotly from 'plotly.js-basic-dist';
 import Tooltip from 'bootstrap/js/dist/tooltip';
 
 import * as storage from './storage';

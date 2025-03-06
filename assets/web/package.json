@@ -6,7 +6,7 @@
     "watch": "NODE_ENV=development vite build --mode development",
     "build": "vite build",
     "lint": "eslint 'src/**/*.{js,jsx}'",
-    "prettier": "prettier --write src/**/*.{js,jsx}"
+    "prettier": "prettier --write 'src/**/*.{js,jsx}'"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,43 @@
+{
+  "name": "varnishmon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "watch": "NODE_ENV=development vite build --emptyOutDir --mode development",
+    "build": "vite build --emptyOutDir",
+    "lint": "eslint 'src/**/*.{js,jsx}'",
+    "prettier": "prettier --write src/**/*.{js,jsx}"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "air-datepicker": "^3.5.3",
+    "bootstrap": "^5.3.3",
+    "d3": "^7.9.0",
+    "d3-collection": "^1.0.7",
+    "plotly.js-basic-dist": "^3.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.0",
+    "@eslint/js": "^9.21.0",
+    "@swc/core": "^1.10.18",
+    "@vitejs/plugin-react-swc": "^3.8.0",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "prettier": "^3.5.3",
+    "sass": "^1.85.1",
+    "vite": "^6.2.0",
+    "vite-plugin-eslint": "^1.8.1",
+    "vite-plugin-minify": "^2.1.0",
+    "vite-plugin-static-copy": "^2.3.0"
+  }
+}

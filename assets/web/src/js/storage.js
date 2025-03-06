@@ -27,7 +27,9 @@ export async function getMetrics(from, to, step) {
   });
   const response = await fetch(`/storage/metrics?${params.toString()}`);
   if (!response.ok) {
-    throw new Error(`Unexpected API response (${response.status}): ${response.statusText}`);
+    throw new Error(
+      `Unexpected API response (${response.status}): ${response.statusText}`,
+    );
   }
 
   const data = await response.json();
@@ -48,8 +50,10 @@ export async function getMetrics(from, to, step) {
  */
 function preprocessMetrics(metrics) {
   function addDebugField(metrics) {
-    metrics.forEach(metric => {
-      metric.debug = varnish.DEBUG_METRICS.findIndex(regex => regex.test(metric.name)) !== -1;
+    metrics.forEach((metric) => {
+      metric.debug =
+        varnish.DEBUG_METRICS.findIndex((regex) => regex.test(metric.name)) !==
+        -1;
     });
   }
 
@@ -57,7 +61,7 @@ function preprocessMetrics(metrics) {
     // Clusters are defined by the longest prefix just before the last dot,
     // unless explicitly overridden by a regex in 'ADHOC_CLUSTERING_PREFIXES'.
     const clusters = {};
-    metrics.forEach(metric => {
+    metrics.forEach((metric) => {
       let prefix = '';
 
       // Check against the list of ad-hoc clustering prefixes.
@@ -85,7 +89,7 @@ function preprocessMetrics(metrics) {
     });
 
     // Convert clusters object to an array of objects.
-    const result = Object.keys(clusters).map(key => ({
+    const result = Object.keys(clusters).map((key) => ({
       name: key,
       metrics: clusters[key],
     }));
@@ -94,8 +98,12 @@ function preprocessMetrics(metrics) {
 
   function sortClusteredMetrics(items) {
     items.sort((a, b) => {
-      const indexA = varnish.ORDER_OF_CLUSTERS.findIndex(regex => regex.test(a.name));
-      const indexB = varnish.ORDER_OF_CLUSTERS.findIndex(regex => regex.test(b.name));
+      const indexA = varnish.ORDER_OF_CLUSTERS.findIndex((regex) =>
+        regex.test(a.name),
+      );
+      const indexB = varnish.ORDER_OF_CLUSTERS.findIndex((regex) =>
+        regex.test(b.name),
+      );
 
       if (indexA !== -1 && indexB !== -1) {
         return indexA - indexB;
@@ -151,7 +159,9 @@ export async function getMetric(id, from, to, step, aggregator) {
   });
   const response = await fetch(`/storage/metrics/${id}?${params.toString()}`);
   if (!response.ok) {
-    throw new Error(`Unexpected API response (${response.status}): ${response.statusText}`);
+    throw new Error(
+      `Unexpected API response (${response.status}): ${response.statusText}`,
+    );
   }
 
   const data = await response.json();
@@ -191,7 +201,10 @@ function preprocessSamples(samples, step) {
       const nextSample = sortedSamples[i + 1];
       const nextTime = nextSample[0];
       for (let j = 1; j < (nextTime - currentTime) / step; j++) {
-        preprocessedSamples.push([helpers.unixToDate(currentTime + j * step), null]);
+        preprocessedSamples.push([
+          helpers.unixToDate(currentTime + j * step),
+          null,
+        ]);
       }
     }
   }

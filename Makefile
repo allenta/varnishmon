@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 UMASK := 022
 
-VERSION := 0.6.2
+VERSION := 0.6.3
 ITERATION := 1
 REVISION := $(shell cd '$(ROOT)' && git rev-parse --short HEAD)
 ENVIRONMENT ?= production
@@ -276,25 +276,30 @@ else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
 	)
 endif
 
-.PHONY: webpack-watch
-webpack-watch:
-	@( \
-		set -e; \
-		\
-		cd '$(ROOT)/assets/webpack'; \
-		npm install; \
-		npm run watch; \
-	)
+define WEB_NPM_TASK
+    @( \
+        set -e; \
+        cd '$(ROOT)/assets/web'; \
+        npm install; \
+        npm run $(1); \
+    )
+endef
 
-.PHONY: webpack-build
-webpack-build:
-	@( \
-		set -e; \
-		\
-		cd '$(ROOT)/assets/webpack'; \
-		npm install; \
-		npm run build; \
-	)
+.PHONY: web-watch
+web-watch:
+	$(call WEB_NPM_TASK,watch)
+
+.PHONY: web-build
+web-build:
+	$(call WEB_NPM_TASK,build)
+
+.PHONY: web-lint
+web-lint:
+	$(call WEB_NPM_TASK,lint)
+
+.PHONY: web-prettier
+web-prettier:
+	$(call WEB_NPM_TASK,prettier)
 
 # Beware of the hardcoded DuckDB version in the 'git clone' command. See:
 # https://github.com/marcboeker/go-duckdb/blob/main/.github/workflows/deps.yaml.
@@ -330,5 +335,5 @@ mrproper:
 	@( \
 		echo '> Cleaning up...'; \
 		rm -rf '$(ROOT)/build'; \
-		git clean -f -x -d -e .env -e assets/webpack/node_modules -e duckdb-static-bundle -e varnishmon.db $(ROOT); \
+		git clean -f -x -d -e .env -e assets/web/node_modules -e duckdb-static-bundle -e varnishmon.db $(ROOT); \
 	)

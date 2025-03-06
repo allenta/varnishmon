@@ -2,7 +2,7 @@ import Toast from 'bootstrap/js/dist/toast';
 
 export function debounce(func, wait) {
   let timeout;
-  return function(...args) {
+  return function (...args) {
     const context = this;
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(context, args), wait);
@@ -73,7 +73,8 @@ export function notify(level, message) {
     btnClose.classList.add('btn-close-white');
     decoration = 'fa-comment';
   }
-  notification.querySelector('.toast-body').innerHTML = `<i class="fa-solid ${decoration}"></i> ` + message;
+  notification.querySelector('.toast-body').innerHTML =
+    `<i class="fa-solid ${decoration}"></i> ` + message;
   container.appendChild(notification);
 
   // Initialize notification as a Bootstrap toast and show it.
@@ -98,7 +99,7 @@ export function overridePlotlyNotificationsSystem() {
   const bodyObserver = new MutationObserver((mutationsList, _observer) => {
     for (const mutation of mutationsList) {
       if (mutation.type === 'childList') {
-        mutation.addedNodes.forEach(node => {
+        mutation.addedNodes.forEach((node) => {
           if (node.classList && node.classList.contains('plotly-notifier')) {
             // Hide plotly-notifier container.
             node.style.display = 'none';
@@ -108,24 +109,29 @@ export function overridePlotlyNotificationsSystem() {
             bodyObserver.disconnect();
 
             // Send any initial messages as notifications.
-            node.querySelectorAll('.notifier-note').forEach(note => {
+            node.querySelectorAll('.notifier-note').forEach((note) => {
               const message = note.querySelector('span').innerText;
               notify('info', message);
             });
 
             // Observe the plotly-notifier container for new messages.
-            const observer = new MutationObserver((mutationsList, _observer) => {
-              for (const mutation of mutationsList) {
-                if (mutation.type === 'childList') {
-                  mutation.addedNodes.forEach(node => {
-                    if (node.classList && node.classList.contains('notifier-note')) {
-                      const message = node.querySelector('span').innerText;
-                      notify('info', message);
-                    }
-                  });
+            const observer = new MutationObserver(
+              (mutationsList, _observer) => {
+                for (const mutation of mutationsList) {
+                  if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                      if (
+                        node.classList &&
+                        node.classList.contains('notifier-note')
+                      ) {
+                        const message = node.querySelector('span').innerText;
+                        notify('info', message);
+                      }
+                    });
+                  }
                 }
-              }
-            });
+              },
+            );
             observer.observe(node, { childList: true });
           }
         });

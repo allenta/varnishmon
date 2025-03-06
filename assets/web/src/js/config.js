@@ -92,7 +92,10 @@ export function getRefreshInterval() {
       }
     }
   } catch (error) {
-    console.error(`Failed to read '${REFRESH_INTERVAL}' from local storage!`, error);
+    console.error(
+      `Failed to read '${REFRESH_INTERVAL}' from local storage!`,
+      error,
+    );
   }
 
   return varnishmon.config.scraper.enabled ? -1 : 0;
@@ -107,7 +110,10 @@ export function setRefreshInterval(value) {
   try {
     localStorage.setItem(REFRESH_INTERVAL, value);
   } catch (error) {
-    console.error(`Failed to write '${REFRESH_INTERVAL}' to local storage!`, error);
+    console.error(
+      `Failed to write '${REFRESH_INTERVAL}' to local storage!`,
+      error,
+    );
   }
 }
 
@@ -116,7 +122,10 @@ export function getRefreshIntervalValues() {
 }
 
 function isValidRefreshIntervalValue(value) {
-  return Number.isInteger(value) && REFRESH_INTERVAL_VALUES.map(v => v[0]).includes(value);
+  return (
+    Number.isInteger(value) &&
+    REFRESH_INTERVAL_VALUES.map((v) => v[0]).includes(value)
+  );
 }
 
 /******************************************************************************
@@ -154,7 +163,10 @@ export function getFilterHistory() {
       return JSON.parse(value);
     }
   } catch (error) {
-    console.error(`Failed to read '${FILTER_HISTORY}' from local storage!`, error);
+    console.error(
+      `Failed to read '${FILTER_HISTORY}' from local storage!`,
+      error,
+    );
   }
 
   return [];
@@ -164,7 +176,10 @@ export function setFilterHistory(value) {
   try {
     localStorage.setItem(FILTER_HISTORY, JSON.stringify(value));
   } catch (error) {
-    console.error(`Failed to write '${FILTER_HISTORY}' to local storage!`, error);
+    console.error(
+      `Failed to write '${FILTER_HISTORY}' to local storage!`,
+      error,
+    );
   }
 }
 
@@ -314,7 +329,9 @@ export function getStep() {
     console.error(`Failed to read '${STEP}' from local storage!`, error);
   }
 
-  return varnishmon.config.scraper.enabled ? varnishmon.config.scraper.period : DEFAULT_STEP;
+  return varnishmon.config.scraper.enabled
+    ? varnishmon.config.scraper.period
+    : DEFAULT_STEP;
 }
 
 export function setStep(value) {
@@ -331,7 +348,9 @@ export function setStep(value) {
 }
 
 export function getMinimumStep() {
-  return varnishmon.config.scraper.enabled ? varnishmon.config.scraper.period : 1;
+  return varnishmon.config.scraper.enabled
+    ? varnishmon.config.scraper.period
+    : 1;
 }
 
 function isValidStepValue(value) {

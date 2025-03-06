@@ -2,4 +2,4 @@
 /coverage.txt
 /build/
 /duckdb-static-bundle/
-/assets/webpack/node_modules/
+/assets/web/node_modules/

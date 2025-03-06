@@ -14,14 +14,14 @@
 #
 #     # Regenerate static assets & templates incrementally (useful when
 #     # compiling with development mode enabled).
-#     $ make webpack-watch
+#     $ make web-watch
 #
 #     # Regenerate static assets & templates, ready for production. Beware
 #     # generated files are versioned to simplify the whole packaging process.
 #     # It's ok to push generated static assets & templates to the repository
 #     # at any time, but the ideal scenario is to do it only when creating a
 #     # new release.
-#     $ make webpack-build
+#     $ make web-build
 #     $ git add ...
 #
 #     # Run the test suite (or part of it).

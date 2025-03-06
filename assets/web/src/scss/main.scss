@@ -2,19 +2,19 @@
  * Bootstrap.
  ******************************************************************************/
 
-@import '~bootstrap/scss/bootstrap';
+@use 'bootstrap/scss/bootstrap' as bootstrap;
 
 /******************************************************************************
  * Font Awesome.
  ******************************************************************************/
 
-@import '~@fortawesome/fontawesome-free/css/all.css';
+@use '@fortawesome/fontawesome-free/css/all.css' as fortawesome;
 
 /******************************************************************************
  * Fonts.
  ******************************************************************************/
 
- @font-face {
+@font-face {
   font-family: 'UbuntuRegular';
   src: url('../fonts/Ubuntu-Regular-webfont.eot');
   src: url('../fonts/Ubuntu-Regular-webfont.eot?#iefix') format('embedded-opentype'),

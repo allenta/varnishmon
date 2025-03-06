@@ -1,5 +1,3 @@
-import '../scss/main.scss';
-
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -7,6 +5,8 @@ import * as config from './config';
 import * as helpers from './helpers';
 import * as storage from './storage';
 import * as components from './components';
+
+import '../scss/main.scss';
 
 const useReload = ({ timeRangePicker, initialRange, step }) => {
   const [metrics, setMetrics] = React.useState(null);

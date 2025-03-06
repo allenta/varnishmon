@@ -276,35 +276,30 @@ else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
 	)
 endif
 
+define WEB_NPM_TASK
+    @( \
+        set -e; \
+        cd '$(ROOT)/assets/web'; \
+        npm install; \
+        npm run $(1); \
+    )
+endef
+
 .PHONY: web-watch
 web-watch:
-	@( \
-		set -e; \
-		\
-		cd '$(ROOT)/assets/web'; \
-		npm install; \
-		npm run watch; \
-	)
+	$(call WEB_NPM_TASK,watch)
 
 .PHONY: web-build
 web-build:
-	@( \
-		set -e; \
-		\
-		cd '$(ROOT)/assets/web'; \
-		npm install; \
-		npm run build; \
-	)
+	$(call WEB_NPM_TASK,build)
+
+.PHONY: web-lint
+web-lint:
+	$(call WEB_NPM_TASK,lint)
 
 .PHONY: web-prettier
 web-prettier:
-	@( \
-		set -e; \
-		\
-		cd '$(ROOT)/assets/web'; \
-		npm install; \
-		npm run prettier; \
-	)
+	$(call WEB_NPM_TASK,prettier)
 
 # Beware of the hardcoded DuckDB version in the 'git clone' command. See:
 # https://github.com/marcboeker/go-duckdb/blob/main/.github/workflows/deps.yaml.

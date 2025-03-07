@@ -48,7 +48,7 @@ export function TimeRange({ timeRangePicker, setTimeRangePicker, reload }) {
         newTimeRangePicker.destroy();
       };
     }
-  }, [containerRef]);
+  }, [containerRef, setTimeRangePicker]);
 
   // On click in the apply time range button, the search results must be rebuilt
   // from scratch because a different time range might lead to a different set
@@ -185,8 +185,8 @@ export function Filter({ filter, setFilter }) {
   const filterId = React.useId();
 
   const debouncedSetFilter = React.useCallback(
-    helpers.debounce(setFilter, 500),
-    [],
+    () => helpers.debounce(setFilter, 500),
+    [setFilter],
   );
 
   const updateLocalState = (newFilter, updateHistory) => {

@@ -15,15 +15,18 @@ export default defineConfig(({ mode }) => {
         failOnError: false,
       }),
       react(),
+      // HTML minification is not enabled in development mode.
       !isDevelopment && ViteMinifyPlugin({}),
+      // Skip the build pipeline for assets not directly referenced in the
+      // JavaScript implementation (e.g., 'src/fonts/*' is not included here
+      // because they are indirectly referenced via the SCSS files, same for
+      // 'src/images/*' which are referenced in the HTML file, etc.).
       viteStaticCopy({
-        targets: [
-          {
-            src: 'src/images/*',
-            dest: 'images',
-          },
-        ],
+        targets: [],
       }),
+      // Simple workaround to move 'index.html' to the 'templates' folder after
+      // the build is completed. The file is a Go template that is hydrated with
+      // data by varnishmon before being served to the client.
       {
         name: 'vite-postbuild',
         closeBundle: () => {
@@ -37,7 +40,7 @@ export default defineConfig(({ mode }) => {
         },
       },
     ],
-    // See: https://github.com/twbs/bootstrap/issues/40962.
+    // Temporary workaround. See: https://github.com/twbs/bootstrap/issues/40962.
     css: {
       preprocessorOptions: {
         scss: {
@@ -48,11 +51,18 @@ export default defineConfig(({ mode }) => {
       }
     },
     build: {
+      // All build output except 'index.html' is placed in the 'static' folder.
       outDir: path.resolve(__dirname, '../static'),
-      emptyOutDir: true,
+      // Emptying the 'outDir' on build is generally a good idea, but during
+      // development, it can be annoying due to errors related to '.fuse_hidden*'
+      // files being blocked by the varnishmon agent.
+      emptyOutDir: !isDevelopment,
+      // We don't really care about the size of the assets in this context.
       chunkSizeWarningLimit: 1024 * 16,
+      // A couple of adjustments trying to make the build faster.
       reportCompressedSize: !isDevelopment,
       minify: !isDevelopment,
+      // Fine tune to ensure the build output is as expected.
       rollupOptions: {
         input: './index.html',
         output: {
@@ -60,17 +70,25 @@ export default defineConfig(({ mode }) => {
           manualChunks: false,
           inlineDynamicImports: true,
           assetFileNames: (assetInfo) => {
+            const originalFileName = assetInfo.originalFileNames?.[0] ?? '';
             const name = assetInfo.names?.[0] ?? '';
-            if (/\.(woff(2)?|eot|ttf|otf|svg)$/.test(name)) {
+            if (originalFileName.startsWith('src/images/') &&
+                /\.(png|svg|jpg|jpeg|gif|ico)$/i.test(name)) {
+              return 'images/[name][extname]';
+            }
+            if ((originalFileName.startsWith('src/fonts/') || originalFileName.includes('/@fortawesome/')) &&
+                /\.(woff(2)?|eot|ttf|otf|svg)$/i.test(name)) {
               return 'fonts/[name][extname]';
             }
             if (name.endsWith('.css')) {
               return 'styles.css';
             }
-            throw new Error(`Unexpected asset: ${name}`);
+            throw new Error(`Unexpected asset: ${name} (${originalFileName})`);
           },
         },
       },
+      // Vite is not used to serve the application. Therefore, during development,
+      // the Rollup watcher needs to be used.
       watch:
         isDevelopment
           ? {

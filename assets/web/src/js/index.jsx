@@ -42,7 +42,7 @@ const useReload = ({ timeRangePicker, initialRange, step }) => {
         helpers.notify('error', `Failed to fetch metrics: ${error}`);
         setLoadProgress('error');
       });
-  }, [timeRangePicker, step]);
+  }, [timeRangePicker, initialRange, step]);
 
   return [metrics, loadProgress, reload];
 };
@@ -153,7 +153,7 @@ const App = () => {
       reload();
       initialLoadDone.current = true;
     }
-  }, [initialLoadDone, timeRangePicker, aggregator, step]);
+  }, [initialLoadDone, timeRangePicker, aggregator, step, reload]);
 
   return (
     <>

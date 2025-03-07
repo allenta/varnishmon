@@ -48,7 +48,7 @@ export function TimeRange({ timeRangePicker, setTimeRangePicker, reload }) {
         newTimeRangePicker.destroy();
       };
     }
-  }, [containerRef]);
+  }, [containerRef, setTimeRangePicker]);
 
   // On click in the apply time range button, the search results must be rebuilt
   // from scratch because a different time range might lead to a different set
@@ -185,8 +185,10 @@ export function Filter({ filter, setFilter }) {
   const filterId = React.useId();
 
   const debouncedSetFilter = React.useCallback(
-    helpers.debounce(setFilter, 500),
-    [],
+    (value) => {
+      return helpers.debounce(setFilter, 500)(value);
+    },
+    [setFilter],
   );
 
   const updateLocalState = (newFilter, updateHistory) => {
@@ -670,6 +672,11 @@ export function Metric({
   const containerRef = React.useRef(null);
   const [chart, setChart] = React.useState(null);
 
+  const getRefreshInterval = React.useCallback(
+    () => (refreshInterval < 0 ? step : refreshInterval),
+    [refreshInterval, step],
+  );
+
   // Beware 'useLayoutEffect' is used here in order to play well with the Chart
   // class, that depends on width calculations to decide the right step factor.
   React.useLayoutEffect(() => {
@@ -724,31 +731,34 @@ export function Metric({
         document.removeEventListener('onZoom', onZoomListener);
         document.removeEventListener('onRefresh', onRefreshListener);
         newChart.destroy();
+        setChart(null);
       };
     }
-  }, [containerRef]);
+    // Beware 'getRefreshInterval', 'aggregator' & 'step' are intentionally
+    // omitted from the dependencies array to avoid re-creating the chart when
+    // those values change. Those changes are handled by the 'useEffect' hooks
+    // below, which update the chart instance accordingly. Remaining dependencies
+    // are include to keep the linter happy, but all of them are irrelevant.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerRef, setChart, timeRangePicker, initialRange, metric]);
 
   React.useEffect(() => {
     if (chart != null) {
       chart.setRefreshInterval(getRefreshInterval());
     }
-  }, [refreshInterval]);
+  }, [chart, getRefreshInterval]);
 
   React.useEffect(() => {
     if (chart != null) {
       chart.setAggregator(aggregator);
     }
-  }, [aggregator]);
+  }, [chart, aggregator]);
 
   React.useEffect(() => {
     if (chart != null) {
       chart.setStep(step);
     }
-  }, [step]);
-
-  const getRefreshInterval = () => {
-    return refreshInterval < 0 ? step : refreshInterval;
-  };
+  }, [chart, step]);
 
   return (
     <div ref={containerRef} className={`chart col col-${12 / columns}`}>

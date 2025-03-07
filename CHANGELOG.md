@@ -1,3 +1,9 @@
+- 0.6.4-1 (2025-03-07):
+    + Assorted improvements to the new React-based UI.
+    + Updated dependencies.
+        * Go
+            - client_golang 1.21.0 ➙ 1.21.1
+
 - 0.6.3-1 (2025-03-06):
     + Replaced Webpack with Vite for the frontend build.
     + Used a smaller bundle of Plotly.js.

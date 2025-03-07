@@ -1,4 +1,5 @@
-- ?
+- 0.6.4-1 (2025-03-07):
+    + Assorted improvements to the new React-based UI.
     + Updated dependencies.
         * Go
             - client_golang 1.21.0 ➙ 1.21.1

@@ -20,13 +20,13 @@ export default defineConfig(({ mode }) => {
       // Skip the build pipeline for assets not directly referenced in the
       // JavaScript implementation (e.g., 'src/fonts/*' is not included here
       // because they are indirectly referenced via the SCSS files, same for
-      // 'src/images/*' which are referenced in the HTML file, etc.).
+      // 'src/images/*' which are referenced in the HTML entry point, etc.).
       viteStaticCopy({
         targets: [],
       }),
       // Simple workaround to move 'index.html' to the 'templates' folder after
       // the build is completed. The file is a Go template that is hydrated with
-      // data by varnishmon before being served to the client.
+      // data by varnishmon before being served to clients.
       {
         name: 'vite-postbuild',
         closeBundle: () => {
@@ -40,7 +40,8 @@ export default defineConfig(({ mode }) => {
         },
       },
     ],
-    // Temporary workaround. See: https://github.com/twbs/bootstrap/issues/40962.
+    // Temporary workaround to avoid a ton of warning messages. See:
+    // https://github.com/twbs/bootstrap/issues/40962.
     css: {
       preprocessorOptions: {
         scss: {

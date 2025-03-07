@@ -185,7 +185,9 @@ export function Filter({ filter, setFilter }) {
   const filterId = React.useId();
 
   const debouncedSetFilter = React.useCallback(
-    () => helpers.debounce(setFilter, 500),
+    (value) => {
+      return helpers.debounce(setFilter, 500)(value);
+    },
     [setFilter],
   );
 

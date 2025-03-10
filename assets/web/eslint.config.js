@@ -45,6 +45,8 @@ export default [
         'error',
         'smart',
       ],
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

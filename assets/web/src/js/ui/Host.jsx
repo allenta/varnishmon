@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function Host() {
   return (
     <div className="me-4 align-self-center">

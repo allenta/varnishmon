@@ -1,4 +1,4 @@
-- ?
+- 0.6.5-1 (2025-03-10):
     + Assorted improvements to the new React-based UI.
     + Updated dependencies.
         * Node.js

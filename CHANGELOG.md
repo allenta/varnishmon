@@ -1,3 +1,11 @@
+- 0.6.5-1 (2025-03-10):
+    + Assorted improvements to the new React-based UI.
+    + Updated dependencies.
+        * Node.js
+            - @eslint/js 9.21.0 ➙ 9.22.0
+            - eslint 9.21.0 ➙ 9.22.0
+            - eslint-config-prettier 10.0.2 ➙ 10.1.1
+
 - 0.6.4-1 (2025-03-07):
     + Assorted improvements to the new React-based UI.
     + Updated dependencies.

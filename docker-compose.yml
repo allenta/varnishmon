@@ -12,9 +12,16 @@
 #     $ ENVIRONMENT=development make
 #     $ ./build/bin/varnishmon --config ./files/varnishmon.yml --loglevel info
 #
-#     # Regenerate static assets & templates incrementally (useful when
-#     # compiling with development mode enabled).
+#     # Regenerate static assets & templates incrementally (only useful when
+#     # compiling with development mode enabled). This is convenient when
+#     # developing is focused on the backend side. Web UI will be available at
+#     # http://127.0.0.1:6100.
 #     $ make web-watch
+#
+#     # Use Vite's development server to serve the web UI, proxying API requests
+#     # to the backend. This is convenient when developing is focused on the
+#     # frontend side. Web UI will be available at http://127.0.0.1:5173.
+#     $ make web-serve
 #
 #     # Regenerate static assets & templates, ready for production. Beware
 #     # generated files are versioned to simplify the whole packaging process.
@@ -91,6 +98,7 @@ services:
     volumes:
       - .:/mnt/host.raw
     ports:
+      - 5173:5173
       - 6100:6100
     tmpfs:
       - /run

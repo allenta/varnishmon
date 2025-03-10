@@ -2,6 +2,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
 import prettier from 'eslint-plugin-prettier';
 
 export default [
@@ -28,6 +29,7 @@ export default [
     plugins: {
       'react': react,
       'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
       'prettier': prettier,
     },
     rules: {
@@ -42,6 +44,10 @@ export default [
       eqeqeq: [
         'error',
         'smart',
+      ],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
       ],
     },
   },

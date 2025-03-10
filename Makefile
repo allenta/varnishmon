@@ -285,6 +285,10 @@ define WEB_NPM_TASK
     )
 endef
 
+.PHONY: web-serve
+web-serve:
+	$(call WEB_NPM_TASK,serve)
+
 .PHONY: web-watch
 web-watch:
 	$(call WEB_NPM_TASK,watch)

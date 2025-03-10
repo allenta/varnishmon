@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "serve": "vite serve",
     "watch": "NODE_ENV=development vite build --mode development",
     "build": "vite build",
     "lint": "eslint 'src/**/*.{js,jsx}'",
@@ -27,6 +28,7 @@
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
     "prettier": "^3.5.3",
     "sass-embedded": "^1.85.1",

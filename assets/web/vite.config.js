@@ -6,10 +6,32 @@ import eslint from 'vite-plugin-eslint';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { ViteMinifyPlugin } from 'vite-plugin-minify'
 
-export default defineConfig(({ mode }) => {
-  const isDevelopment = mode === 'development';
+export default defineConfig(({ command, mode }) => {
+  const isDevelopment = command === 'serve' || mode === 'development';
+
+  const chokidarOptions = {
+    usePolling: true,
+    interval: 1000,
+  };
 
   return {
+    // Customize Vite's development server. Using it is not required (check
+    // 'docker-compose.yml' for details), but it can be very useful when
+    // developing is focused on the frontend side. For proper integration with
+    // the varnishmon service, some adjustments are needed here, in addition to
+    // some logic to hydrate the 'index.html' template (see 'hydrate-index-html'
+    // plugin).
+    server: {
+      host: '0.0.0.0',
+      port: 5173,
+      watch: chokidarOptions,
+      proxy: {
+        '^/(?:metrics|storage)': {
+          target: 'http://localhost:6100',
+          changeOrigin: true,
+        },
+      },
+    },
     plugins: [
       eslint({
         failOnError: false,
@@ -30,13 +52,51 @@ export default defineConfig(({ mode }) => {
       {
         name: 'vite-postbuild',
         closeBundle: () => {
-          fs.rename(
-            path.join(__dirname, '../static/index.html'),
-            path.join(__dirname, '../templates/index.html.tmpl'),
-            (err) => {
-              if (err) throw err;
-              console.log(`'index.html' successfully moved to 'templates' folder`);
+          if (command === 'build') {
+            fs.rename(
+              path.join(__dirname, '../static/index.html'),
+              path.join(__dirname, '../templates/index.html.tmpl'),
+              (err) => {
+                if (err) throw err;
+                console.log(`'index.html' successfully moved to 'templates' folder`);
+              });
+          }
+        },
+      },
+      // When Vite's development server is used, the 'index.html' template is
+      // served by Vite itself. In this case, the template needs to be hydrated
+      // with data that is usually provided by the varnishmon service.
+      {
+        name: 'hydrate-index-html',
+        transformIndexHtml(html) {
+          if (command === 'serve') {
+            return html.replace(/{{\.(Config|Version|Revision)}}/g, (_, key) => {
+              switch (key) {
+                case 'Config':
+                  return JSON.stringify({
+                    config: {
+                      scraper: {
+                        enabled: true,
+                        period: 5,
+                      },
+                    },
+                    revision: '0000000',
+                    storage: {
+                      earliest: 0,
+                      hostname: 'dev',
+                      latest: 0,
+                    },
+                    version: '0.9.0',
+                  });
+                case 'Version':
+                  return '0.0.0';
+                case 'Revision':
+                  return '0000000';
+              }
+              throw new Error(`Unexpected placeholder: {{.${key}}}`);
             });
+          }
+          return html;
         },
       },
     ],
@@ -88,17 +148,11 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-      // Vite is not used to serve the application. Therefore, during development,
-      // the Rollup watcher needs to be used.
+      // When Vite's development server is not used for development, the Rollup
+      // watcher is used instead.
       watch:
         isDevelopment
-          ? {
-              chokidar: {
-                usePolling: true,
-                interval: 1000,
-              },
-              exclude: 'node_modules/**',
-            }
+          ? { chokidar: chokidarOptions }
           : undefined,
     },
   };

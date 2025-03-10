@@ -87,36 +87,18 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 	}
 
 	// Prepare template data & render it.
-	scraperPeriod := 0
-	if h.app.Cfg().ScraperEnabled() {
-		scraperPeriod = int(h.app.Cfg().ScraperPeriod().Seconds())
-	}
-	cfg, err := json.Marshal(map[string]any{
-		"version":  config.Version(),
-		"revision": config.Revision(),
-		"config": map[string]any{
-			"scraper": map[string]any{
-				"enabled": h.app.Cfg().ScraperEnabled(),
-				"period":  scraperPeriod,
-			},
-		},
-		"storage": map[string]any{
-			"hostname": h.storage.Hostname(),
-			"earliest": h.storage.Earliest().Unix(),
-			"latest":   h.storage.Latest().Unix(),
-		},
-	})
+	cfg, err := h.getConfigObject()
 	if err != nil {
 		h.app.Cfg().Log().Error().
 			Err(err).
-			Msg("Failed to config for 'templates/index.html.tmpl' template!")
+			Msg("Failed to build config for 'templates/index.html.tmpl' template!")
 		rctx.SetStatusCode(fasthttp.StatusInternalServerError)
 		return
 	}
 	tmplData := map[string]any{
 		"Version":  config.Version(),
 		"Revision": config.Revision(),
-		"Config":   string(cfg),
+		"Config":   cfg,
 	}
 	var renderedTmpl bytes.Buffer
 	if err := tmpl.Execute(&renderedTmpl, tmplData); err != nil {
@@ -131,6 +113,21 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 	rctx.SetContentType("text/html; charset=utf-8")
 	rctx.SetStatusCode(fasthttp.StatusOK)
 	rctx.SetBody(renderedTmpl.Bytes())
+}
+
+func (h *Handler) handleConfigRequest(rctx *fasthttp.RequestCtx) {
+	cfg, err := h.getConfigObject()
+	if err != nil {
+		h.app.Cfg().Log().Error().
+			Err(err).
+			Msg("Failed to build config object!")
+		rctx.SetStatusCode(fasthttp.StatusInternalServerError)
+		return
+	}
+
+	rctx.SetContentType("application/json; charset=utf-8")
+	rctx.SetStatusCode(fasthttp.StatusOK)
+	rctx.SetBodyString(cfg)
 }
 
 func (h *Handler) handleStorageMetricsRequest(rctx *fasthttp.RequestCtx) {
@@ -219,6 +216,33 @@ func (h *Handler) handleStorageMetricsRequest(rctx *fasthttp.RequestCtx) {
 			Msg("Failed to encode response!")
 		rctx.SetStatusCode(fasthttp.StatusInternalServerError)
 	}
+}
+
+func (h *Handler) getConfigObject() (string, error) {
+	scraperPeriod := 0
+	if h.app.Cfg().ScraperEnabled() {
+		scraperPeriod = int(h.app.Cfg().ScraperPeriod().Seconds())
+	}
+	cfg, err := json.Marshal(map[string]any{
+		"version":  config.Version(),
+		"revision": config.Revision(),
+		"config": map[string]any{
+			"scraper": map[string]any{
+				"enabled": h.app.Cfg().ScraperEnabled(),
+				"period":  scraperPeriod,
+			},
+		},
+		"storage": map[string]any{
+			"hostname": h.storage.Hostname(),
+			"earliest": h.storage.Earliest().Unix(),
+			"latest":   h.storage.Latest().Unix(),
+		},
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal config object: %w", err)
+	}
+
+	return string(cfg), nil
 }
 
 func (h *Handler) getQueryArgsTimeParam(rctx *fasthttp.RequestCtx, name string) (time.Time, error) {

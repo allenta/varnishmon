@@ -64,6 +64,7 @@ func NewHandler(app Application, storage *storage.Storage) *Handler {
 	h.router.GET("/storage/metrics", h.handleStorageMetricsRequest)
 	h.router.GET("/storage/metrics/{id:[0-9]+}", h.handleStorageMetricsRequest)
 	h.router.GET("/", h.handleHomeRequest)
+	h.router.GET("/config", h.handleConfigRequest)
 	h.router.ServeFilesCustom("/{filepath:*}", h.filesystemHandler())
 
 	h.app.Cfg().Metrics().Registry.MustRegister(h.requestsTotal)

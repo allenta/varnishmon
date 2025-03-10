@@ -1,3 +1,6 @@
+- 0.6.6-1 (2025-03-10):
+    + Added `/config` endpoint to retrieve the configuration, as an alternative to hydrating the `index.html` template server-side.
+
 - 0.6.5-1 (2025-03-10):
     + Assorted improvements to the new React-based UI.
     + Updated dependencies.
@@ -136,7 +139,7 @@
     + Added spinner for visual feedback when loading a metric.
 
 - 0.2.2-1 (2025-01-24):
-    + Added event handlers to apply the time range when 'Enter' is pressed in one of the time range inputs.
+    + Added event handlers to apply the time range when `Enter` is pressed in one of the time range inputs.
     + Fixed overflow when processing bitmap metrics.
 
 - 0.2.1-1 (2025-01-24):

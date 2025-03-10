@@ -13,7 +13,7 @@ export default [
       ecmaVersion: 2020,
       globals: {
         ...globals.browser,
-        varnishmon: 'readonly',
+        varnishmon: true,
       },
       parserOptions: {
         ecmaVersion: 'latest',

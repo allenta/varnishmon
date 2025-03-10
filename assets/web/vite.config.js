@@ -26,7 +26,7 @@ export default defineConfig(({ command, mode }) => {
       port: 5173,
       watch: chokidarOptions,
       proxy: {
-        '^/(?:metrics|storage)': {
+        '^/(?:config|metrics|storage)': {
           target: 'http://localhost:6100',
           changeOrigin: true,
         },
@@ -50,7 +50,7 @@ export default defineConfig(({ command, mode }) => {
       // the build is completed. The file is a Go template that is hydrated with
       // data by varnishmon before being served to clients.
       {
-        name: 'vite-postbuild',
+        name: 'build-index-html-template',
         closeBundle: () => {
           if (command === 'build') {
             fs.rename(
@@ -64,8 +64,9 @@ export default defineConfig(({ command, mode }) => {
         },
       },
       // When Vite's development server is used, the 'index.html' template is
-      // served by Vite itself. In this case, the template needs to be hydrated
-      // with data that is usually provided by the varnishmon service.
+      // served by Vite itself. In this case, the template needs to be manually
+      // hydrated: some dummy data is injected here and the rest is fetched
+      // client-side using the '/config' endpoint.
       {
         name: 'hydrate-index-html',
         transformIndexHtml(html) {
@@ -73,21 +74,7 @@ export default defineConfig(({ command, mode }) => {
             return html.replace(/{{\.(Config|Version|Revision)}}/g, (_, key) => {
               switch (key) {
                 case 'Config':
-                  return JSON.stringify({
-                    config: {
-                      scraper: {
-                        enabled: true,
-                        period: 5,
-                      },
-                    },
-                    revision: '0000000',
-                    storage: {
-                      earliest: 0,
-                      hostname: 'dev',
-                      latest: 0,
-                    },
-                    version: '0.9.0',
-                  });
+                  return 'null';
                 case 'Version':
                   return '0.0.0';
                 case 'Revision':

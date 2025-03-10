@@ -2,20 +2,9 @@ import React from 'react';
 
 import * as config from '../config';
 import * as helpers from '../helpers';
-
+import * as components from './components';
 import { useReload } from './useReload';
 import { useFilter } from './useFilter';
-import { Host } from './components/Host';
-import { TimeRange } from './components/TimeRange';
-import { Refresh } from './components/Refresh';
-import { Filter } from './components/Filter';
-import { Verbosity } from './components/Verbosity';
-import { Columns } from './components/Columns';
-import { Aggregator } from './components/Aggregator';
-import { Step } from './components/Step';
-import { FilterStats } from './components/FilterStats';
-import { Actions } from './components/Actions';
-import { Clusters } from './components/Clusters';
 
 export function App() {
   const [timeRangePicker, setTimeRangePicker] = React.useState(null);
@@ -72,13 +61,13 @@ export function App() {
             varnishmon
           </a>
           <div className="d-flex ms-auto">
-            <Host />
-            <TimeRange
+            <components.Host />
+            <components.TimeRange
               timeRangePicker={timeRangePicker}
               setTimeRangePicker={setTimeRangePicker}
               reload={reload}
             />
-            <Refresh
+            <components.Refresh
               refreshInterval={refreshInterval}
               setRefreshInterval={setRefreshInterval}
             />
@@ -90,34 +79,37 @@ export function App() {
         <div className="container-fluid py-md-4 flex-grow-1 d-flex flex-column">
           <div className="row mb-2">
             <div className="col-md-8">
-              <Filter filter={filter} setFilter={setFilter} />
+              <components.Filter filter={filter} setFilter={setFilter} />
             </div>
             <div className="col-md-1">
-              <Verbosity verbosity={verbosity} setVerbosity={setVerbosity} />
+              <components.Verbosity
+                verbosity={verbosity}
+                setVerbosity={setVerbosity}
+              />
             </div>
             <div className="col-md-1">
-              <Columns columns={columns} setColumns={setColumns} />
+              <components.Columns columns={columns} setColumns={setColumns} />
             </div>
             <div className="col-md-1">
-              <Aggregator
+              <components.Aggregator
                 aggregator={aggregator}
                 setAggregator={setAggregator}
               />
             </div>
             <div className="col-md-1">
-              <Step step={step} setStep={setStep} />
+              <components.Step step={step} setStep={setStep} />
             </div>
           </div>
 
           <div className="row mb-2">
-            <FilterStats filterStats={filterStats} />
+            <components.FilterStats filterStats={filterStats} />
             <div className="col text-end">
-              <Actions />
+              <components.Actions />
             </div>
           </div>
 
           {loadProgress == null && (
-            <Clusters
+            <components.Clusters
               timeRangePicker={timeRangePicker}
               initialRange={initialRange}
               refreshInterval={refreshInterval}

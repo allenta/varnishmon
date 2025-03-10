@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 
 import * as config from '../../config';
+import { EVENTS } from '../events';
 
 export function Refresh({ refreshInterval, setRefreshInterval }) {
   const onChange = (event) => {
@@ -10,7 +11,7 @@ export function Refresh({ refreshInterval, setRefreshInterval }) {
   };
 
   const onClick = () => {
-    document.dispatchEvent(new Event('onRefresh'));
+    document.dispatchEvent(new Event(EVENTS.REFRESH));
   };
 
   return (

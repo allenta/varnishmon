@@ -3,6 +3,7 @@ import React from 'react';
 import Collapse from 'bootstrap/js/dist/collapse';
 
 import { Metric } from './Metric';
+import { EVENTS } from '../events';
 
 export function Cluster({ cluster, ...props }) {
   const containerRef = React.useRef(null);
@@ -21,7 +22,7 @@ export function Cluster({ cluster, ...props }) {
         setIsAccordionCollapsed(true);
       };
       document.addEventListener(
-        'onCollapseAllClusters',
+        EVENTS.COLLAPSE_ALL_CLUSTERS,
         onCollapseAllClustersListener,
       );
 
@@ -29,17 +30,17 @@ export function Cluster({ cluster, ...props }) {
         setIsAccordionCollapsed(false);
       };
       document.addEventListener(
-        'onExpandAllClusters',
+        EVENTS.EXPAND_ALL_CLUSTERS,
         onExpandAllClustersListener,
       );
 
       return () => {
         document.removeEventListener(
-          'onCollapseAllClusters',
+          EVENTS.COLLAPSE_ALL_CLUSTERS,
           onCollapseAllClustersListener,
         );
         document.removeEventListener(
-          'onExpandAllClusters',
+          EVENTS.EXPAND_ALL_CLUSTERS,
           onExpandAllClustersListener,
         );
         // When mounting and then unmounting the component too quickly (e.g.,

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import * as config from '../config';
-import * as helpers from '../helpers';
+import * as config from '../../config';
+import * as helpers from '../../helpers';
 
 export function Filter({ filter, setFilter }) {
   const [localFilter, setLocalFilter] = React.useState(filter);

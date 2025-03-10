@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import * as config from '../config';
+import * as config from '../../config';
 
 export function Aggregator({ aggregator, setAggregator }) {
   const aggregatorId = React.useId();

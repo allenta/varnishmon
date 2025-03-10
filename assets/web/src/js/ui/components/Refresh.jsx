@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-import * as config from '../config';
+import * as config from '../../config';
 
 export function Refresh({ refreshInterval, setRefreshInterval }) {
   const onChange = (event) => {

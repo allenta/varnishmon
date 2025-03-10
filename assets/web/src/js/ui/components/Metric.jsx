@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Chart from '../chart';
+import Chart from '../../chart';
 
 export function Metric({
   timeRangePicker,

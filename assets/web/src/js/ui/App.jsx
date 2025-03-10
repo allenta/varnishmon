@@ -2,119 +2,20 @@ import React from 'react';
 
 import * as config from '../config';
 import * as helpers from '../helpers';
-import * as storage from '../storage';
 
-import { Host } from './Host';
-import { TimeRange } from './TimeRange';
-import { Refresh } from './Refresh';
-import { Filter } from './Filter';
-import { Verbosity } from './Verbosity';
-import { Columns } from './Columns';
-import { Aggregator } from './Aggregator';
-import { Step } from './Step';
-import { FilterStats } from './FilterStats';
-import { Actions } from './Actions';
-import { Clusters } from './Clusters';
-
-const useReload = ({ timeRangePicker, initialRange, step }) => {
-  const [metrics, setMetrics] = React.useState(null);
-  const [loadProgress, setLoadProgress] = React.useState(null);
-
-  const reload = React.useCallback(() => {
-    // Flush previous state.
-    initialRange.current = null;
-    setMetrics(null);
-
-    // Fetch metrics from the storage, exposing load state to show a loading
-    // spinner in the meantime, etc.
-    setLoadProgress('loading');
-    const rangeFactory = timeRangePicker.getDatesFactory();
-    const [from, to] = rangeFactory();
-    storage
-      .getMetrics(from, to, step)
-      .then((fetchedMetrics) => {
-        const numClusters = fetchedMetrics.clusters.length;
-        const numMetrics = fetchedMetrics.clusters.reduce(
-          (acc, cluster) => acc + cluster.metrics.length,
-          0,
-        );
-        helpers.notify(
-          'info',
-          `Fetched ${numMetrics} metrics organized in ${numClusters} clusters`,
-        );
-        setLoadProgress(null);
-
-        setMetrics(fetchedMetrics);
-      })
-      .catch((error) => {
-        helpers.notify('error', `Failed to fetch metrics: ${error}`);
-        setLoadProgress('error');
-      });
-  }, [timeRangePicker, initialRange, step]);
-
-  return [metrics, loadProgress, reload];
-};
-
-const useFilter = ({ metrics }) => {
-  const [filter, setFilter] = React.useState(config.getFilter());
-  const [filterStats, setFilterStats] = React.useState('');
-  const [verbosity, setVerbosity] = React.useState(config.getVerbosity());
-  const [filteredMetrics, setFilteredMetrics] = React.useState(metrics);
-
-  React.useEffect(() => {
-    if (metrics == null) {
-      setFilterStats('');
-      setFilteredMetrics(null);
-      return;
-    }
-
-    const newFilteredMetrics = { ...metrics, clusters: [] };
-    const filterTerms = filter.split(/\s+/).filter((term) => term.length > 0);
-    let numClusters = 0,
-      numVisibleClusters = 0,
-      numMetrics = 0,
-      numVisibleMetrics = 0;
-    metrics.clusters.forEach((cluster) => {
-      numClusters += 1;
-      numMetrics += cluster.metrics.length;
-
-      const newCluster = { ...cluster, metrics: [] };
-      newCluster.metrics = cluster.metrics.filter((metric) => {
-        if (verbosity === 'normal' && metric.debug) {
-          return false;
-        }
-
-        if (filterTerms.length > 0) {
-          return filterTerms.some((term) => metric.name.includes(term));
-        }
-
-        return true;
-      });
-
-      if (newCluster.metrics.length > 0) {
-        numVisibleClusters += 1;
-        numVisibleMetrics += newCluster.metrics.length;
-        newFilteredMetrics.clusters.push(newCluster);
-      }
-    });
-
-    setFilterStats(
-      `${numVisibleMetrics} metrics found (${numMetrics - numVisibleMetrics} hidden),` +
-        ` organized in ${numVisibleClusters} clusters (${numClusters - numVisibleClusters}` +
-        ' hidden)',
-    );
-    setFilteredMetrics(newFilteredMetrics);
-  }, [metrics, filter, verbosity]);
-
-  return [
-    filteredMetrics,
-    filter,
-    setFilter,
-    filterStats,
-    verbosity,
-    setVerbosity,
-  ];
-};
+import { useReload } from './useReload';
+import { useFilter } from './useFilter';
+import { Host } from './components/Host';
+import { TimeRange } from './components/TimeRange';
+import { Refresh } from './components/Refresh';
+import { Filter } from './components/Filter';
+import { Verbosity } from './components/Verbosity';
+import { Columns } from './components/Columns';
+import { Aggregator } from './components/Aggregator';
+import { Step } from './components/Step';
+import { FilterStats } from './components/FilterStats';
+import { Actions } from './components/Actions';
+import { Clusters } from './components/Clusters';
 
 export function App() {
   const [timeRangePicker, setTimeRangePicker] = React.useState(null);

@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import * as config from '../config';
-import * as helpers from '../helpers';
-import { TimeRangePicker } from '../time-picker';
+import * as config from '../../config';
+import * as helpers from '../../helpers';
+import { TimeRangePicker } from '../../time-picker';
 
 export function TimeRange({ timeRangePicker, setTimeRangePicker, reload }) {
   const containerRef = React.useRef(null);

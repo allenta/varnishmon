@@ -124,21 +124,6 @@ func (cfg *Config) initAPIConfig() {
 			cfg.checkFile("api.tls.keyfile")
 		}
 
-		cfg.vpr.SetDefault("api.backlog", 1024)
-		cfg.checkInt("api.backlog", 1, 65536)
-
-		cfg.vpr.SetDefault("api.concurrency", 1024)
-		cfg.checkInt("api.concurrency", 1, math.MaxInt32)
-
-		cfg.vpr.SetDefault("api.read-buffer-size", 65536)
-		cfg.checkInt("api.read-buffer-size", 1, math.MaxInt32)
-
-		cfg.vpr.SetDefault("api.write-buffer-size", 65536)
-		cfg.checkInt("api.write-buffer-size", 1, math.MaxInt32)
-
-		cfg.vpr.SetDefault("api.max-request-body-size", 65536)
-		cfg.checkInt("api.max-request-body-size", 1, math.MaxInt32)
-
 		cfg.vpr.SetDefault("api.read-timeout", 1*time.Minute)
 		cfg.checkDuration("api.read-timeout", 1*time.Second, 10*time.Minute)
 
@@ -148,12 +133,8 @@ func (cfg *Config) initAPIConfig() {
 		cfg.vpr.SetDefault("api.idle-timeout", 2*time.Minute)
 		cfg.checkDuration("api.idle-timeout", 1*time.Second, 10*time.Minute)
 
-		cfg.vpr.SetDefault("api.tcp-keepalive", true)
-
-		if cfg.vpr.GetBool("api.tcp-keepalive") {
-			cfg.vpr.SetDefault("api.tcp-keepalive-period", 2*time.Minute)
-			cfg.checkDuration("api.tcp-keepalive-period", 1*time.Second, 10*time.Minute)
-		}
+		cfg.vpr.SetDefault("api.max-header-bytes", 1024*1024)
+		cfg.checkInt("api.max-header-bytes", 1, math.MaxInt32)
 	}
 }
 

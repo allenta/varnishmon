@@ -1,3 +1,6 @@
+- ?
+    + Dropped fasthttp in favor of the standard net/http package.
+
 - 0.6.6-1 (2025-03-10):
     + Added `/config` endpoint to retrieve the configuration, as an alternative to hydrating the `index.html` template server-side.
 

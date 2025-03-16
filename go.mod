@@ -5,7 +5,7 @@ go 1.24
 toolchain go1.24.0
 
 require (
-	github.com/fasthttp/router v1.5.4
+	github.com/gorilla/mux v1.8.1
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/marcboeker/go-duckdb v1.8.5
 	github.com/prometheus/client_golang v1.21.1
@@ -13,13 +13,11 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
-	github.com/valyala/fasthttp v1.59.0
-	github.com/valyala/tcplisten v1.0.0
 	gitlab.com/stone.code/assert v1.1.4
+	golang.org/x/sys v0.30.0
 )
 
 require (
-	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/apache/arrow-go/v18 v18.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -53,21 +51,18 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
-	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vektra/mockery/v2 v2.52.1 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/term v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/tools v0.30.1-0.20250220174815-31e3bb2b8fd1 // indirect

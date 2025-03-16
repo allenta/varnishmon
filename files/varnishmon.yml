@@ -29,13 +29,7 @@ api:
   tls:
     certfile:
     keyfile:
-  backlog: 1024
-  concurrency: 1024
-  read-buffer-size: 65536
-  write-buffer-size: 65536
-  max-request-body-size: 65536
   read-timeout: 60s
   write-timeout: 60s
   idle-timeout: 2m
-  tcp-keepalive: true
-  tcp-keepalive-period: 2m
+  max-header-bytes: 1048576

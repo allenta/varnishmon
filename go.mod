@@ -2,8 +2,6 @@ module github.com/allenta/varnishmon
 
 go 1.24
 
-toolchain go1.24.0
-
 require (
 	github.com/gorilla/mux v1.8.1
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
@@ -14,7 +12,7 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	gitlab.com/stone.code/assert v1.1.4
-	golang.org/x/sys v0.30.0
+	golang.org/x/sys v0.31.0
 )
 
 require (

@@ -1,4 +1,4 @@
-- ?
+- 0.7.0-1 (2025-03-18):
     + Dropped fasthttp in favor of the standard net/http package.
     + Integrated gin for routing.
     + Dropped 'api_worker_concurrency' & 'api_worker_open_connections' metrics.

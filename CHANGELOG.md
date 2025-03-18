@@ -2,6 +2,14 @@
     + Dropped fasthttp in favor of the standard net/http package.
     + Integrated gin for routing.
     + Dropped 'api_worker_concurrency' & 'api_worker_open_connections' metrics.
+    + Updated dependencies.
+        * Go
+            - sys 0.30.0 ➙ 0.31.0
+            - viper 1.19.0 ➙ 1.20.0
+        * Node.js
+            - @types/react 19.0.10 ➙ 19.0.11
+            - sass-embedded 1.85.1 ➙ 1.86.0
+            - vite 6.2.0 ➙ 6.2.2
 
 - 0.6.6-1 (2025-03-10):
     + Added `/config` endpoint to retrieve the configuration, as an alternative to hydrating the `index.html` template server-side.

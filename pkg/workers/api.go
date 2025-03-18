@@ -2,23 +2,26 @@ package workers
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log"
+	"net"
+	"net/http"
 	"sync"
+	"syscall"
+	"time"
 
-	"github.com/allenta/varnishmon/pkg/config"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/valyala/fasthttp"
-	"github.com/valyala/tcplisten"
+	"golang.org/x/sys/unix"
 )
 
 type APIWorker struct {
 	*worker
 	handler APIHandler
-	server  *fasthttp.Server
+	server  *http.Server
 }
 
 type APIHandler interface {
-	HandleRequest(ctx context.Context, rctx *fasthttp.RequestCtx)
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
 func NewAPIWorker(
@@ -42,104 +45,70 @@ func NewAPIWorker(
 }
 
 func (aw *APIWorker) init() {
-	aw.server = &fasthttp.Server{
-		Name:    fmt.Sprintf("varnishmon/%s (%s)", config.Version(), config.Revision()),
-		Handler: fasthttp.CompressHandler(aw.handleRequest),
-		Logger:  aw.app.Cfg().Log(),
-
-		Concurrency: aw.app.Cfg().APIConcurrency(),
-
-		ReadBufferSize:     aw.app.Cfg().APIReadBufferSize(),
-		WriteBufferSize:    aw.app.Cfg().APIWriteBufferSize(),
-		MaxRequestBodySize: aw.app.Cfg().APIMaxRequestBodySize(),
-
-		ReadTimeout:  aw.app.Cfg().APIReadTimeout(),
-		WriteTimeout: aw.app.Cfg().APIWriteTimeout(),
-		IdleTimeout:  aw.app.Cfg().APIIdleTimeout(),
-
-		TCPKeepalive:       aw.app.Cfg().APITCPKeepalive(),
-		TCPKeepalivePeriod: aw.app.Cfg().APITCPKeepalivePeriod(),
+	aw.server = &http.Server{
+		Addr:           fmt.Sprintf("%s:%d", aw.app.Cfg().APIListenIP(), aw.app.Cfg().APIListenPort()),
+		Handler:        aw.handler,
+		ReadTimeout:    aw.app.Cfg().APIReadTimeout(),
+		WriteTimeout:   aw.app.Cfg().APIWriteTimeout(),
+		IdleTimeout:    aw.app.Cfg().APIIdleTimeout(),
+		MaxHeaderBytes: aw.app.Cfg().APIMaxHeaderBytes(),
+		BaseContext: func(net.Listener) context.Context {
+			return aw.worker.ctx
+		},
+		ErrorLog: log.New(aw.app.Cfg().Log().ErrorWriter(), "", 0),
 	}
-
-	aw.app.Cfg().Metrics().Registry.MustRegister(prometheus.NewGaugeFunc(
-		prometheus.GaugeOpts{
-			Name:        "api_worker_concurrency",
-			Help:        "Served connections, partitioned by API worker",
-			ConstLabels: prometheus.Labels{"id": aw.worker.id},
-		},
-		func() float64 {
-			return float64(aw.server.GetCurrentConcurrency())
-		},
-	))
-
-	aw.app.Cfg().Metrics().Registry.MustRegister(prometheus.NewGaugeFunc(
-		prometheus.GaugeOpts{
-			Name:        "api_worker_open_connections",
-			Help:        "Opened connections, partitioned by API worker",
-			ConstLabels: prometheus.Labels{"id": aw.worker.id},
-		},
-		func() float64 {
-			return float64(aw.server.GetOpenConnectionsCount())
-		},
-	))
-}
-
-func (aw *APIWorker) handleRequest(rctx *fasthttp.RequestCtx) {
-	aw.handler.HandleRequest(aw.ctx, rctx)
 }
 
 func (aw *APIWorker) run() {
-	address := fmt.Sprintf(
-		"%s:%d",
-		aw.app.Cfg().APIListenIP(),
-		aw.app.Cfg().APIListenPort())
-
-	var cfg = &tcplisten.Config{
-		ReusePort:   true,
-		DeferAccept: true,
-		FastOpen:    true,
-		Backlog:     aw.app.Cfg().APIBacklog(),
+	listenConfig := net.ListenConfig{
+		Control: func(network, address string, c syscall.RawConn) error {
+			return c.Control(func(fd uintptr) {
+				if err := unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEPORT, 1); err != nil {
+					aw.app.Cfg().Log().Error().
+						Err(err).
+						Str("network", network).
+						Str("address", address).
+						Msgf("Failed to set 'SO_REUSEPORT' socket option for API worker '%v'!", aw)
+				}
+			})
+		},
 	}
 
-	if listener, err := cfg.NewListener("tcp4", address); err == nil {
-		if aw.app.Cfg().APITLSCertfile() != "" && aw.app.Cfg().APITLSKeyfile() != "" {
-			if err := aw.server.ServeTLS(listener, aw.app.Cfg().APITLSCertfile(), aw.app.Cfg().APITLSKeyfile()); err != nil {
-				aw.app.Cfg().Log().Fatal().
-					Err(err).
-					Str("address", address).
-					Msgf("Failed to launch %v!", aw)
-			}
-		} else {
-			if err := aw.server.Serve(listener); err != nil {
-				aw.app.Cfg().Log().Fatal().
-					Err(err).
-					Str("address", address).
-					Msgf("Failed to launch %v!", aw)
-			}
-		}
-	} else {
+	listener, err := listenConfig.Listen(aw.worker.ctx, "tcp", aw.server.Addr)
+	if err != nil {
 		aw.app.Cfg().Log().Fatal().
 			Err(err).
-			Str("address", address).
-			Msgf("Failed to create TCP listener for '%v' worker!", aw)
+			Msgf("API worker '%v' failed to listen!", aw)
+	}
+
+	if aw.app.Cfg().APITLSCertfile() != "" && aw.app.Cfg().APITLSKeyfile() != "" {
+		if err := aw.server.ServeTLS(listener, aw.app.Cfg().APITLSCertfile(), aw.app.Cfg().APITLSKeyfile()); err != nil &&
+			!errors.Is(err, http.ErrServerClosed) {
+			aw.app.Cfg().Log().Fatal().
+				Err(err).
+				Str("address", aw.server.Addr).
+				Msgf("API worker '%v' failed to serve!", aw)
+		}
+	} else {
+		if err := aw.server.Serve(listener); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			aw.app.Cfg().Log().Fatal().
+				Err(err).
+				Str("address", aw.server.Addr).
+				Msgf("API worker '%v' failed to serve!", aw)
+		}
 	}
 }
 
 func (aw *APIWorker) stop() {
-	// 'aw.server.Shutdown()' blocks indefinitely while in-flight connections
-	// are gracefully closed. Even worst, if 'APIReadTimeout()' or
-	// 'APIIdleTimeout()' are set to 0 (i.e. no timeout) it will block forever.
-	// Ideally we'd prefer a controlled but ungraceful shutdown in order to
-	// avoid blocking the service shutdown too much time. Apparently that's not
-	// possible for the fasthttp library. Best alternative is triggering
-	// 'aw.server.Shutdown()' asynchronously: 'aw.server.Serve()' will exit
-	// immediately and nobody will wait for goroutines handling in-flight
-	// connections.
-	go func() {
-		if err := aw.server.Shutdown(); err != nil {
-			aw.app.Cfg().Log().Error().
-				Err(err).
-				Msgf("Got error while shutting down '%v' worker!", aw)
-		}
-	}()
+	// 'aw.server.Shutdown()' performs an orderly shutdown of the server, waiting
+	// for in-flight connections to close before returning. We limit that time
+	// to 1 second here. Also, note that incoming requests use the base context
+	// 'aw.worker.ctx', which is canceled when the worker is stopped.
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	if err := aw.server.Shutdown(ctx); err != nil {
+		aw.app.Cfg().Log().Error().
+			Err(err).
+			Msgf("Got error while shutting down '%v' worker!", aw)
+	}
 }

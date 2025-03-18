@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"path"
 	"strconv"
 	"text/template"
 	"time"
@@ -12,7 +14,7 @@ import (
 	"github.com/allenta/varnishmon/assets"
 	"github.com/allenta/varnishmon/pkg/config"
 	"github.com/allenta/varnishmon/pkg/workers/storage"
-	"github.com/valyala/fasthttp"
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -24,37 +26,67 @@ var (
 	errInvalidQueryArgsParam = errors.New("invalid query string parameter")
 )
 
-func (h *Handler) filesystemHandler() *fasthttp.FS {
-	fs := &fasthttp.FS{
-		FS:                 assets.StaticFS,
-		IndexNames:         []string{},
-		Compress:           true,
-		GenerateIndexPages: false,
-		PathRewrite: func(rctx *fasthttp.RequestCtx) []byte {
-			return append([]byte("/static"), rctx.Path()...)
-		},
-		PathNotFound: func(rctx *fasthttp.RequestCtx) {
-			rctx.SetStatusCode(fasthttp.StatusNotFound)
-		},
+type embedFilesystem struct {
+	fs   http.FileSystem
+	root string
+}
+
+func (efs embedFilesystem) Open(name string) (http.File, error) {
+	return efs.fs.Open(path.Join(efs.root, name)) //nolint:wrapcheck
+}
+
+type wrappedFilesystem struct {
+	fs http.FileSystem
+}
+
+func (wfs wrappedFilesystem) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Check if the file exists.
+	file, err := wfs.fs.Open(r.URL.Path)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	defer file.Close()
+	stat, err := file.Stat()
+	if err != nil {
+		http.NotFound(w, r)
+		return
 	}
 
+	// Disable directory listing.
+	if stat.IsDir() {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Serve the file.
+	http.ServeContent(w, r, r.URL.Path, stat.ModTime(), file)
+}
+
+func (h *Handler) filesystemHandler() gin.HandlerFunc {
 	// In development mode, bypass the embedded filesystem and serve assets
 	// directly from the host filesystem. This avoids the need to rebuild the
 	// binary for every change. The absolute path to the assets directory is
 	// hardcoded here, assuming the official development environment is
 	// reasonable enough for anyone contributing to the project.
+	var fs http.FileSystem
 	if config.IsDevelopment() {
-		fs.FS = nil
-		fs.Compress = false
-		fs.Root = developmentAssetsRoot
-		fs.CacheDuration = 0
-		fs.SkipCache = true
+		fs = http.Dir(path.Join(developmentAssetsRoot, "static"))
+	} else {
+		fs = embedFilesystem{fs: http.FS(assets.StaticFS), root: "static"}
 	}
+	wfs := wrappedFilesystem{fs: fs}
 
-	return fs
+	return func(c *gin.Context) {
+		if c.Request.Method == http.MethodGet || c.Request.Method == http.MethodHead {
+			wfs.ServeHTTP(c.Writer, c.Request)
+		} else {
+			c.AbortWithStatus(http.StatusMethodNotAllowed)
+		}
+	}
 }
 
-func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
+func (h *Handler) handleHomeRequest(c *gin.Context) {
 	// Fetch the template. In development mode, the template is loaded from the
 	// host filesystem. In production mode, the template is loaded from the
 	// embedded filesystem, parsed once, and reused for every request.
@@ -67,7 +99,7 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 				h.app.Cfg().Log().Error().
 					Err(err).
 					Msg("Failed to parse 'templates/index.html.tmpl' template!")
-				rctx.SetStatusCode(fasthttp.StatusInternalServerError)
+				c.AbortWithStatus(http.StatusInternalServerError)
 				return
 			}
 		}
@@ -76,12 +108,12 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 		// The absolute path to the assets directory is hardcoded here, assuming
 		// the official development environment is reasonable enough for anyone
 		// contributing to the project.
-		tmpl, err = template.ParseFiles(developmentAssetsRoot + "/templates/index.html.tmpl")
+		tmpl, err = template.ParseFiles(path.Join(developmentAssetsRoot, "templates", "index.html.tmpl"))
 		if err != nil {
 			h.app.Cfg().Log().Error().
 				Err(err).
 				Msg("Failed to parse 'templates/index.html.tmpl' template!")
-			rctx.SetStatusCode(fasthttp.StatusInternalServerError)
+			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 	}
@@ -92,94 +124,87 @@ func (h *Handler) handleHomeRequest(rctx *fasthttp.RequestCtx) {
 		h.app.Cfg().Log().Error().
 			Err(err).
 			Msg("Failed to build config for 'templates/index.html.tmpl' template!")
-		rctx.SetStatusCode(fasthttp.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 	tmplData := map[string]any{
 		"Version":  config.Version(),
 		"Revision": config.Revision(),
-		"Config":   cfg,
+		"Config":   string(cfg),
 	}
 	var renderedTmpl bytes.Buffer
 	if err := tmpl.Execute(&renderedTmpl, tmplData); err != nil {
 		h.app.Cfg().Log().Error().
 			Err(err).
 			Msg("Failed to render 'static/index.html.tmpl' template!")
-		rctx.SetStatusCode(fasthttp.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
 	// Set response headers & body.
-	rctx.SetContentType("text/html; charset=utf-8")
-	rctx.SetStatusCode(fasthttp.StatusOK)
-	rctx.SetBody(renderedTmpl.Bytes())
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.String(http.StatusOK, renderedTmpl.String())
 }
 
-func (h *Handler) handleConfigRequest(rctx *fasthttp.RequestCtx) {
+func (h *Handler) handleConfigRequest(c *gin.Context) {
 	cfg, err := h.getConfigObject()
 	if err != nil {
 		h.app.Cfg().Log().Error().
 			Err(err).
 			Msg("Failed to build config object!")
-		rctx.SetStatusCode(fasthttp.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	rctx.SetContentType("application/json; charset=utf-8")
-	rctx.SetStatusCode(fasthttp.StatusOK)
-	rctx.SetBodyString(cfg)
+	c.Header("Content-Type", "application/json; charset=utf-8")
+	c.String(http.StatusOK, string(cfg))
 }
 
-func (h *Handler) handleStorageMetricsRequest(rctx *fasthttp.RequestCtx) {
-	idRaw := rctx.UserValue("id")
+func (h *Handler) handleStorageMetricsRequest(c *gin.Context) {
+	idRaw := c.Param("id")
 	var result map[string]any
 	var err error
 
 	// Extract 'from' query string parameter.
-	from, err := h.getQueryArgsTimeParam(rctx, "from")
+	from, err := h.getQueryArgsTimeParam(c, "from")
 	if err != nil {
-		rctx.SetStatusCode(fasthttp.StatusBadRequest)
-		rctx.SetBodyString("Invalid 'from' parameter")
+		c.String(http.StatusBadRequest, "Invalid 'from' parameter")
 		return
 	}
 
 	// Extract 'to' query string parameter.
-	to, err := h.getQueryArgsTimeParam(rctx, "to")
+	to, err := h.getQueryArgsTimeParam(c, "to")
 	if err != nil {
-		rctx.SetStatusCode(fasthttp.StatusBadRequest)
-		rctx.SetBodyString("Invalid 'to' parameter")
+		c.String(http.StatusBadRequest, "Invalid 'to' parameter")
 		return
 	}
 
 	// Extract 'step' query string parameter.
-	step, err := rctx.QueryArgs().GetUint("step")
+	step, err := strconv.Atoi(c.Query("step"))
 	if err != nil {
-		rctx.SetStatusCode(fasthttp.StatusBadRequest)
-		rctx.SetBodyString("Invalid 'step' parameter")
+		c.String(http.StatusBadRequest, "Invalid 'step' parameter")
 		return
 	}
 
 	// If no metric ID is provided, return info about all metrics, filtering
 	// out the irrelevant (i.e., without samples) ones.
-	if idRaw == nil {
+	if idRaw == "" {
 		result, err = h.storage.GetMetrics(from, to, step)
 	} else {
 		// Validate metric ID.
 		var id int
-		id, err = strconv.Atoi(idRaw.(string))
+		id, err = strconv.Atoi(idRaw)
 		if err != nil {
-			rctx.SetStatusCode(fasthttp.StatusBadRequest)
-			rctx.SetBodyString(fmt.Sprintf("Invalid metric ID: %s", idRaw))
+			c.String(http.StatusBadRequest, fmt.Sprintf("Invalid metric ID: %s", idRaw)) //nolint:perfsprint
 			return
 		}
 
 		// Extract 'aggregator' query string parameter.
-		if !rctx.QueryArgs().Has("aggregator") {
-			rctx.SetStatusCode(fasthttp.StatusBadRequest)
-			rctx.SetBodyString("Missing 'aggregator' parameter")
+		aggregator := c.Query("aggregator")
+		if aggregator == "" {
+			c.String(http.StatusBadRequest, "Missing 'aggregator' parameter")
 			return
 		}
-		aggregator := string(rctx.QueryArgs().Peek("aggregator"))
 
 		// Get metric data.
 		result, err = h.storage.GetMetric(id, from, to, step, aggregator)
@@ -189,36 +214,25 @@ func (h *Handler) handleStorageMetricsRequest(rctx *fasthttp.RequestCtx) {
 	if err != nil {
 		switch {
 		case errors.Is(err, storage.ErrUnknownMetricID):
-			rctx.SetStatusCode(fasthttp.StatusNotFound)
-			rctx.SetBodyString("Unknown metric ID")
+			c.String(http.StatusNotFound, "Unknown metric ID")
 		case errors.Is(err, storage.ErrInvalidFromTo):
-			rctx.SetStatusCode(fasthttp.StatusBadRequest)
-			rctx.SetBodyString("Invalid 'from' and 'to' parameters")
+			c.String(http.StatusBadRequest, "Invalid 'from' and 'to' parameters")
 		case errors.Is(err, storage.ErrInvalidAggregator):
-			rctx.SetStatusCode(fasthttp.StatusBadRequest)
-			rctx.SetBodyString("Invalid 'aggregator' parameter")
+			c.String(http.StatusBadRequest, "Invalid 'aggregator' parameter")
 		default:
 			h.app.Cfg().Log().Error().
 				Err(err).
 				Msg("Failed to get metric(s) from storage!")
-			rctx.SetStatusCode(fasthttp.StatusInternalServerError)
+			c.AbortWithStatus(http.StatusInternalServerError)
 		}
 		return
 	}
 
 	// Encode response.
-	if err := json.NewEncoder(rctx).Encode(result); err == nil {
-		rctx.SetContentType("application/json; charset=utf-8")
-		rctx.SetStatusCode(fasthttp.StatusOK)
-	} else {
-		h.app.Cfg().Log().Error().
-			Err(err).
-			Msg("Failed to encode response!")
-		rctx.SetStatusCode(fasthttp.StatusInternalServerError)
-	}
+	c.JSON(http.StatusOK, result)
 }
 
-func (h *Handler) getConfigObject() (string, error) {
+func (h *Handler) getConfigObject() ([]byte, error) {
 	scraperPeriod := 0
 	if h.app.Cfg().ScraperEnabled() {
 		scraperPeriod = int(h.app.Cfg().ScraperPeriod().Seconds())
@@ -239,19 +253,19 @@ func (h *Handler) getConfigObject() (string, error) {
 		},
 	})
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal config object: %w", err)
+		return nil, fmt.Errorf("failed to marshal config object: %w", err)
 	}
 
-	return string(cfg), nil
+	return cfg, nil
 }
 
-func (h *Handler) getQueryArgsTimeParam(rctx *fasthttp.RequestCtx, name string) (time.Time, error) {
-	value := rctx.QueryArgs().Peek(name)
-	if value == nil {
+func (h *Handler) getQueryArgsTimeParam(c *gin.Context, name string) (time.Time, error) {
+	value := c.Query(name)
+	if value == "" {
 		return time.Time{}, fmt.Errorf("%w: %s", errMissingQueryArgsParam, name)
 	}
 
-	seconds, err := strconv.Atoi(string(value))
+	seconds, err := strconv.Atoi(value)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("%w: %s", errInvalidQueryArgsParam, name)
 	}

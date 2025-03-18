@@ -145,26 +145,6 @@ func (cfg *Config) APITLSKeyfile() string {
 	return cfg.vpr.GetString("api.tls.keyfile")
 }
 
-func (cfg *Config) APIBacklog() int {
-	return cfg.vpr.GetInt("api.backlog")
-}
-
-func (cfg *Config) APIConcurrency() int {
-	return cfg.vpr.GetInt("api.concurrency")
-}
-
-func (cfg *Config) APIReadBufferSize() int {
-	return cfg.vpr.GetInt("api.read-buffer-size")
-}
-
-func (cfg *Config) APIWriteBufferSize() int {
-	return cfg.vpr.GetInt("api.write-buffer-size")
-}
-
-func (cfg *Config) APIMaxRequestBodySize() int {
-	return cfg.vpr.GetInt("api.max-request-body-size")
-}
-
 func (cfg *Config) APIReadTimeout() time.Duration {
 	return cfg.vpr.GetDuration("api.read-timeout")
 }
@@ -177,10 +157,6 @@ func (cfg *Config) APIIdleTimeout() time.Duration {
 	return cfg.vpr.GetDuration("api.idle-timeout")
 }
 
-func (cfg *Config) APITCPKeepalive() bool {
-	return cfg.vpr.GetBool("api.tcp-keepalive")
-}
-
-func (cfg *Config) APITCPKeepalivePeriod() time.Duration {
-	return cfg.vpr.GetDuration("api.tcp-keepalive-period")
+func (cfg *Config) APIMaxHeaderBytes() int {
+	return cfg.vpr.GetInt("api.max-header-bytes")
 }

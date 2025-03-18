@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Chart from '../../chart';
+import { EVENTS } from '../events';
 
 export function Metric({
   timeRangePicker,
@@ -39,7 +40,7 @@ export function Metric({
         // Apply the zoom range to all the charts except the one that triggered
         // the event.
         document.dispatchEvent(
-          new CustomEvent('onZoom', {
+          new CustomEvent(EVENTS.ZOOM, {
             detail: { source: newChart, range: event.range },
           }),
         );
@@ -63,16 +64,16 @@ export function Metric({
           newChart.setZoomRange(event.detail.range);
         }
       };
-      document.addEventListener('onZoom', onZoomListener);
+      document.addEventListener(EVENTS.ZOOM, onZoomListener);
 
       const onRefreshListener = () => {
         newChart.refresh();
       };
-      document.addEventListener('onRefresh', onRefreshListener);
+      document.addEventListener(EVENTS.REFRESH, onRefreshListener);
 
       return () => {
-        document.removeEventListener('onZoom', onZoomListener);
-        document.removeEventListener('onRefresh', onRefreshListener);
+        document.removeEventListener(EVENTS.ZOOM, onZoomListener);
+        document.removeEventListener(EVENTS.REFRESH, onRefreshListener);
         newChart.destroy();
         setChart(null);
       };

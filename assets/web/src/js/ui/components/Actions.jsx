@@ -1,4 +1,5 @@
 import * as config from '../../config';
+import { EVENTS } from '../events';
 
 export function Actions() {
   const onResetClick = () => {
@@ -7,11 +8,11 @@ export function Actions() {
   };
 
   const onCollapseClick = () => {
-    document.dispatchEvent(new Event('onCollapseAllClusters'));
+    document.dispatchEvent(new Event(EVENTS.COLLAPSE_ALL_CLUSTERS));
   };
 
   const onExpandClick = () => {
-    document.dispatchEvent(new Event('onExpandAllClusters'));
+    document.dispatchEvent(new Event(EVENTS.EXPAND_ALL_CLUSTERS));
   };
 
   return (

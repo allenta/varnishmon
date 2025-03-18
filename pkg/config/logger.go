@@ -46,6 +46,19 @@ func NewTestLogger(tl zerolog.TestingLog, level zerolog.Level) *Logger {
 	}
 }
 
+type errorWriter struct {
+	logger *Logger
+}
+
+func (ew *errorWriter) Write(p []byte) (int, error) {
+	ew.logger.Error().Msg(string(p))
+	return len(p), nil
+}
+
+func (log *Logger) ErrorWriter() io.Writer {
+	return &errorWriter{logger: log}
+}
+
 func (log *Logger) Buffer() *LoggingBuffer {
 	return log.buffer
 }

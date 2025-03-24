@@ -1,3 +1,13 @@
+- ?
+    + Updated dependencies.
+        * Go
+            - zerolog 1.33.0 ➙ 1.34.0
+        * Node.js
+            - @eslint/js 9.22.0 ➙ 9.23.0
+            - @types/react 19.0.11 ➙ 19.0.12
+            - @vitejs/plugin-react-swc 3.8.0 ➙ 3.8.1
+            - eslint 9.22.0 ➙ 9.23.0
+
 - 0.7.0-1 (2025-03-18):
     + Dropped fasthttp in favor of the standard net/http package.
     + Integrated gin for routing.

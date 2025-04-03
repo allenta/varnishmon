@@ -75,7 +75,7 @@ func (sw *ScraperWorker) run() {
 
 	for {
 		select {
-		case <-sw.worker.ctx.Done():
+		case <-sw.ctx.Done():
 			sw.wg.Wait() // Wait for all goroutines to finish.
 			return
 		case <-ticker.C:
@@ -92,7 +92,7 @@ func (sw *ScraperWorker) scrape() {
 		// Create a new context with a timeout to limit 'varnishstat'
 		// time execution.
 		contextWithTimeout, cancel := context.WithTimeout(
-			sw.worker.ctx, sw.worker.app.Cfg().ScraperPeriod())
+			sw.ctx, sw.worker.app.Cfg().ScraperPeriod())
 		defer cancel()
 
 		//nolint:lll
@@ -123,7 +123,7 @@ func (sw *ScraperWorker) scrape() {
 				// waiting to insert metrics.
 				select {
 				case sw.metricsQueue <- metrics:
-				case <-sw.worker.ctx.Done():
+				case <-sw.ctx.Done():
 				default:
 					sw.queuingFailed.Inc()
 					sw.worker.app.Cfg().Log().Error().

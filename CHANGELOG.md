@@ -1,6 +1,8 @@
 - ?
     + Updated dependencies.
-        * Go
+        * DuckDB 1.2.0 ➙ 1.2.1
+        * Go 1.24.0 ➙ 1.24.1
+            - golangci-lint 1.64.5 ➙ 2.0.2
             - zerolog 1.33.0 ➙ 1.34.0
         * Node.js
             - @eslint/js 9.22.0 ➙ 9.23.0

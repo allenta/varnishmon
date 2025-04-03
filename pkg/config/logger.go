@@ -65,7 +65,7 @@ func (log *Logger) Buffer() *LoggingBuffer {
 
 func (log *Logger) Fatal() *zerolog.Event {
 	if log.panicOnFatal {
-		return log.Logger.Panic() //nolint:zerologlint
+		return log.Panic() //nolint:zerologlint
 	}
 	return log.Logger.Fatal() //nolint:zerologlint
 }
@@ -79,7 +79,7 @@ func (b *LoggingBuffer) Write(p []byte) (int, error) {
 func (b *LoggingBuffer) Clear() {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
-	b.Buffer.Reset()
+	b.Reset()
 }
 
 func (b *LoggingBuffer) Events() []map[string]any {

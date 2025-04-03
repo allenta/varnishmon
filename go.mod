@@ -2,7 +2,7 @@ module github.com/allenta/varnishmon
 
 go 1.24
 
-toolchain go1.24.0
+toolchain go1.24.1
 
 require (
 	github.com/gin-contrib/gzip v1.2.2

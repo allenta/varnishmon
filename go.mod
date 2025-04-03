@@ -2,8 +2,6 @@ module github.com/allenta/varnishmon
 
 go 1.24
 
-toolchain go1.24.1
-
 require (
 	github.com/gin-contrib/gzip v1.2.2
 	github.com/gin-contrib/pprof v1.5.2
@@ -13,7 +11,7 @@ require (
 	github.com/prometheus/client_golang v1.21.1
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	gitlab.com/stone.code/assert v1.1.4
 	golang.org/x/sys v0.31.0

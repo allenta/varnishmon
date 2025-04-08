@@ -3,12 +3,20 @@
         * DuckDB 1.2.0 ➙ 1.2.1
         * Go 1.24.0 ➙ 1.24.1
             - golangci-lint 1.64.5 ➙ 2.0.2
+            - gzip 1.2.2 ➙ 1.2.3
+            - sys 0.31.0 ➙ 0.32.0
+            - viper 1.20.0 ➙ 1.20.1
             - zerolog 1.33.0 ➙ 1.34.0
         * Node.js
             - @eslint/js 9.22.0 ➙ 9.23.0
             - @types/react 19.0.11 ➙ 19.0.12
             - @vitejs/plugin-react-swc 3.8.0 ➙ 3.8.1
             - eslint 9.22.0 ➙ 9.23.0
+            - eslint-plugin-prettier 5.2.3 ➙ 5.2.6
+            - react 19.0.0 ➙ 19.1.0
+            - react-dom 19.0.0 ➙ 19.1.0
+            - sass-embedded 1.86.0 ➙ 1.86.3
+            - vite 6.2.2 ➙ 6.2.5
 
 - 0.7.0-1 (2025-03-18):
     + Dropped fasthttp in favor of the standard net/http package.

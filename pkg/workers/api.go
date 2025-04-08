@@ -53,7 +53,7 @@ func (aw *APIWorker) init() {
 		IdleTimeout:    aw.app.Cfg().APIIdleTimeout(),
 		MaxHeaderBytes: aw.app.Cfg().APIMaxHeaderBytes(),
 		BaseContext: func(net.Listener) context.Context {
-			return aw.worker.ctx
+			return aw.ctx
 		},
 		ErrorLog: log.New(aw.app.Cfg().Log().ErrorWriter(), "", 0),
 	}
@@ -74,7 +74,7 @@ func (aw *APIWorker) run() {
 		},
 	}
 
-	listener, err := listenConfig.Listen(aw.worker.ctx, "tcp", aw.server.Addr)
+	listener, err := listenConfig.Listen(aw.ctx, "tcp", aw.server.Addr)
 	if err != nil {
 		aw.app.Cfg().Log().Fatal().
 			Err(err).

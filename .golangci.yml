@@ -1,30 +1,29 @@
+version: "2"
 run:
   tests: false
-
 linters:
+  default: all
   disable:
     - containedctx # We do store contexts in some cases.
+    - cyclop # Too opinionated.
+    - gocognit # Too opinionated.
     - depguard # No need for dependency white/blacklisting.
     - exhaustruct # Too opinionated.
     - forbidigo # Too opinionated.
     - forcetypeassert # Too opinionated.
     - funlen # Too opinionated.
-    - gci # We're using goimports, not GCI.
     - gochecknoinits # We do use init functions.
-    - gofumpt # We're using goimports, not gofumpt.
     - gomoddirectives # We do local replacements.
     - mnd # Too opinionated.
+    - nestif # Too opinionated.
     - nlreturn # Too opinionated.
     - promlinter # Too opinionated.
-    - stylecheck # We're using golint, not stylecheck.
     - tagalign # Too opinionated.
     - varnamelen # Too opinionated.
     - wsl # Too opinionated.
-  presets:
-    - bugs
-    - error
-    - format
-    - metalinter
-    - performance
-    - style
-    - unused
+  exclusions:
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling

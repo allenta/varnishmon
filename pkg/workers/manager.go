@@ -18,7 +18,8 @@ type Manager struct {
 
 	metricsQueue chan *helpers.VarnishMetrics
 
-	storage *storage.Storage
+	storage    *storage.Storage
+	apiHandler *api.Handler
 }
 
 func NewManager(app Application) *Manager {
@@ -53,9 +54,9 @@ func (m *Manager) Start() {
 	}
 
 	if m.app.Cfg().APIEnabled() {
-		apiHandler := api.NewHandler(m.app, m.storage)
+		m.apiHandler = api.NewHandler(m.app, m.storage)
 		for i := range m.app.Cfg().APIWorkers() {
-			NewAPIWorker(m.ctx, m.wg, m.app, i, apiHandler).Start()
+			NewAPIWorker(m.ctx, m.wg, m.app, i, m.apiHandler).Start()
 		}
 	}
 }
@@ -64,6 +65,14 @@ func (m *Manager) Stop() {
 	// Request workers to stop and wait for their termination.
 	m.cancelFunc()
 	m.wg.Wait()
+
+	// Shutdown API handler, if any.
+	if m.apiHandler != nil {
+		if err := m.apiHandler.Shutdown(); err != nil {
+			m.app.Cfg().Log().Error().Err(err).
+				Msg("Failed to shutdown API handler!")
+		}
+	}
 
 	// Shutdown storage, assuming this is the last blocking operation just
 	// before termination.

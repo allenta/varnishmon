@@ -181,6 +181,23 @@ While `varnishmon` **doesn't replace a comprehensive monitoring solutions like P
 - **Why DuckDB?**
   > DuckDB is an ideal choice for `varnishmon` because it is a lightweight, timeseries-friendly, and easily embeddable in-process analytical database. Its CLI is a simple, statically-linked binary that provides an easy way to analyze and share collected data with other tools.
 
+- **Is `varnishmon` ready for the AI/LLM era?**
+  > While you already have a powerful brain and may not need to integrate LLMs into every aspect of your life, the answer is yes—just for fun (and because it was incredibly easy to implement). `varnishmon` can be queried by LLMs using the [Model Context Protocol](https://github.com/modelcontextprotocol). Specifically, the `varnishmon` API supports the SSE transport mechanism via the `/mcp/sse` endpoint. For example, in GitHub Copilot + VS Code, you can enable 'agent' mode and configure the `varnishmon` API as one of your MCP servers.
+  > ```
+  > {
+  >     "mcp": {
+  >         "servers": {
+  >             "varnishmon": {
+  >                 "type": "sse",
+  >                 "url": "http://127.0.0.1:6100/mcp/sse"
+  >             }
+  >         }
+  >     }
+  > }
+  > ```
+  >
+  > Here's an example prompt: *Using `varnishmon`, identify the key metric that best represents incoming HTTP traffic. Provide the metric's name, explain its significance, and highlight any unusual spikes or drops. For each anomaly, include the time windows (both as UNIX timestamps and as human-readable strings using the `varnishmon-timestamp` MCP tool for conversion) and describe how the traffic deviates from the expected pattern.* Of course, results may vary due to various factors, including the unpredictable nature of LLMs—because, let's be honest, for this kind of analysis, your own brain (a.k.a., your built-in LLM) is probably the best tool for the job.
+
 - **I want to contribute to `varnishmon`. How can I help?**
   > This is a small project, but there are many areas where you can contribute. Feel free to open an issue or a PR, or simply share your thoughts and ideas. A good starting point is to check [the cheat sheet in the `docker-compose.yml` file](docker-compose.yml) and start using the development environment.
 

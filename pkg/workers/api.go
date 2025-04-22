@@ -22,6 +22,7 @@ type APIWorker struct {
 
 type APIHandler interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
+	Shutdown() error
 }
 
 func NewAPIWorker(

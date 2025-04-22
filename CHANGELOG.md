@@ -1,3 +1,6 @@
+- ?
+    + Added basic support for MCP (Model Context Protocol) in the API, enabling queries to varnishmon using LLMs.
+
 - 0.7.1-1 (2025-04-08):
     + Updated dependencies.
         * DuckDB 1.2.0 ➙ 1.2.1

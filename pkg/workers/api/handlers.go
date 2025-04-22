@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+	"github.com/mark3labs/mcp-go/server"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -23,6 +25,7 @@ type Handler struct {
 	router       *gin.Engine
 
 	homeTemplate *template.Template
+	sseServer    *server.SSEServer
 
 	requestsTotal          *prometheus.CounterVec
 	requestsInflightTotal  prometheus.Gauge
@@ -61,6 +64,12 @@ func NewHandler(app Application, storage *storage.Storage) *Handler {
 			[]string{"method", "code"}),
 	}
 
+	h.sseServer = server.NewSSEServer(
+		h.newMCPServer(),
+		server.WithBasePath("/mcp"),
+		server.WithUseFullURLForMessageEndpoint(true),
+		server.WithBaseURL(""))
+
 	h.router.RedirectTrailingSlash = true
 	h.router.RedirectFixedPath = false
 	h.router.HandleMethodNotAllowed = false
@@ -94,6 +103,9 @@ func NewHandler(app Application, storage *storage.Storage) *Handler {
 	h.router.GET("/storage/metrics/:id", h.handleStorageMetricsRequest)
 	h.router.GET("/", h.handleHomeRequest)
 	h.router.GET("/config", h.handleConfigRequest)
+	h.router.Any("/mcp/*action", func(ctx *gin.Context) {
+		h.sseServer.ServeHTTP(ctx.Writer, ctx.Request)
+	})
 	h.router.NoRoute(h.filesystemHandler())
 
 	h.app.Cfg().Metrics().Registry.MustRegister(h.requestsTotal)
@@ -111,6 +123,12 @@ type responseWriter struct {
 func (rw *responseWriter) WriteHeader(code int) {
 	rw.code = code
 	rw.ResponseWriter.WriteHeader(code)
+}
+
+func (rw *responseWriter) Flush() {
+	if flusher, ok := rw.ResponseWriter.(http.Flusher); ok {
+		flusher.Flush()
+	}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -143,6 +161,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Route the request.
 	h.router.ServeHTTP(rw, r)
+}
+
+func (h *Handler) Shutdown() error {
+	return h.sseServer.Shutdown(context.Background()) //nolint:wrapcheck
 }
 
 func (h *Handler) handleMetricsRequest(c *gin.Context) {

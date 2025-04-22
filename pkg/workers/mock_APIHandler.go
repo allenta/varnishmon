@@ -18,6 +18,24 @@ func (_m *MockAPIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_m.Called(w, r)
 }
 
+// Shutdown provides a mock function with no fields
+func (_m *MockAPIHandler) Shutdown() error {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Shutdown")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // NewMockAPIHandler creates a new instance of MockAPIHandler. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockAPIHandler(t interface {

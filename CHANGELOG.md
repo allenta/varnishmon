@@ -1,4 +1,4 @@
-- ?
+- 0.8.0-1 (2025-04-22):
     + Added basic support for MCP (Model Context Protocol) in the API, enabling queries to varnishmon using LLMs.
     + Updated dependencies.
         * Go

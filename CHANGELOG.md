@@ -5,7 +5,7 @@
           - gin-contrib/pprof 1.5.2 ➙ 1.5.3
           - prometheus/client_golang 1.21.1 ➙ 1.22.0
         * Node.js
-          - @eslint/js 9.23.0 ➙ 9.25.0
+          - @eslint/js 9.23.0 ➙ 9.25.1
           - bootstrap 5.3.3 ➙ 5.3.5
           - eslint-config-prettier 10.1.1 ➙ 10.1.2
           - vite 6.2.5 ➙ 6.3.2

@@ -165,14 +165,9 @@ func (h *Handler) handleHumanFriendlyTimestampTool(
 
 func (h *Handler) handleConfigTool(
 	_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	cfg, err := h.getConfigObject()
+	cfgMarshaled, err := h.getConfigObject()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get config object: %w", err)
-	}
-
-	cfgMarshaled, err := json.Marshal(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal config object: %w", err)
 	}
 
 	return &mcp.CallToolResult{

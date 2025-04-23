@@ -1,3 +1,6 @@
+- 0.8.1-1 (2025-04-23):
+    + Fixed double response compression in the '/metrics' endpoint.
+
 - 0.8.0-1 (2025-04-22):
     + Added basic support for MCP (Model Context Protocol) in the API, enabling queries to varnishmon using LLMs.
     + Updated dependencies.

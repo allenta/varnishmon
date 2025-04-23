@@ -1,3 +1,6 @@
+- ?
+    + Added pagination support to the MCP tool used to collect metrics.
+
 - 0.8.1-1 (2025-04-23):
     + Fixed double response compression in the '/metrics' endpoint.
 

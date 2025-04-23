@@ -1,4 +1,4 @@
-- ?
+- 0.8.2-1 (2025-04-23):
     + Added pagination support to the MCP tool used to collect metrics.
     + Fixed response of the MCP config tool.
 

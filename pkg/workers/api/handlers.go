@@ -68,7 +68,9 @@ func NewHandler(app Application, storage *storage.Storage) *Handler {
 		h.newMCPServer(),
 		server.WithBasePath("/mcp"),
 		server.WithUseFullURLForMessageEndpoint(true),
-		server.WithBaseURL(""))
+		server.WithBaseURL(""),
+		server.WithKeepAlive(true),
+		server.WithKeepAliveInterval(10*time.Second))
 
 	h.router.RedirectTrailingSlash = true
 	h.router.RedirectFixedPath = false

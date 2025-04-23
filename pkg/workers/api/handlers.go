@@ -168,7 +168,9 @@ func (h *Handler) Shutdown() error {
 }
 
 func (h *Handler) handleMetricsRequest(c *gin.Context) {
+	// Compression is explicitly disabled here to avoid double compression by
+	// the 'gzip' middleware.
 	promhttp.HandlerFor(
 		h.app.Cfg().Metrics().Registry,
-		promhttp.HandlerOpts{}).ServeHTTP(c.Writer, c.Request)
+		promhttp.HandlerOpts{DisableCompression: true}).ServeHTTP(c.Writer, c.Request)
 }

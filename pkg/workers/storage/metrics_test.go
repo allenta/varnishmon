@@ -217,7 +217,7 @@ func (suite *MetricsTestSuite) TestGetMetricsBasics() {
 	from := time.Date(2025, time.January, 1, 13, 0, 0, 0, time.UTC)
 	to := time.Date(2025, time.January, 1, 13, 0, 5, 0, time.UTC)
 	step := 10
-	metrics, err := suite.stg.GetMetrics(from, to, step)
+	metrics, err := suite.stg.GetMetrics(from, to, step, 0, 0)
 
 	assert.NoError(err)
 	assert.Equal(from.Unix(), metrics["from"])

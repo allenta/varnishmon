@@ -3,6 +3,7 @@ package storage
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -15,7 +16,8 @@ var (
 	ErrUnknownMetricID   = errors.New("unknown metric ID")
 )
 
-func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]any, error) {
+func (stg *Storage) GetMetrics(
+	from, to time.Time, step int, page, pageSize int) (map[string]any, error) {
 	// Validate 'from' and 'to' parameters.
 	if from.After(to) {
 		return nil, ErrInvalidFromTo
@@ -35,7 +37,8 @@ func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]any, er
 	rows, err := stg.db.Query(`
 		SELECT DISTINCT metric_id
 		FROM metric_values
-		WHERE timestamp >= $1 AND timestamp < $2`, from, to)
+		WHERE timestamp >= $1 AND timestamp < $2
+		ORDER BY metric_id`, from, to)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query 'metric_values' table: %w", err)
 	}
@@ -58,7 +61,16 @@ func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]any, er
 
 	// Decide metrics to be included in the response.
 	metrics := make([]map[string]any, 0, len(stg.cache.metricsByID))
-	for _, id := range ids {
+	for i, id := range ids {
+		if page > 0 && pageSize > 0 {
+			if i < (page-1)*pageSize {
+				continue
+			}
+			if i >= page*pageSize {
+				break
+			}
+		}
+
 		metric := stg.cache.metricsByID[id]
 		if metric == nil {
 			stg.app.Cfg().Log().Warn().
@@ -76,12 +88,18 @@ func (stg *Storage) GetMetrics(from, to time.Time, step int) (map[string]any, er
 	}
 
 	// Done!
-	return map[string]any{
+	result := map[string]any{
 		"from":    from.Unix(),
 		"to":      to.Unix(),
 		"step":    step,
 		"metrics": metrics,
-	}, nil
+	}
+	if page > 0 && pageSize > 0 {
+		result["page"] = page
+		result["page-size"] = pageSize
+		result["pages"] = int(math.Ceil(float64(len(ids)) / float64(pageSize)))
+	}
+	return result, nil
 }
 
 func (stg *Storage) GetMetric(

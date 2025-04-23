@@ -59,7 +59,8 @@ reasonable default like 60 seconds). For each metric, the response includes an
 'id', 'name', 'description', 'flag' ('c': counter, 'g': gauge, 'b': bitmap,
 'q': boolean), and 'format' ('i': integer, 'd': duration, 'B': bytes, 'b': bitmap,
 'q': boolean). The 'varnishmon-timestamp' tool should be used to convert the
-timestamps to a human-friendly format`),
+timestamps to a human-friendly format. Pagination is supported with 'page' and
+'page-size' parameters`),
 			mcp.WithNumber("from",
 				mcp.Description(
 					"The start of the time range as a UNIX timestamp in seconds"),
@@ -74,6 +75,20 @@ timestamps to a human-friendly format`),
 				mcp.Description(
 					"The step size in seconds, defining the granularity of the time axis"),
 				mcp.Required(),
+			),
+			mcp.WithNumber("page",
+				mcp.Description(
+					"The page number for pagination. Use 0 to disable pagination"),
+				mcp.Required(),
+				mcp.DefaultNumber(500),
+				mcp.Min(0),
+			),
+			mcp.WithNumber("page-size",
+				mcp.Description(
+					"The number of items per page for pagination. Use 0 to disable pagination"),
+				mcp.Required(),
+				mcp.DefaultNumber(500),
+				mcp.Min(0),
 			)),
 		h.handleMetricsTool)
 
@@ -94,7 +109,8 @@ samples exist within a single time step. Samples are returned as a list of
 tuples containing the UNIX timestamp in seconds and the sample value. For
 counter metrics (i.e., 'flag' = 'c'), the value is expressed as a rate per
 second. The 'varnishmon-timestamp' tool should be used to convert the timestamps
-to a human-friendly format`),
+to a human-friendly format. Pagination is not supported for this tool, but you
+can control the number of samples returned by using the 'step' parameter`),
 			mcp.WithNumber("id",
 				mcp.Description(
 					"The ID of the metric, as returned by 'varnishmon-metrics'"),
@@ -149,14 +165,9 @@ func (h *Handler) handleHumanFriendlyTimestampTool(
 
 func (h *Handler) handleConfigTool(
 	_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	cfg, err := h.getConfigObject()
+	cfgMarshaled, err := h.getConfigObject()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get config object: %w", err)
-	}
-
-	cfgMarshaled, err := json.Marshal(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal config object: %w", err)
 	}
 
 	return &mcp.CallToolResult{
@@ -175,14 +186,18 @@ func (h *Handler) handleMetricsTool(
 	from, okFrom := args["from"].(float64)
 	to, okTo := args["to"].(float64)
 	step, okStep := args["step"].(float64)
-	if !okFrom || !okTo || !okStep {
+	page, okPage := args["page"].(float64)
+	pageSize, okPageSize := args["page-size"].(float64)
+	if !okFrom || !okTo || !okStep || !okPage || !okPageSize {
 		return nil, errInvalidMCPArg
 	}
 
 	metrics, err := h.storage.GetMetrics(
 		time.Unix(int64(from), 0),
 		time.Unix(int64(to), 0),
-		int(step))
+		int(step),
+		int(page),
+		int(pageSize))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get metrics: %w", err)
 	}

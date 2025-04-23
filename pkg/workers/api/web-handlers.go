@@ -189,7 +189,7 @@ func (h *Handler) handleStorageMetricsRequest(c *gin.Context) {
 	// If no metric ID is provided, return info about all metrics, filtering
 	// out the irrelevant (i.e., without samples) ones.
 	if idRaw == "" {
-		result, err = h.storage.GetMetrics(from, to, step)
+		result, err = h.storage.GetMetrics(from, to, step, 0, 0)
 	} else {
 		// Validate metric ID.
 		var id int

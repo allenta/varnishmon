@@ -11,6 +11,7 @@ linters:
     - exhaustruct # Too opinionated.
     - forbidigo # Too opinionated.
     - forcetypeassert # Too opinionated.
+    - funcorder # Too opinionated.
     - funlen # Too opinionated.
     - gochecknoinits # We do use init functions.
     - gomoddirectives # We do local replacements.

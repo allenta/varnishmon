@@ -101,13 +101,14 @@ vet:
 		go vet ./...; \
 	)
 
+# See: https://github.com/golang/go/issues/73279.
 .PHONY: modernize
 modernize:
 	@( \
 		set -e; \
 		\
 		echo '> Running modernize...'; \
-		go tool modernize -fix ./...; \
+		go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@v0.18.1 -fix ./...; \
 	)
 
 TEST_PACKAGES ?= '$(ROOT)/...'

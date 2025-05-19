@@ -21,6 +21,7 @@
             - vite 6.3.2 ➙ 6.3.5
             - vite-plugin-static-copy 2.3.1 ➙ 3.0.0
         * uv 0.6.0 ➙ 0.7.2
+    + Fixed filter history UI.
 
 - 0.8.3-1 (2025-04-23):
     + Enabled MCP keep-alive mechanism to enhance connection stability.

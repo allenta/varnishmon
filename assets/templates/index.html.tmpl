@@ -1,1 +1,33 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>varnishmon</title><link rel="icon" href="/images/favicon.ico" type="image/x-icon"><script type="text/javascript">let varnishmon={{.Config}}</script><script type="module" crossorigin src="/app.js"></script><link rel="stylesheet" crossorigin href="/styles.css"></head><body class="d-flex flex-column min-vh-100"><div id="root" class="flex-grow-1 d-flex flex-column"></div><footer class="text-center mt-4"><i class="fa-solid fa-bolt"></i> Powered by <a href="https://github.com/allenta/varnishmon/">varnishmon</a> v{{.Version}} (<span class="font-monospace">{{.Revision}}</span>)</footer><div id="notifications" class="position-fixed bottom-0 end-0 p-3 d-grid gap-2"></div><template id="notification-template"><div class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true"><div class="d-flex"><div class="toast-body"></div><button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div></div></template></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>varnishmon</title>
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+  <script type="text/javascript">let varnishmon={{.Config}}</script>
+  <script type="module" crossorigin src="/app.js"></script>
+  <link rel="stylesheet" crossorigin href="/styles.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <div id="root" class="flex-grow-1 d-flex flex-column"></div>
+
+  <footer class="text-center mt-4">
+    <i class="fa-solid fa-bolt"></i> Powered by <a href="https://github.com/allenta/varnishmon/">varnishmon</a>
+    v{{.Version}} (<span class="font-monospace">{{.Revision}}</span>)
+  </footer>
+
+  <div id="notifications" class="position-fixed bottom-0 end-0 p-3 d-grid gap-2"></div>
+
+  <!-- Template elements -->
+
+  <template id="notification-template">
+    <div class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"></div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </template>
+</body>
+</html>

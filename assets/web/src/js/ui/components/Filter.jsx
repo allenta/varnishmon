@@ -1,3 +1,4 @@
+import { Dropdown } from 'bootstrap';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -8,6 +9,7 @@ export function Filter({ filter, setFilter }) {
   const [localFilter, setLocalFilter] = React.useState(filter);
   const [history, setHistory] = React.useState(config.getFilterHistory());
   const filterId = React.useId();
+  const dropdownButtonRef = React.useRef(null);
 
   const debouncedSetFilter = React.useCallback(
     (value) => {
@@ -50,6 +52,12 @@ export function Filter({ filter, setFilter }) {
     updateLocalState(event.target.textContent, true);
   };
 
+  React.useEffect(() => {
+    if (dropdownButtonRef.current) {
+      new Dropdown(dropdownButtonRef.current);
+    }
+  }, []);
+
   return (
     <>
       <label className="form-label" htmlFor={filterId}>
@@ -69,6 +77,7 @@ export function Filter({ filter, setFilter }) {
           id={filterId}
         />
         <button
+          ref={dropdownButtonRef}
           className="btn border-secondary-subtle bg-body-tertiary dropdown-toggle"
           type="button"
           data-bs-toggle="dropdown"

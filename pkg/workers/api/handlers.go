@@ -66,7 +66,7 @@ func NewHandler(app Application, storage *storage.Storage) *Handler {
 
 	h.sseServer = server.NewSSEServer(
 		h.newMCPServer(),
-		server.WithBasePath("/mcp"),
+		server.WithStaticBasePath("/mcp"),
 		server.WithUseFullURLForMessageEndpoint(true),
 		server.WithBaseURL(""),
 		server.WithKeepAlive(true),

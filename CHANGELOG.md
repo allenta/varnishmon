@@ -1,3 +1,28 @@
+- 0.8.4-1 (2025-05-19):
+    + Updated dependencies.
+        * DuckDB 1.2.1 ➙ 1.2.2
+        * FPM 1.15.1 ➙ 1.16.0
+        * Go 1.24.1 ➙ 1.24.2
+            - golangci-lint 2.0.2 ➙ 2.1.6
+            - mcp-go 0.22.0 ➙ 0.28.0
+            - sys 0.32.0 ➙ 0.33.0
+        * Node.js 22.14.0 ➙ 22.15.0
+            - @eslint/js 9.25.1 ➙ 9.26.0
+            - @types/react 19.0.12 ➙ 19.1.4
+            - @types/react-dom 19.0.4 ➙ 19.1.3
+            - @vitejs/plugin-react-swc 3.8.1 ➙ 3.9.0
+            - bootstrap 5.3.5 ➙ 5.3.6
+            - eslint 9.23.0 ➙ 9.26.0
+            - eslint-config-prettier 10.1.2 ➙ 10.1.5
+            - eslint-plugin-prettier 5.2.6 ➙ 5.4.0
+            - eslint-plugin-react 7.37.4 ➙ 7.37.5
+            - eslint-plugin-react-refresh 0.4.19 ➙ 0.4.20
+            - sass-embedded 1.86.3 ➙ 1.89.0
+            - vite 6.3.2 ➙ 6.3.5
+            - vite-plugin-static-copy 2.3.1 ➙ 3.0.0
+        * uv 0.6.0 ➙ 0.7.2
+    + Fixed filter history UI.
+
 - 0.8.3-1 (2025-04-23):
     + Enabled MCP keep-alive mechanism to enhance connection stability.
 

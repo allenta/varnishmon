@@ -1,3 +1,21 @@
+- ?:
+    + Updated dependencies.
+        * DuckDB 1.2.2 ➙ 1.3.0
+        * Go 1.24.2 ➙ 1.24.3
+            - gin 1.10.0 ➙ 1.10.1
+            - mcp-go 0.28.0 ➙ 0.31.0
+        * Node.js 22.15.0 ➙ 22.16.0
+            - @eslint/js 9.26.0 ➙ 9.28.0
+            - @types/react 19.1.4 ➙ 19.1.6
+            - @types/react-dom 19.1.3 ➙ 19.1.5
+            - @vitejs/plugin-react-swc 3.9.0 ➙ 3.10.1
+            - air-datepicker 3.5.3 ➙ 3.6.0
+            - eslint 9.26.0 ➙ 9.28.0
+            - eslint-plugin-prettier 5.4.0 ➙ 5.4.1
+            - globals 16.0.0 ➙ 16.2.0
+            - sass-embedded 1.89.0 ➙ 1.89.1
+        * uv 0.7.2 ➙ 0.7.9
+
 - 0.8.4-1 (2025-05-19):
     + Updated dependencies.
         * DuckDB 1.2.1 ➙ 1.2.2

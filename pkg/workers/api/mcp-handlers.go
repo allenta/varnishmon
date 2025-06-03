@@ -142,15 +142,18 @@ can control the number of samples returned by using the 'step' parameter`),
 	return mcpServer
 }
 
+type humanFriendlyTimestampToolArgs struct {
+	Value float64 `json:"value"`
+}
+
 func (h *Handler) handleHumanFriendlyTimestampTool(
 	_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	args := request.Params.Arguments
-	value, ok := args["value"].(float64)
-	if !ok {
+	var args humanFriendlyTimestampToolArgs
+	if err := request.BindArguments(&args); err != nil {
 		return nil, errInvalidMCPArg
 	}
 
-	timestamp := time.Unix(int64(value), 0).In(time.Local) //nolint:gosmopolitan
+	timestamp := time.Unix(int64(args.Value), 0).In(time.Local) //nolint:gosmopolitan
 	humanFriendlyTimestamp := timestamp.Format(time.RFC1123)
 
 	return &mcp.CallToolResult{
@@ -180,24 +183,27 @@ func (h *Handler) handleConfigTool(
 	}, nil
 }
 
+type MetricsToolArgs struct {
+	From     float64 `json:"from"`
+	To       float64 `json:"to"`
+	Step     float64 `json:"step"`
+	Page     float64 `json:"page"`
+	PageSize float64 `json:"page-size"`
+}
+
 func (h *Handler) handleMetricsTool(
 	_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	args := request.Params.Arguments
-	from, okFrom := args["from"].(float64)
-	to, okTo := args["to"].(float64)
-	step, okStep := args["step"].(float64)
-	page, okPage := args["page"].(float64)
-	pageSize, okPageSize := args["page-size"].(float64)
-	if !okFrom || !okTo || !okStep || !okPage || !okPageSize {
+	var args MetricsToolArgs
+	if err := request.BindArguments(&args); err != nil {
 		return nil, errInvalidMCPArg
 	}
 
 	metrics, err := h.storage.GetMetrics(
-		time.Unix(int64(from), 0),
-		time.Unix(int64(to), 0),
-		int(step),
-		int(page),
-		int(pageSize))
+		time.Unix(int64(args.From), 0),
+		time.Unix(int64(args.To), 0),
+		int(args.Step),
+		int(args.Page),
+		int(args.PageSize))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get metrics: %w", err)
 	}
@@ -217,24 +223,27 @@ func (h *Handler) handleMetricsTool(
 	}, nil
 }
 
+type MetricToolArgs struct {
+	ID         float64 `json:"id"`
+	From       float64 `json:"from"`
+	To         float64 `json:"to"`
+	Step       float64 `json:"step"`
+	Aggregator string  `json:"aggregator"`
+}
+
 func (h *Handler) handleMetricTool(
 	_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	args := request.Params.Arguments
-	id, okID := args["id"].(float64)
-	from, okFrom := args["from"].(float64)
-	to, okTo := args["to"].(float64)
-	step, okStep := args["step"].(float64)
-	aggregator, okAggregator := args["aggregator"].(string)
-	if !okID || !okFrom || !okTo || !okStep || !okAggregator {
+	var args MetricToolArgs
+	if err := request.BindArguments(&args); err != nil {
 		return nil, errInvalidMCPArg
 	}
 
 	metric, err := h.storage.GetMetric(
-		int(id),
-		time.Unix(int64(from), 0),
-		time.Unix(int64(to), 0),
-		int(step),
-		aggregator)
+		int(args.ID),
+		time.Unix(int64(args.From), 0),
+		time.Unix(int64(args.To), 0),
+		int(args.Step),
+		args.Aggregator)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get metric: %w", err)
 	}

@@ -188,7 +188,7 @@ type MetricsToolArgs struct {
 	To       float64 `json:"to"`
 	Step     float64 `json:"step"`
 	Page     float64 `json:"page"`
-	PageSize float64 `json:"page-size"`
+	PageSize float64 `json:"page-size"` //nolint:tagliatelle
 }
 
 func (h *Handler) handleMetricsTool(

@@ -16,6 +16,7 @@ import (
 
 type APIWorker struct {
 	*worker
+
 	handler APIHandler
 	server  *http.Server
 }

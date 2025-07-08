@@ -18,10 +18,12 @@ linters:
     - mnd # Too opinionated.
     - nestif # Too opinionated.
     - nlreturn # Too opinionated.
+    - noinlineerr # Too opinionated.
     - promlinter # Too opinionated.
     - tagalign # Too opinionated.
     - varnamelen # Too opinionated.
     - wsl # Too opinionated.
+    - wsl_v5 # Too opinionated.
   exclusions:
     presets:
       - comments

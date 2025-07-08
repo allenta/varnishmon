@@ -119,6 +119,7 @@ func NewHandler(app Application, storage *storage.Storage) *Handler {
 
 type responseWriter struct {
 	http.ResponseWriter
+
 	code int
 }
 

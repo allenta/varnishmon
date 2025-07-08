@@ -20,13 +20,15 @@ func (cfg *Config) SetLog(log *Logger) {
 
 type Logger struct {
 	*zerolog.Logger
+
 	panicOnFatal bool
 	buffer       *LoggingBuffer
 }
 
 type LoggingBuffer struct {
-	mutex sync.Mutex
 	bytes.Buffer
+
+	mutex sync.Mutex
 }
 
 func NewLogger(log *zerolog.Logger) *Logger {

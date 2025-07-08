@@ -84,7 +84,7 @@ lint:
 		\
 		if [ ! -f "$$HOME/go/bin/golangci-lint" ]; then \
 			echo '> Installing golangci-lint...'; \
-			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.1.6; \
+			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.2.1; \
 		fi; \
 		\
 		echo '> Running golangci-lint...'; \
@@ -108,7 +108,7 @@ modernize:
 		set -e; \
 		\
 		echo '> Running modernize...'; \
-		go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@v0.18.1 -fix ./...; \
+		go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@v0.19.1 -fix ./...; \
 	)
 
 TEST_PACKAGES ?= '$(ROOT)/...'

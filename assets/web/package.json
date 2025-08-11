@@ -14,7 +14,7 @@
     "@fortawesome/fontawesome-free": "7.0.0",
     "air-datepicker": "3.6.0",
     "bootstrap": "5.3.7",
-    "plotly.js-basic-dist": "3.0.3",
+    "plotly.js-basic-dist": "3.1.0",
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },

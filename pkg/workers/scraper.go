@@ -14,6 +14,7 @@ import (
 
 type ScraperWorker struct {
 	*worker
+
 	wg           sync.WaitGroup
 	metricsQueue chan *helpers.VarnishMetrics
 

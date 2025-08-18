@@ -14,6 +14,7 @@ import (
 
 type ArchiverWorker struct {
 	*worker
+
 	metricsQueue chan *helpers.VarnishMetrics
 	lastMetrics  map[string]*lastMetrics
 	storage      *storage.Storage

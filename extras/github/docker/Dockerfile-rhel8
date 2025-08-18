@@ -24,15 +24,13 @@ RUN ARCHITECTURE=$(uname -m) \
         esac \
     && curl -L -s curl -L -s https://go.dev/dl/go${GO_VERSION}.linux-${ARCHITECTURE}.tar.gz | tar xvfz - -C /usr/local
 
-# For RHEL 8 pre-installing 'dotenv' 2.8.1 (required by 'pleaserun') is not
-# enough: 'gem' will still try to install a newer version of 'dotenv' when
-# installing 'fpm' / 'pleaserun'. That will fail because of the Ruby version.
-# This is a -hopefully temporary- dirty workaround. The same happens with 'ffi'
-# 1.16.3, required by 'fpm'.
-# See: https://github.com/jordansissel/fpm/issues/2048#issuecomment-1972196104.
-RUN gem install dotenv -v 2.8.1 \
-    && gem install ffi -v 1.16.3 \
+# In this version of 'fpm' there's an unpinned dependency to 'ffi', which would
+# lead to an installation of a version that would require Ruby 3.x and that's a
+# problem in RHEL 8. Sadly, in RHEL 8 pre-installing gems is not enough: 'gem'
+# will still install newer versions when required by other unpinned dependencies,
+# so we must clean them up afterwards (see:
+# https://github.com/jordansissel/fpm/issues/2048#issuecomment-1972196104).
+RUN gem install ffi -v 1.16.3 \
     && gem install fpm -v ${FPM_VERSION} --minimal-deps --conservative --force \
-    && gem uninstall dotenv -v '>2.8.1' \
     && gem uninstall ffi -v '>1.16.3' \
     && gem cleanup

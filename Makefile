@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 UMASK := 022
 
-VERSION := 0.8.4
+VERSION := 0.8.5
 ITERATION := 1
 REVISION := $(shell cd '$(ROOT)' && git rev-parse --short HEAD)
 ENVIRONMENT ?= production
@@ -84,7 +84,7 @@ lint:
 		\
 		if [ ! -f "$$HOME/go/bin/golangci-lint" ]; then \
 			echo '> Installing golangci-lint...'; \
-			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.1.6; \
+			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.3.0; \
 		fi; \
 		\
 		echo '> Running golangci-lint...'; \
@@ -108,7 +108,7 @@ modernize:
 		set -e; \
 		\
 		echo '> Running modernize...'; \
-		go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@v0.18.1 -fix ./...; \
+		go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@v0.20.0 -fix ./...; \
 	)
 
 TEST_PACKAGES ?= '$(ROOT)/...'

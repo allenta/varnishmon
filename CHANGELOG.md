@@ -19,6 +19,7 @@
             - vite 6.3.5 ➙ 7.0.3
             - vite-plugin-static-copy 3.0.0 ➙ 3.1.0
         * uv 0.7.2 ➙ 0.7.19
+    + Fixed 'fpm' installation in RHEL8.
 
 - 0.8.4-1 (2025-05-19):
     + Updated dependencies.

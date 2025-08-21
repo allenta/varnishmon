@@ -1,3 +1,6 @@
+- ?
+    + Added support for Debian Trixie and RHEL (Rocky Linux) 10.
+
 - 0.8.5-1 (2025-08-18):
     + Updated dependencies.
         * DuckDB 1.2.2 ➙ 1.3.1

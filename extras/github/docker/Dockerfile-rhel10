@@ -1,0 +1,27 @@
+FROM docker.io/rockylinux/rockylinux:10.0.20250606-ubi
+
+ARG GO_VERSION
+
+ENV FPM_VERSION 1.15.1
+
+RUN yum install -y \
+        curl-minimal \
+        gcc-c++ \
+        git \
+        make \
+        rpm-build \
+        ruby \
+        ruby-devel \
+        tar \
+    && yum clean all
+
+RUN ARCHITECTURE=$(uname -m) \
+    && case $ARCHITECTURE in \
+            x86_64)  ARCHITECTURE='amd64' ;; \
+            aarch64) ARCHITECTURE='arm64' ;; \
+            *)       echo "unknown architecture: $ARCHITECTURE" && exit 1 ;; \
+        esac \
+    && curl -L -s curl -L -s https://go.dev/dl/go${GO_VERSION}.linux-${ARCHITECTURE}.tar.gz | tar xvfz - -C /usr/local
+
+RUN gem install fpm -v ${FPM_VERSION} \
+    && gem cleanup

@@ -165,7 +165,8 @@ dist: build
 		umask $(UMASK); \
 		\
 		[ '$(PLATFORM)' = 'noble' -o '$(PLATFORM)' = 'jammy' -o \
-			'$(PLATFORM)' = 'bookworm' -o '$(PLATFORM)' = 'rhel9' -o \
+			'$(PLATFORM)' = 'trixie' -o '$(PLATFORM)' = 'bookworm' -o \
+			'$(PLATFORM)' = 'rhel10' -o '$(PLATFORM)' = 'rhel9' -o \
 			'$(PLATFORM)' = 'rhel8' ] || \
 				{ echo >&2 'Invalid platform ($(PLATFORM))'; exit 1; }; \
 		\
@@ -197,7 +198,7 @@ dist: build
 		gzip '$(ROOT)/build/dist/usr/share/man/man1/'*.1; \
 	)
 
-ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
+ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy trixie bookworm))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -211,7 +212,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
 		cp '$(ROOT)/extras/packaging/debian/varnishmon.logrotate' '$(ROOT)/build/dist/etc/logrotate.d/varnishmon'; \
 		cp '$(ROOT)/extras/packaging/debian/varnishmon.service' '$(ROOT)/build/dist/lib/systemd/system/'; \
 	)
-else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel10 rhel9 rhel8))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -241,7 +242,7 @@ endif
 
 .PHONY: package
 package: dist
-ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
+ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy trixie bookworm))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -258,7 +259,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
 			--config-files /etc/logrotate.d/varnishmon \
 			-C '$(ROOT)/build/dist' .; \
 	)
-else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel10 rhel9 rhel8))
 	@( \
 		set -e; \
 		umask $(UMASK); \

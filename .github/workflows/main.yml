@@ -24,7 +24,9 @@ jobs:
         platform:
           - noble
           - jammy
+          - trixie
           - bookworm
+          - rhel10
           - rhel9
           - rhel8
         architecture:
@@ -49,7 +51,9 @@ jobs:
         platform:
           - noble
           - jammy
+          - trixie
           - bookworm
+          - rhel10
           - rhel9
         architecture:
           - arm64

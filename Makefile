@@ -84,7 +84,7 @@ lint:
 		\
 		if [ ! -f "$$HOME/go/bin/golangci-lint" ]; then \
 			echo '> Installing golangci-lint...'; \
-			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.3.0; \
+			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.4.0; \
 		fi; \
 		\
 		echo '> Running golangci-lint...'; \
@@ -137,7 +137,7 @@ mod:
 		set -e; \
 		\
 		echo '> Adding missing and removing unused modules...'; \
-		go mod tidy -compat=1.24; \
+		go mod tidy -compat=1.25; \
 		\
 		echo '> Printing module requirement graph...'; \
 		go mod graph; \

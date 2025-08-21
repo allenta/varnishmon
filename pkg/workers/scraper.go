@@ -86,10 +86,7 @@ func (sw *ScraperWorker) run() {
 }
 
 func (sw *ScraperWorker) scrape() {
-	sw.wg.Add(1)
-	go func() {
-		defer sw.wg.Done()
-
+	sw.wg.Go(func() {
 		// Create a new context with a timeout to limit 'varnishstat'
 		// time execution.
 		contextWithTimeout, cancel := context.WithTimeout(
@@ -157,7 +154,7 @@ func (sw *ScraperWorker) scrape() {
 					Msg("Failed to execute 'varnishstat'!")
 			}
 		}
-	}()
+	})
 }
 
 func (sw *ScraperWorker) stop() {

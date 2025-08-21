@@ -1,5 +1,21 @@
 - ?
     + Added support for Debian Trixie and RHEL (Rocky Linux) 10.
+    + Updated dependencies.
+        * Go 1.24.4 ➙ 1.25.0
+            - golangci-lint 2.3.0 ➙ 2.4.0
+            - mcp-go 0.36.0 ➙ 0.38.0
+            - sys 0.34.0 ➙ 0.35.0
+        * Node.js 24.3.0 ➙ 24.6.0
+            - @eslint/js 9.32.0 ➙ 9.3.0
+            - @types/react 19.1.9 ➙ 19.1.0
+            - @vitejs/plugin-react-swc 3.11.0 ➙ 4.0.1
+            - eslint 9.32.0  ➙ 9.33.0
+            - eslint-plugin-prettier 5.5.3 ➙ 5.5.4
+            - plotly.js-basic-dist 3.0.3 ➙ 3.1.0
+            - sass-embedded 1.89.2 ➙ 1.90.0
+            - vite 7.0.6 ➙ 7.1.3
+            - vite-plugin-static-copy 3.1.1 ➙ 3.1.2
+        * uv 0.7.19 ➙ 0.8.12
 
 - 0.8.5-1 (2025-08-18):
     + Updated dependencies.

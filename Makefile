@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 UMASK := 022
 
-VERSION := 0.8.5
+VERSION := 0.8.6
 ITERATION := 1
 REVISION := $(shell cd '$(ROOT)' && git rev-parse --short HEAD)
 ENVIRONMENT ?= production
@@ -84,7 +84,7 @@ lint:
 		\
 		if [ ! -f "$$HOME/go/bin/golangci-lint" ]; then \
 			echo '> Installing golangci-lint...'; \
-			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.3.0; \
+			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.4.0; \
 		fi; \
 		\
 		echo '> Running golangci-lint...'; \
@@ -137,7 +137,7 @@ mod:
 		set -e; \
 		\
 		echo '> Adding missing and removing unused modules...'; \
-		go mod tidy -compat=1.24; \
+		go mod tidy -compat=1.25; \
 		\
 		echo '> Printing module requirement graph...'; \
 		go mod graph; \
@@ -165,7 +165,8 @@ dist: build
 		umask $(UMASK); \
 		\
 		[ '$(PLATFORM)' = 'noble' -o '$(PLATFORM)' = 'jammy' -o \
-			'$(PLATFORM)' = 'bookworm' -o '$(PLATFORM)' = 'rhel9' -o \
+			'$(PLATFORM)' = 'trixie' -o '$(PLATFORM)' = 'bookworm' -o \
+			'$(PLATFORM)' = 'rhel10' -o '$(PLATFORM)' = 'rhel9' -o \
 			'$(PLATFORM)' = 'rhel8' ] || \
 				{ echo >&2 'Invalid platform ($(PLATFORM))'; exit 1; }; \
 		\
@@ -197,7 +198,7 @@ dist: build
 		gzip '$(ROOT)/build/dist/usr/share/man/man1/'*.1; \
 	)
 
-ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
+ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy trixie bookworm))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -211,7 +212,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
 		cp '$(ROOT)/extras/packaging/debian/varnishmon.logrotate' '$(ROOT)/build/dist/etc/logrotate.d/varnishmon'; \
 		cp '$(ROOT)/extras/packaging/debian/varnishmon.service' '$(ROOT)/build/dist/lib/systemd/system/'; \
 	)
-else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel10 rhel9 rhel8))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -241,7 +242,7 @@ endif
 
 .PHONY: package
 package: dist
-ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
+ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy trixie bookworm))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -258,7 +259,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy bookworm))
 			--config-files /etc/logrotate.d/varnishmon \
 			-C '$(ROOT)/build/dist' .; \
 	)
-else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel9 rhel8))
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel10 rhel9 rhel8))
 	@( \
 		set -e; \
 		umask $(UMASK); \

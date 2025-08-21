@@ -7,7 +7,7 @@ on:
     - cron: 0 5 * * 1
 
 env:
-  GO_VERSION: 1.24.5
+  GO_VERSION: 1.25.0
 
 permissions:
   actions: write
@@ -24,14 +24,16 @@ jobs:
         platform:
           - noble
           - jammy
+          - trixie
           - bookworm
+          - rhel10
           - rhel9
           - rhel8
         architecture:
           - amd64
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: ./extras/github/build-action
         with:
@@ -49,13 +51,15 @@ jobs:
         platform:
           - noble
           - jammy
+          - trixie
           - bookworm
+          - rhel10
           - rhel9
         architecture:
           - arm64
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: ./extras/github/build-action
         with:
@@ -75,9 +79,9 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: artifacts
 

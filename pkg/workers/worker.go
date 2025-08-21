@@ -32,27 +32,21 @@ func (wrk *worker) Start() {
 
 	wrk.init()
 
-	wrk.wg.Add(1)
-	go func() {
-		defer wrk.wg.Done()
-
+	wrk.wg.Go(func() {
 		wrk.run()
 
 		if wrk.ctx.Err() == nil {
 			wrk.app.Cfg().Log().Warn().Msgf("Worker '%v' terminated unexpectedly", wrk)
 		}
-	}()
+	})
 
-	wrk.wg.Add(1)
-	go func() {
-		defer wrk.wg.Done()
-
+	wrk.wg.Go(func() {
 		<-wrk.ctx.Done()
 
 		wrk.app.Cfg().Log().Info().Msgf("Stopping '%v' worker", wrk)
 
 		wrk.stop()
-	}()
+	})
 }
 
 func (wrk *worker) String() string {

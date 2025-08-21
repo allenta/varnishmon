@@ -1,4 +1,4 @@
-- ?
+- 0.8.6-1 (2025-08-21):
     + Added support for Debian Trixie and RHEL (Rocky Linux) 10.
     + Updated dependencies.
         * Go 1.24.4 ➙ 1.25.0

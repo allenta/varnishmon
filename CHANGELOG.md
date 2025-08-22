@@ -1,3 +1,7 @@
+- ?:
+    + Updated dependencies.
+        * uv 0.8.12 ➙ 0.8.13
+
 - 0.8.6-1 (2025-08-21):
     + Added support for Debian Trixie and RHEL (Rocky Linux) 10.
     + Updated dependencies.

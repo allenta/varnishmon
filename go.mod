@@ -11,7 +11,7 @@ require (
 	github.com/mark3labs/mcp-go v0.38.0
 	github.com/prometheus/client_golang v1.23.0
 	github.com/rs/zerolog v1.34.0
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.1
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	gitlab.com/stone.code/assert v1.1.4
@@ -68,7 +68,7 @@ require (
 	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
 	github.com/spf13/afero v1.14.0 // indirect
 	github.com/spf13/cast v1.9.2 // indirect
-	github.com/spf13/pflag v1.0.7 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect

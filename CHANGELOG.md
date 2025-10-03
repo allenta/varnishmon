@@ -1,6 +1,33 @@
 - ?:
     + Updated dependencies.
-        * uv 0.8.12 ➙ 0.8.13
+        * DuckDB 1.3.2 ➙ 1.4.0
+        * FPM 1.16.0 ➙ 1.17.0
+        * Go 1.25.0 ➙ 1.25.1
+            - cobra 1.9.1 ➙ 1.10.1
+            - gin 1.10.1 ➙ 1.11.0
+            - golangci-lint 2.4.0 ➙ 2.5.0
+            - mcp-go 0.38.0 ➙ 0.41.0
+            - sys 0.35.0 ➙ 0.36.0
+            - testify 1.10.0 ➙ 1.11.1
+            - viper 1.20.1 ➙ 1.21.0
+        * Node.js 24.6.0 ➙ 24.9.0
+            @eslint/js 9.33.0 ➙ 9.36.0
+            @fortawesome/fontawesome-free 7.0.0 ➙ 7.1.0
+            @types/react 19.1.10 ➙ 19.2.0
+            @types/react-dom 19.1.7 ➙ 19.2.0
+            @vitejs/plugin-react-swc 4.0.1 ➙ 4.1.0
+            bootstrap 5.3.7 ➙ 5.3.8
+            eslint 9.33.0 ➙ 9.36.0
+            eslint-plugin-react-hooks 5.2.0 ➙ 6.1.0
+            eslint-plugin-react-refresh 0.4.20 ➙ 0.4.23
+            globals 16.3.0 ➙ 16.4.0
+            plotly.js-basic-dist 3.1.0 ➙ 3.1.1
+            react 19.1.1 ➙ 19.2.0
+            react-dom 19.1.1 ➙ 19.2.0
+            sass-embedded 1.90.0 ➙ 1.93.2
+            vite 7.1.3 ➙ 7.1.9
+            vite-plugin-static-copy 3.1.2 ➙ 3.1.3
+        * uv 0.8.12 ➙ 0.8.22
 
 - 0.8.6-1 (2025-08-21):
     + Added support for Debian Trixie and RHEL (Rocky Linux) 10.

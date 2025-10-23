@@ -28,6 +28,7 @@
             vite 7.1.3 ➙ 7.1.9
             vite-plugin-static-copy 3.1.2 ➙ 3.1.3
         * uv 0.8.12 ➙ 0.8.22
+    + Fixed segmentation fault when files referenced in the configuration are in an unreadable directory because of permissions.
 
 - 0.8.6-1 (2025-08-21):
     + Added support for Debian Trixie and RHEL (Rocky Linux) 10.

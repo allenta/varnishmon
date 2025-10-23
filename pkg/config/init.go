@@ -79,7 +79,7 @@ func (cfg *Config) initScraperConfig() {
 					Msg("Failed to split 'scraper.varnishstat' command!")
 			}
 			if len(command) > 0 {
-				if info, err := os.Stat(command[0]); os.IsNotExist(err) || info.IsDir() {
+				if info, err := os.Stat(command[0]); err != nil || info.IsDir() {
 					cfg.log.Fatal().
 						Err(err).
 						Str("value", varnishstat).
@@ -186,7 +186,7 @@ func (cfg *Config) checkIP(key string) {
 
 func (cfg *Config) checkFile(key string) {
 	value := cfg.vpr.GetString(key)
-	if info, err := os.Stat(value); os.IsNotExist(err) || info.IsDir() {
+	if info, err := os.Stat(value); err != nil || info.IsDir() {
 		cfg.log.Fatal().
 			Err(err).
 			Str("value", value).

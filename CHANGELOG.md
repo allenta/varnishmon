@@ -1,4 +1,4 @@
-- ?
+- 0.8.8-1 (2025-11-04):
     + Updated dependencies.
         * Node.js
             - @eslint/js 9.39.0 ➙ 9.39.1

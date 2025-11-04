@@ -1,3 +1,9 @@
+- 0.8.8-1 (2025-11-04):
+    + Updated dependencies.
+        * Node.js
+            - @eslint/js 9.39.0 ➙ 9.39.1
+            - eslint 9.39.0 ➙ 9.39.1
+
 - 0.8.7-1 (2025-11-04):
     + Updated dependencies.
         * DuckDB 1.3.2 ➙ 1.4.1

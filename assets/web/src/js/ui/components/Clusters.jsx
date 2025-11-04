@@ -15,7 +15,7 @@ export function Clusters({ filteredMetrics, ...props }) {
 
 Clusters.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
-  initialRange: PropTypes.object.isRequired,
+  initialRangeRef: PropTypes.object.isRequired,
   refreshInterval: PropTypes.number.isRequired,
   columns: PropTypes.number.isRequired,
   aggregator: PropTypes.string.isRequired,

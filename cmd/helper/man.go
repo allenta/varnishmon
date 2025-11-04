@@ -20,7 +20,7 @@ var (
 				return fmt.Errorf("requires a section and a destination folder: %w",
 					errInvalidArguments)
 			}
-			if info, err := os.Stat(args[1]); os.IsNotExist(err) || !info.IsDir() {
+			if info, err := os.Stat(args[1]); err != nil || !info.IsDir() {
 				return fmt.Errorf("'%s' is an invalid destination folder: %w",
 					args[1], errInvalidArguments)
 			}

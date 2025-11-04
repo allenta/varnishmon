@@ -6,7 +6,7 @@ import { EVENTS } from '../events';
 
 export function Metric({
   timeRangePicker,
-  initialRange,
+  initialRangeRef,
   refreshInterval,
   columns,
   aggregator,
@@ -47,14 +47,14 @@ export function Metric({
 
         // Update the time range picker with the zoom range.
         if (event.range != null) {
-          if (initialRange.current == null) {
-            initialRange.current = timeRangePicker.getRawDates();
+          if (initialRangeRef.current == null) {
+            initialRangeRef.current = timeRangePicker.getRawDates();
           }
           timeRangePicker.setDates(...event.range);
         } else {
-          if (initialRange.current != null) {
-            timeRangePicker.setDates(...initialRange.current);
-            initialRange.current = null;
+          if (initialRangeRef.current != null) {
+            timeRangePicker.setDates(...initialRangeRef.current);
+            initialRangeRef.current = null;
           }
         }
       });
@@ -84,7 +84,7 @@ export function Metric({
     // below, which update the chart instance accordingly. Remaining dependencies
     // are include to keep the linter happy, but all of them are irrelevant.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [containerRef, setChart, timeRangePicker, initialRange, metric]);
+  }, [containerRef, setChart, timeRangePicker, initialRangeRef, metric]);
 
   React.useEffect(() => {
     if (chart != null) {
@@ -130,7 +130,7 @@ export function Metric({
 
 Metric.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
-  initialRange: PropTypes.object.isRequired,
+  initialRangeRef: PropTypes.object.isRequired,
   refreshInterval: PropTypes.number.isRequired,
   columns: PropTypes.number.isRequired,
   aggregator: PropTypes.string.isRequired,

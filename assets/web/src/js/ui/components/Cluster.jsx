@@ -93,7 +93,7 @@ export function Cluster({ cluster, ...props }) {
 
 Cluster.propTypes = {
   timeRangePicker: PropTypes.object.isRequired,
-  initialRange: PropTypes.object.isRequired,
+  initialRangeRef: PropTypes.object.isRequired,
   refreshInterval: PropTypes.number.isRequired,
   columns: PropTypes.number.isRequired,
   aggregator: PropTypes.string.isRequired,

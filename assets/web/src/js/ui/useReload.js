@@ -3,13 +3,13 @@ import React from 'react';
 import * as helpers from '../helpers';
 import * as storage from '../storage';
 
-export function useReload({ timeRangePicker, initialRange, step }) {
+export function useReload({ timeRangePicker, initialRangeRef, step }) {
   const [metrics, setMetrics] = React.useState(null);
   const [loadProgress, setLoadProgress] = React.useState(null);
 
   const reload = React.useCallback(() => {
     // Flush previous state.
-    initialRange.current = null;
+    initialRangeRef.current = null;
     setMetrics(null);
 
     // Fetch metrics from the storage, exposing load state to show a loading
@@ -37,7 +37,7 @@ export function useReload({ timeRangePicker, initialRange, step }) {
         helpers.notify('error', `Failed to fetch metrics: ${error}`);
         setLoadProgress('error');
       });
-  }, [timeRangePicker, initialRange, step]);
+  }, [timeRangePicker, initialRangeRef, step]);
 
   return [metrics, loadProgress, reload];
 }

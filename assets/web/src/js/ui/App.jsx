@@ -15,12 +15,12 @@ export function App() {
   const [aggregator, setAggregator] = React.useState(config.getAggregator());
   const [step, setStep] = React.useState(config.getStep());
 
-  const initialRange = React.useRef(null);
-  const initialLoadDone = React.useRef(false);
+  const initialRangeRef = React.useRef(null);
+  const initialLoadDoneRef = React.useRef(false);
 
   const [metrics, loadProgress, reload] = useReload({
     timeRangePicker,
-    initialRange,
+    initialRangeRef,
     step,
   });
   const [
@@ -43,15 +43,15 @@ export function App() {
   // the required parameters are set.
   React.useEffect(() => {
     if (
-      !initialLoadDone.current &&
+      !initialLoadDoneRef.current &&
       timeRangePicker != null &&
       aggregator != null &&
       step != null
     ) {
       reload();
-      initialLoadDone.current = true;
+      initialLoadDoneRef.current = true;
     }
-  }, [initialLoadDone, timeRangePicker, aggregator, step, reload]);
+  }, [initialLoadDoneRef, timeRangePicker, aggregator, step, reload]);
 
   return (
     <>
@@ -111,7 +111,7 @@ export function App() {
           {loadProgress == null && (
             <components.Clusters
               timeRangePicker={timeRangePicker}
-              initialRange={initialRange}
+              initialRange={initialRangeRef}
               refreshInterval={refreshInterval}
               columns={columns}
               aggregator={aggregator}

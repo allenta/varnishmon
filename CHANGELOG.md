@@ -1,3 +1,37 @@
+- 0.8.7-1 (2025-11-04):
+    + Updated dependencies.
+        * DuckDB 1.3.2 ➙ 1.4.1
+        * FPM 1.16.0 ➙ 1.17.0
+        * Go 1.25.0 ➙ 1.25.3
+            - client_golang 1.23.0 ➙ 1.23.2
+            - cobra 1.9.1 ➙ 1.10.1
+            - gin 1.10.1 ➙ 1.11.0
+            - golangci-lint 2.4.0 ➙ 2.5.0
+            - gzip 1.2.3 ➙ 1.2.5
+            - mcp-go 0.38.0 ➙ 0.43.0
+            - sys 0.35.0 ➙ 0.37.0
+            - testify 1.10.0 ➙ 1.11.1
+            - viper 1.20.1 ➙ 1.21.0
+        * Node.js 24.6.0 ➙ 24.11.0
+            - @eslint/js 9.33.0 ➙ 9.39.0
+            - @fortawesome/fontawesome-free 7.0.0 ➙ 7.1.0
+            - @types/react 19.1.10 ➙ 19.2.2
+            - @types/react-dom 19.1.7 ➙ 19.2.2
+            - @vitejs/plugin-react-swc 4.0.1 ➙ 4.2.0
+            - bootstrap 5.3.7 ➙ 5.3.8
+            - eslint 9.33.0 ➙ 9.39.0
+            - eslint-plugin-react-hooks 5.2.0 ➙ 7.0.1
+            - eslint-plugin-react-refresh 0.4.20 ➙ 0.4.24
+            - globals 16.3.0 ➙ 16.5.0
+            - plotly.js-basic-dist 3.1.0 ➙ 3.2.0
+            - react 19.1.1 ➙ 19.2.0
+            - react-dom 19.1.1 ➙ 19.2.0
+            - sass-embedded 1.90.0 ➙ 1.93.3
+            - vite 7.1.3 ➙ 7.1.12
+            - vite-plugin-static-copy 3.1.2 ➙ 3.1.4
+        * uv 0.8.12 ➙ 0.9.7
+    + Fixed segmentation fault when files referenced in the configuration are in an unreadable directory because of permissions.
+
 - 0.8.6-1 (2025-08-21):
     + Added support for Debian Trixie and RHEL (Rocky Linux) 10.
     + Updated dependencies.

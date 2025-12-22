@@ -4,7 +4,14 @@ ARG GO_VERSION
 
 ENV FPM_VERSION 1.15.1
 
-RUN yum install -y \
+# Temporary workaround for https://access.redhat.com/solutions/7134243:
+# /lib64/librpm_sequoia.so.1: undefined symbol: EVP_PKEY_verify_message_init, version OPENSSL_3.4.0.
+RUN dnf update -y rpm-sequoia openssl-libs \
+    && dnf clean all
+
+RUN dnf clean all \
+    && dnf -y makecache --refresh \
+    && dnf install -y \
         curl-minimal \
         gcc-c++ \
         git \
@@ -13,7 +20,7 @@ RUN yum install -y \
         ruby \
         ruby-devel \
         tar \
-    && yum clean all
+    && dnf clean all
 
 RUN ARCHITECTURE=$(uname -m) \
     && case $ARCHITECTURE in \

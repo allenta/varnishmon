@@ -9,7 +9,9 @@ ENV FPM_VERSION 1.15.1
 RUN dnf update -y rpm-sequoia openssl-libs \
     && dnf clean all
 
-RUN yum install -y \
+RUN dnf clean all \
+    && dnf -y makecache --refresh \
+    && dnf install -y \
         curl-minimal \
         gcc-c++ \
         git \
@@ -18,7 +20,7 @@ RUN yum install -y \
         ruby \
         ruby-devel \
         tar \
-    && yum clean all
+    && dnf clean all
 
 RUN ARCHITECTURE=$(uname -m) \
     && case $ARCHITECTURE in \

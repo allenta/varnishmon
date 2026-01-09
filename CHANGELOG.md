@@ -1,3 +1,28 @@
+- 0.8.9-1 (2026-01-09):
+    + Updated dependencies.
+        * DuckDB 1.4.1 ➙ 1.4.3
+        * Go 1.25.3 ➙ 1.25.5
+            - cobra 1.10.1 ➙ 1.10.2
+            - golangci-lint 2.6.0 ➙ 2.8.0
+            - mcp-go 0.43.0 ➙ 0.43.2
+            - modernize 0.20.0 ➙ 0.21.0
+            - sys 0.37.0 ➙ 0.40.0
+        * Node.js 24.11.0 ➙ 24.12.0
+            - @eslint/js 9.39.1 ➙ 9.39.2
+            - @types/react 19.2.2 ➙ 19.2.7
+            - @types/react-dom 19.2.2 ➙ 19.2.3
+            - @vitejs/plugin-react-swc 4.2.0 ➙ 4.2.2
+            - eslint 9.39.1 ➙ 9.39.2
+            - eslint-plugin-react-refresh 0.4.24 ➙ 0.4.26
+            - globals 16.5.0 ➙ 17.0.0
+            - plotly.js-basic-dist 3.2.0 ➙ 3.3.1
+            - prettier 3.6.2 ➙ 3.7.4
+            - react 19.2.0 ➙ 19.2.3
+            - react-dom 19.2.0 ➙ 19.2.3
+            - sass-embedded 1.93.3 ➙ 1.97.2
+            - vite 7.1.12 ➙ 7.3.1
+        * uv 0.9.7 ➙ 0.9.22
+
 - 0.8.8-1 (2025-11-04):
     + Updated dependencies.
         * Node.js

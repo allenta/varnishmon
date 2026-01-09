@@ -7,7 +7,7 @@ on:
     - cron: 0 5 * * 1
 
 env:
-  GO_VERSION: 1.25.3
+  GO_VERSION: 1.25.5
 
 permissions:
   actions: write
@@ -33,7 +33,7 @@ jobs:
           - amd64
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: ./extras/github/build-action
         with:
@@ -59,7 +59,7 @@ jobs:
           - arm64
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: ./extras/github/build-action
         with:
@@ -79,9 +79,9 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           path: artifacts
 

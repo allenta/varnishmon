@@ -2,7 +2,7 @@ FROM docker.io/debian:bookworm-20250721
 
 ARG GO_VERSION
 
-ENV FPM_VERSION 1.15.1
+ENV FPM_VERSION 1.17.0
 
 ENV DEBIAN_FRONTEND noninteractive
 

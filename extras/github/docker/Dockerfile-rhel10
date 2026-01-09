@@ -2,7 +2,7 @@ FROM docker.io/rockylinux/rockylinux:10.0.20250606-ubi
 
 ARG GO_VERSION
 
-ENV FPM_VERSION 1.15.1
+ENV FPM_VERSION 1.17.0
 
 # Temporary workaround for https://access.redhat.com/solutions/7134243:
 # /lib64/librpm_sequoia.so.1: undefined symbol: EVP_PKEY_verify_message_init, version OPENSSL_3.4.0.

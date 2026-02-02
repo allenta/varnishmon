@@ -1,3 +1,19 @@
+- ?:
+    + Updated dependencies.
+        * DuckDB 1.4.3 ➙ 1.4.4
+        * Node.js 24.12.0 ➙ 24.13.0
+            - @types/react 19.2.7 ➙ 19.2.10
+            - @vitejs/plugin-react-swc 4.2.2 ➙ 4.2.3
+            - eslint-plugin-prettier 5.5.4 ➙ 5.5.5
+            - eslint-plugin-react-refresh 0.4.26 ➙ 0.5.0
+            - globals 17.0.0 ➙ 17.3.0
+            - prettier 3.7.4 ➙ 3.8.1
+            - react 19.2.3 ➙ 19.2.4
+            - react-dom 19.2.3 ➙ 19.2.4
+            - sass-embedded 1.97.2 ➙ 1.97.3
+            - vite-plugin-static-copy 3.1.4 ➙ 3.2.0
+        * uv 0.9.22 ➙ 0.9.28
+
 - 0.8.9-1 (2026-01-09):
     + Updated dependencies.
         * DuckDB 1.4.1 ➙ 1.4.3

@@ -1,4 +1,4 @@
-FROM docker.io/ubuntu:noble-20250714
+FROM docker.io/ubuntu:noble-20260113
 
 ENV DUCKDB_VERSION 1.4.4
 ENV FPM_VERSION 1.17.0

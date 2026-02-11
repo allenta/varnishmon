@@ -1,4 +1,4 @@
-FROM docker.io/debian:trixie-20250721
+FROM docker.io/debian:trixie-20260202
 
 ARG GO_VERSION
 

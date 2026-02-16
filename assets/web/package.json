@@ -11,7 +11,7 @@
     "prettier": "prettier --write 'src/**/*.{js,jsx}'"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "7.1.0",
+    "@fortawesome/fontawesome-free": "7.2.0",
     "air-datepicker": "3.6.0",
     "bootstrap": "5.3.8",
     "plotly.js-basic-dist": "3.3.1",

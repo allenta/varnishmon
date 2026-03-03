@@ -585,8 +585,10 @@ class Chart {
         fixedrange: true,
         griddash: 'dash',
         rangemode: 'normal',
-        // tickformat: '.1s',
+        tickformat: '.3s',
+        automargin: true,
         title: {
+          standoff: 15,
           text: (() => {
             if (this.metric.flag === 'c') {
               if (this.metric.format === 'd') {

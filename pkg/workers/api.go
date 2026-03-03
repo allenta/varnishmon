@@ -65,7 +65,7 @@ func (aw *APIWorker) run() {
 	listenConfig := net.ListenConfig{
 		Control: func(network, address string, c syscall.RawConn) error {
 			return c.Control(func(fd uintptr) {
-				if err := unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEPORT, 1); err != nil {
+				if err := unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEPORT, 1); err != nil { //nolint:gosec
 					aw.app.Cfg().Log().Error().
 						Err(err).
 						Str("network", network).

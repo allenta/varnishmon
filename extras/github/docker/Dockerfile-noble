@@ -1,4 +1,4 @@
-FROM docker.io/ubuntu:noble-20250714
+FROM docker.io/ubuntu:noble-20260113
 
 ARG GO_VERSION
 

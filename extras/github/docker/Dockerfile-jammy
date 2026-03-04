@@ -1,4 +1,4 @@
-FROM docker.io/ubuntu:jammy-20250714
+FROM docker.io/ubuntu:jammy-20260109
 
 ARG GO_VERSION
 

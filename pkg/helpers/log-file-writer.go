@@ -28,11 +28,11 @@ func NewLogFileWriter(name string, mode os.FileMode, redirect bool) (*LogFileWri
 	var stdout, stderr int
 	if redirect {
 		var err error
-		if stdout, err = syscall.Dup(int(os.Stdout.Fd())); err != nil {
+		if stdout, err = syscall.Dup(int(os.Stdout.Fd())); err != nil { //nolint:gosec
 			return nil, fmt.Errorf(
 				"failed to duplicate stdout's file descriptor: %w", err)
 		}
-		if stderr, err = syscall.Dup(int(os.Stderr.Fd())); err != nil {
+		if stderr, err = syscall.Dup(int(os.Stderr.Fd())); err != nil { //nolint:gosec
 			return nil, fmt.Errorf(
 				"failed to duplicate stderr's file descriptor: %w", err)
 		}
@@ -77,10 +77,10 @@ func (fw *LogFileWriter) Reopen() error {
 func (fw *LogFileWriter) Close() error {
 	// Undo stdout and stderr redirections.
 	if fw.redirect {
-		if err := PortableDup2(fw.stdout, int(os.Stdout.Fd())); err != nil {
+		if err := PortableDup2(fw.stdout, int(os.Stdout.Fd())); err != nil { //nolint:gosec
 			return fmt.Errorf("failed to undo stdout redirection: %w", err)
 		}
-		if err := PortableDup2(fw.stderr, int(os.Stderr.Fd())); err != nil {
+		if err := PortableDup2(fw.stderr, int(os.Stderr.Fd())); err != nil { //nolint:gosec
 			return fmt.Errorf("failed to undo stderr redirection: %w", err)
 		}
 	}
@@ -103,7 +103,7 @@ func (fw *LogFileWriter) unsafeReopen() error {
 	}
 
 	// Open new file.
-	newFile, err := os.OpenFile(fw.name, os.O_WRONLY|os.O_APPEND|os.O_CREATE, fw.mode) //nolint:nosnakecase
+	newFile, err := os.OpenFile(fw.name, os.O_WRONLY|os.O_APPEND|os.O_CREATE, fw.mode)
 	if err != nil {
 		return fmt.Errorf("failed to open underlying file: %w", err)
 	}
@@ -112,7 +112,7 @@ func (fw *LogFileWriter) unsafeReopen() error {
 	if fw.redirect {
 		files := []*os.File{os.Stdout, os.Stderr}
 		for _, file := range files {
-			if err := PortableDup2(int(newFile.Fd()), int(file.Fd())); err != nil {
+			if err := PortableDup2(int(newFile.Fd()), int(file.Fd())); err != nil { //nolint:gosec
 				return fmt.Errorf("failed to redirect '%s' to underlying file: %w", file.Name(), err)
 			}
 		}

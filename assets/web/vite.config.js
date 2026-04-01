@@ -115,8 +115,7 @@ export default defineConfig(({ command, mode }) => {
         input: './index.html',
         output: {
           entryFileNames: 'app.js',
-          manualChunks: false,
-          inlineDynamicImports: true,
+          codeSplitting: false,
           assetFileNames: (assetInfo) => {
             const originalFileName = assetInfo.originalFileNames?.[0] ?? '';
             const name = assetInfo.names?.[0] ?? '';

@@ -1,3 +1,19 @@
+- ?:
+    + Updated dependencies.
+        * DuckDB 1.4.4 ➙ 1.5.1
+        * Go 1.26.0 ➙ 1.26.1
+            - gzip 1.2.5 ➙ 1.2.6
+            - pprof 1.5.3 ➙ 1.5.4
+            - mcp-go 0.44.1 ➙ 0.46.0
+            - zerolog 1.34.0 ➙ 1.35.0
+            - sys 0.41.0 ➙ 0.42.0
+        * Node.js 24.14.0 ➙ 24.14.1
+            - @vitejs/plugin-react-swc 4.2.3 ➙ 4.3.0
+            - sass-embedded 1.97.3 ➙ 1.98.0
+            - vite 7.3.1 ➙ 8.0.3
+            - vite-plugin-static-copy 3.2.0 ➙ 4.0.0
+        * uv 0.10.7 ➙ 0.11.2
+
 - 0.8.10-1 (2026-03-04):
     + Updated dependencies.
         * DuckDB 1.4.3 ➙ 1.4.4

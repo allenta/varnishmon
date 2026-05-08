@@ -1,4 +1,4 @@
-FROM docker.io/debian:bookworm-20260202
+FROM docker.io/debian:bookworm-20260421
 
 ARG GO_VERSION
 

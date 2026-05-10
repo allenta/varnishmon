@@ -2,9 +2,9 @@ FROM docker.io/ubuntu:noble-20260410
 
 ARG GO_VERSION
 
-ENV FPM_VERSION 1.17.0
+ENV FPM_VERSION=1.17.0
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update \
     && apt install -y \

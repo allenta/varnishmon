@@ -37,11 +37,12 @@ runs:
       with:
         context: .
         file: extras/github/docker/Dockerfile-${{ inputs.platform }}
+        platforms: linux/${{ inputs.architecture }}
         load: true
         tags: varnishmon-dev
         build-args: GO_VERSION=${{ inputs.go-version }}
-        cache-from: type=gha,scope=${{ inputs.architecture }}-${{ inputs.go-version }}
-        cache-to: type=gha,mode=max,scope=${{ inputs.architecture }}-${{ inputs.go-version }}
+        cache-from: type=gha,scope=${{ inputs.platform }}-${{ inputs.architecture }}-${{ inputs.go-version }}
+        cache-to: type=gha,mode=max,scope=${{ inputs.platform }}-${{ inputs.architecture }}-${{ inputs.go-version }}
 
     - shell: bash
       id: build

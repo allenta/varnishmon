@@ -1,4 +1,4 @@
-FROM docker.io/ubuntu:noble-20260410
+FROM docker.io/ubuntu:resolute-20260421
 
 ENV DUCKDB_VERSION=1.5.2
 ENV FPM_VERSION=1.17.0
@@ -58,7 +58,7 @@ RUN gem install fpm -v ${FPM_VERSION} \
 
 RUN curl -fsSL https://packages.varnish-software.com/varnish/varnish.pub.asc | \
         gpg --dearmor > /etc/apt/trusted.gpg.d/varnish.gpg \
-    && echo 'deb [signed-by=/etc/apt/trusted.gpg.d/varnish.gpg] https://packages.varnish-software.com/varnish/ubuntu noble main' > /etc/apt/sources.list.d/varnish.list \
+    && echo 'deb [signed-by=/etc/apt/trusted.gpg.d/varnish.gpg] https://packages.varnish-software.com/varnish/ubuntu resolute main' > /etc/apt/sources.list.d/varnish.list \
     && echo 'Package: varnish varnish-*' > /etc/apt/preferences.d/varnish \
     && echo 'Pin: release o=packages.varnish-software.com/varnish/*' >> /etc/apt/preferences.d/varnish \
     && echo 'Pin-Priority: 1000' >> /etc/apt/preferences.d/varnish \

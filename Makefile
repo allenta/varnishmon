@@ -164,10 +164,10 @@ dist: build
 		set -e; \
 		umask $(UMASK); \
 		\
-		[ '$(PLATFORM)' = 'noble' -o '$(PLATFORM)' = 'jammy' -o \
-			'$(PLATFORM)' = 'trixie' -o '$(PLATFORM)' = 'bookworm' -o \
-			'$(PLATFORM)' = 'rhel10' -o '$(PLATFORM)' = 'rhel9' -o \
-			'$(PLATFORM)' = 'rhel8' ] || \
+		[ '$(PLATFORM)' = 'resolute' -o '$(PLATFORM)' = 'noble' -o \
+		    '$(PLATFORM)' = 'jammy' -o '$(PLATFORM)' = 'trixie' -o \
+			'$(PLATFORM)' = 'bookworm' -o '$(PLATFORM)' = 'rhel10' -o \
+			'$(PLATFORM)' = 'rhel9' -o '$(PLATFORM)' = 'rhel8' ] || \
 				{ echo >&2 'Invalid platform ($(PLATFORM))'; exit 1; }; \
 		\
 		[ '$(ENVIRONMENT)' = 'production' ] || \
@@ -198,7 +198,7 @@ dist: build
 		gzip '$(ROOT)/build/dist/usr/share/man/man1/'*.1; \
 	)
 
-ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy trixie bookworm))
+ifeq ($(PLATFORM),$(filter $(PLATFORM),resolute noble jammy trixie bookworm))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -242,7 +242,7 @@ endif
 
 .PHONY: package
 package: dist
-ifeq ($(PLATFORM),$(filter $(PLATFORM),noble jammy trixie bookworm))
+ifeq ($(PLATFORM),$(filter $(PLATFORM),resolute noble jammy trixie bookworm))
 	@( \
 		set -e; \
 		umask $(UMASK); \

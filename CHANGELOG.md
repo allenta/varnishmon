@@ -1,4 +1,5 @@
 - ?:
+    + Added support for Ubuntu Resolute.
     + Updated dependencies.
         * DuckDB 1.4.4 ➙ 1.5.1
         * Go 1.26.0 ➙ 1.26.1

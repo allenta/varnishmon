@@ -103,7 +103,7 @@ While `varnishmon` **doesn't replace a comprehensive monitoring solutions like P
   > To use an in-memory database, set the `--db` flag (or the `db.file` setting) to an empty value. Note that the data will be lost when `varnishmon` exits. Additionally, be aware that an in-memory database may consume a significant amount of memory, depending on (1) the number of metrics; (2) the scraping period; and (3) the duration `varnishmon` runs.
 
 - **How do I build `varnishmon` from source?**
-  > The build process is designed to be executed on the target platform (e.g., Ubuntu Noble, Ubuntu Jammy, etc.) and architecture (`amd64` or `arm64`). The dependencies are minimal (`make`, `git`, `go`, `g++`, etc.; refer to the [Dockerfiles used by GitHub Actions](extras/github/docker) for guidance). To build, simply run `make build` in the root of the repository.
+  > The build process is designed to be executed on the target platform (e.g., Ubuntu Resolute, Ubuntu Noble, etc.) and architecture (`amd64` or `arm64`). The dependencies are minimal (`make`, `git`, `go`, `g++`, etc.; refer to the [Dockerfiles used by GitHub Actions](extras/github/docker) for guidance). To build, simply run `make build` in the root of the repository.
 
 ### Running as a Service
 

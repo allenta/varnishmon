@@ -1,3 +1,6 @@
+- 0.8.12-1 (2026-05-11):
+    + Test release to try out changes in GitHub actions.
+
 - 0.8.11-1 (2026-05-11):
     + Added support for Ubuntu Resolute.
     + Updated dependencies.

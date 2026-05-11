@@ -41,7 +41,7 @@
 #     # development mode is requested (i.e., ENVIRONMENT=development). Also,
 #     # beware packing is expected to be done on the target platform +
 #     # architecture.
-#     $ PLATFORM=noble make package
+#     $ PLATFORM=resolute make package
 #
 #     # Periodic update of dependencies:
 #     #   - Development & CI environments:

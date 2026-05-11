@@ -1,19 +1,24 @@
 - ?:
     + Added support for Ubuntu Resolute.
     + Updated dependencies.
-        * DuckDB 1.4.4 ➙ 1.5.1
-        * Go 1.26.0 ➙ 1.26.1
+        * DuckDB 1.4.4 ➙ 1.5.2
+        * Go 1.26.0 ➙ 1.26.3
             - gzip 1.2.5 ➙ 1.2.6
             - pprof 1.5.3 ➙ 1.5.4
-            - mcp-go 0.44.1 ➙ 0.46.0
-            - zerolog 1.34.0 ➙ 1.35.0
-            - sys 0.41.0 ➙ 0.42.0
-        * Node.js 24.14.0 ➙ 24.14.1
+            - mcp-go 0.44.1 ➙ 0.52.0
+            - zerolog 1.34.0 ➙ 1.35.1
+            - sys 0.41.0 ➙ v0.44.0
+        * Node.js 24.14.0 ➙ 24.15.0
             - @vitejs/plugin-react-swc 4.2.3 ➙ 4.3.0
-            - sass-embedded 1.97.3 ➙ 1.98.0
-            - vite 7.3.1 ➙ 8.0.3
-            - vite-plugin-static-copy 3.2.0 ➙ 4.0.0
-        * uv 0.10.7 ➙ 0.11.2
+            - globals 17.4.0 ➙ 17.6.0
+            - plotly.js-basic-dist 3.4.0 ➙ 3.5.1
+            - prettier 3.8.1 ➙ 3.8.3
+            - react 19.2.4 ➙ 19.2.6
+            - react-dom 19.2.4 ➙ 19.2.6
+            - sass-embedded 1.98.0 ➙ 1.99.0
+            - vite 7.3.1 ➙ 8.0.12
+            - vite-plugin-static-copy 3.2.0 ➙ 4.1.0
+        * uv 0.10.7 ➙ 0.11.11
 
 - 0.8.10-1 (2026-03-04):
     + Updated dependencies.

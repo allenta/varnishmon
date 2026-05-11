@@ -14,9 +14,9 @@
     "@fortawesome/fontawesome-free": "7.2.0",
     "air-datepicker": "3.6.0",
     "bootstrap": "5.3.8",
-    "plotly.js-basic-dist": "3.4.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "plotly.js-basic-dist": "3.5.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
@@ -29,12 +29,12 @@
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-react-refresh": "0.5.2",
-    "globals": "17.4.0",
-    "prettier": "3.8.1",
-    "sass-embedded": "1.98.0",
-    "vite": "8.0.3",
+    "globals": "17.6.0",
+    "prettier": "3.8.3",
+    "sass-embedded": "1.99.0",
+    "vite": "8.0.12",
     "vite-plugin-eslint": "1.8.1",
     "vite-plugin-minify": "2.1.0",
-    "vite-plugin-static-copy": "4.0.0"
+    "vite-plugin-static-copy": "4.1.0"
   }
 }

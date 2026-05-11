@@ -14,7 +14,9 @@ linters:
     - funcorder # Too opinionated.
     - funlen # Too opinionated.
     - gochecknoinits # We do use init functions.
+    - goconst # Too opinionated.
     - gomoddirectives # We do local replacements.
+    - gomodguard # Replaced by gomodguard_v2
     - mnd # Too opinionated.
     - nestif # Too opinionated.
     - nlreturn # Too opinionated.

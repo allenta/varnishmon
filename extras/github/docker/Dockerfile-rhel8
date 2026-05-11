@@ -2,7 +2,7 @@ FROM docker.io/rockylinux/rockylinux:8.10.20240528-ubi
 
 ARG GO_VERSION
 
-ENV FPM_VERSION 1.11.0
+ENV FPM_VERSION=1.11.0
 
 RUN yum install -y \
         cmake3 \

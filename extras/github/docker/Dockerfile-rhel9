@@ -2,7 +2,7 @@ FROM docker.io/rockylinux/rockylinux:9.7.20251123-ubi
 
 ARG GO_VERSION
 
-ENV FPM_VERSION 1.17.0
+ENV FPM_VERSION=1.17.0
 
 RUN yum install -y \
         curl-minimal \

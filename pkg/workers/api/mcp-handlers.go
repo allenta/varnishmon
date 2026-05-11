@@ -159,7 +159,7 @@ func (h *Handler) handleHumanFriendlyTimestampTool(
 	return &mcp.CallToolResult{
 		Content: []mcp.Content{
 			mcp.TextContent{
-				Type: "text",
+				Type: "text", //nolint:goconst
 				Text: humanFriendlyTimestamp,
 			},
 		},

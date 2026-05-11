@@ -56,12 +56,11 @@ RUN curl -L -s https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/u
 RUN gem install fpm -v ${FPM_VERSION} \
     && gem cleanup
 
-RUN curl -fsSL https://packagecloud.io/varnishcache/varnish60lts/gpgkey | \
-        gpg --dearmor > /etc/apt/trusted.gpg.d/varnish-6.0.gpg \
-    && echo 'deb [signed-by=/etc/apt/trusted.gpg.d/varnish-6.0.gpg] https://packagecloud.io/varnishcache/varnish60lts/ubuntu noble main' > /etc/apt/sources.list.d/varnish-6.0.list \
-    && echo 'deb-src [signed-by=/etc/apt/trusted.gpg.d/varnish-6.0.gpg] https://packagecloud.io/varnishcache/varnish60lts/ubuntu noble main' >> /etc/apt/sources.list.d/varnish-6.0.list \
+RUN curl -fsSL https://packages.varnish-software.com/varnish/varnish.pub.asc | \
+        gpg --dearmor > /etc/apt/trusted.gpg.d/varnish.gpg \
+    && echo 'deb [signed-by=/etc/apt/trusted.gpg.d/varnish.gpg] https://packages.varnish-software.com/varnish/ubuntu noble main' > /etc/apt/sources.list.d/varnish.list \
     && echo 'Package: varnish varnish-*' > /etc/apt/preferences.d/varnish \
-    && echo 'Pin: release o=packagecloud.io/varnishcache/*' >> /etc/apt/preferences.d/varnish \
+    && echo 'Pin: release o=packages.varnish-software.com/varnish/*' >> /etc/apt/preferences.d/varnish \
     && echo 'Pin-Priority: 1000' >> /etc/apt/preferences.d/varnish \
     && apt update \
     && apt install -y varnish \

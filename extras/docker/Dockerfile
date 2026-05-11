@@ -56,9 +56,10 @@ RUN curl -L -s https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/u
 RUN gem install fpm -v ${FPM_VERSION} \
     && gem cleanup
 
-RUN curl -fsSL https://packages.varnish-software.com/varnish/varnish.pub.asc | \
-        gpg --dearmor > /etc/apt/trusted.gpg.d/varnish.gpg \
-    && echo 'deb [signed-by=/etc/apt/trusted.gpg.d/varnish.gpg] https://packages.varnish-software.com/varnish/ubuntu resolute main' > /etc/apt/sources.list.d/varnish.list \
+RUN mkdir -p /etc/apt/keyrings \
+    && curl -Ls https://packages.varnish-software.com/varnish/varnish.pub.asc | \
+        gpg --dearmor > /etc/apt/keyrings/varnish.gpg \
+    && echo 'deb [signed-by=/etc/apt/keyrings/varnish.gpg] https://packages.varnish-software.com/varnish/ubuntu resolute main' > /etc/apt/sources.list.d/varnish.list \
     && echo 'Package: varnish varnish-*' > /etc/apt/preferences.d/varnish \
     && echo 'Pin: release o=packages.varnish-software.com/varnish/*' >> /etc/apt/preferences.d/varnish \
     && echo 'Pin-Priority: 1000' >> /etc/apt/preferences.d/varnish \

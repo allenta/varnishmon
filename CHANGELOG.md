@@ -1,4 +1,4 @@
-- ?:
+- 0.8.11-1 (2026-05-11):
     + Added support for Ubuntu Resolute.
     + Updated dependencies.
         * DuckDB 1.4.4 ➙ 1.5.2

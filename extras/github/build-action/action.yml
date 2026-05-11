@@ -17,12 +17,12 @@ runs:
     #   with:
     #     platforms: ${{ inputs.architecture }}
 
-    - uses: docker/setup-buildx-action@v3
+    - uses: docker/setup-buildx-action@v4
 
     # Try to populate 'duckdb-static-bundle/libduckdb_bundle.a' from cache. This
     # will only succeed for platforms + architectures building their own DuckDB
     # static bundle (currently, only RHEL 8 + AMD64).
-    - uses: actions/cache/restore@v4
+    - uses: actions/cache/restore@v5
       id: duckdb-static-bundle-restore
       with:
         path: duckdb-static-bundle/libduckdb_bundle.a
@@ -60,7 +60,7 @@ runs:
     # Save 'duckdb-static-bundle/libduckdb_bundle.a' to cache if it was not
     # restored from cache. The file won't exist for platforms + architectures
     # that don't build their own DuckDB static bundle.
-    - uses: actions/cache/save@v4
+    - uses: actions/cache/save@v5
       if: |
         steps.duckdb-static-bundle-restore.outputs.cache-hit != 'true' &&
         steps.build.outputs.duckdb-static-bundle-exists == 'true'
@@ -68,7 +68,7 @@ runs:
         path: duckdb-static-bundle/libduckdb_bundle.a
         key: ${{ steps.duckdb-static-bundle-restore.outputs.cache-primary-key }}
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.platform }}-${{ inputs.architecture }}-artifacts
         path: |

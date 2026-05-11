@@ -36,6 +36,7 @@ runs:
       uses: docker/build-push-action@v7
       with:
         context: .
+        file: extras/github/docker/Dockerfile-${{ inputs.platform }}
         load: true
         tags: varnishmon-dev
         build-args: GO_VERSION=${{ inputs.go-version }}

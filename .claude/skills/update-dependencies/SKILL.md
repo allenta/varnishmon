@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 Work through each phase of the workflow in order. Pause at the human checkpoints before continuing.
 
-## Phase 1 — Dev env: discover latest versions
+## Phase 1 — Dev & CI envs: discover latest versions
 
 Perform all lookups in parallel:
 
@@ -27,7 +27,7 @@ Using the versions discovered above:
 3. **`docker-compose.yml`**:
    - Update `GO_VERSION` in the example command.
 
-FPM version is references in `extras/docker/Dockerfile` and `extras/github/docker/Dockerfile-*`, but do not update it in this workflow.
+FPM version is referenced in `extras/docker/Dockerfile` and `extras/github/docker/Dockerfile-*`, but do not update it in this workflow.
 
 ## Phase 3 — Human checkpoint: rebuild Docker dev env
 
@@ -114,5 +114,5 @@ Prepend a new entry to `CHANGELOG.md` following the existing format:
 Rules:
 - The `?` is a literal placeholder — do NOT substitute a version number; it will be filled in later during the release process.
 - List each changed item as its own `*` bullet with **old → new** versions explicitly.
-- Only include **direct** dependencies (i.e. those without `// indirect` in `go.mod`), plus named tool versions (Go, uv, golangci-lint, modernize, Python packages). **Do not list indirect Go module dependencies.**
+- Only include **direct** dependencies (i.e. those without `// indirect` in `go.mod`), plus named tool versions (Go, uv, golangci-lint, modernize, etc.). **Do not list indirect Go module dependencies.**
 - If unreleased changes are already listed, merge them appropriately into the new entry.

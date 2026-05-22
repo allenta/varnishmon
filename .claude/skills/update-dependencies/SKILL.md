@@ -93,7 +93,7 @@ Then say:
 
 Wait for approval before continuing.
 
-## Phase 9 — Agent: update CHANGELOG.md
+## Phase 9 — Update CHANGELOG.md
 
 Prepend a new entry to `CHANGELOG.md` following the existing format:
 

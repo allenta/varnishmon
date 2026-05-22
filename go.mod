@@ -3,11 +3,11 @@ module github.com/allenta/varnishmon
 go 1.26
 
 require (
+	github.com/duckdb/duckdb-go/v2 v2.10503.0
 	github.com/gin-contrib/gzip v1.2.6
 	github.com/gin-contrib/pprof v1.5.4
 	github.com/gin-gonic/gin v1.12.0
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
-	github.com/marcboeker/go-duckdb v1.8.5
 	github.com/mark3labs/mcp-go v0.52.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/rs/zerolog v1.35.1
@@ -29,6 +29,12 @@ require (
 	github.com/cloudwego/base64x v0.1.7 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/duckdb/duckdb-go-bindings v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/darwin-amd64 v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/darwin-arm64 v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/linux-amd64 v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/linux-arm64 v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/windows-amd64 v0.10503.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/gin-contrib/sse v1.1.1 // indirect

@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/allenta/varnishmon/pkg/config"
-	_ "github.com/marcboeker/go-duckdb" // Register the DuckDB driver.
+	_ "github.com/duckdb/duckdb-go/v2" // Register the DuckDB driver.
 )
 
 const (
-	SchemaVersion = 1
+	SchemaVersion = 2
 )
 
 func (stg *Storage) init() {
@@ -108,9 +108,58 @@ func (stg *Storage) unsafeConfigureDB() {
 }
 
 func (stg *Storage) unsafeMigrateDBTables() {
-	// This is a placeholder for future database migrations. The idea is to
-	// use 'metadata.schema_version' to track the current schema version and
-	// apply migrations as needed.
+	// Skip when the database is fresh (no 'metadata' table yet); the current
+	// schema will be created from scratch by 'unsafeCreateDBTables'.
+	var hasMetadata bool
+	if err := stg.db.QueryRow(`
+		SELECT COUNT(*) > 0
+		FROM information_schema.tables
+		WHERE table_name = 'metadata'`).Scan(&hasMetadata); err != nil {
+		stg.app.Cfg().Log().Fatal().
+			Err(err).
+			Msg("Failed to check existence of 'metadata' table!")
+	}
+	if !hasMetadata {
+		return
+	}
+
+	// Check the current schema version.
+	var version int
+	if err := stg.db.QueryRow(
+		`SELECT schema_version FROM metadata LIMIT 1`).Scan(&version); err != nil {
+		stg.app.Cfg().Log().Fatal().
+			Err(err).
+			Msg("Failed to query 'metadata.schema_version'!")
+	}
+
+	// v1 -> v2: drop the FOREIGN KEY constraint on 'metric_values.metric_id'.
+	// Recent DuckDB versions enforce FKs strictly on UPDATEs of the referenced
+	// row (UPDATE is implemented as DELETE + INSERT internally), which makes
+	// it impossible to update metric metadata once samples reference it.
+	// Referential integrity is maintained by the application via the metrics
+	// cache and the 'metrics_seq' sequence. See:
+	//   - https://github.com/duckdb/duckdb/pull/16399.
+	//   - https://github.com/duckdb/duckdb-web/pull/4932/changes.
+	//   - https://duckdb.org/docs/current/sql/indexes#over-eager-constraint-checking-in-foreign-keys.
+	if version < 2 {
+		if _, err := stg.db.Exec(`
+			CREATE TABLE metric_values_new (
+				metric_id INTEGER NOT NULL,
+				timestamp TIMESTAMP NOT NULL,
+				value UNION(float64 FLOAT8, uint64 UBIGINT) NOT NULL,
+				PRIMARY KEY (metric_id, timestamp)
+			);
+			INSERT INTO metric_values_new SELECT * FROM metric_values;
+			DROP TABLE metric_values;
+			ALTER TABLE metric_values_new RENAME TO metric_values;
+			UPDATE metadata SET schema_version = 2;`); err != nil {
+			stg.app.Cfg().Log().Fatal().
+				Err(err).
+				Msg("Failed to migrate schema from v1 to v2!")
+		}
+		stg.app.Cfg().Log().Info().
+			Msg("Migrated database schema from v1 to v2 (dropped FK on 'metric_values')")
+	}
 }
 
 func (stg *Storage) unsafeCreateDBTables() {
@@ -136,7 +185,7 @@ func (stg *Storage) unsafeCreateDBTables() {
 		);
 
 		CREATE TABLE IF NOT EXISTS metric_values (
-			metric_id INTEGER NOT NULL REFERENCES metrics(id),
+			metric_id INTEGER NOT NULL,
 			timestamp TIMESTAMP NOT NULL,
 			value UNION(float64 FLOAT8, uint64 UBIGINT) NOT NULL,
 			PRIMARY KEY (metric_id, timestamp)

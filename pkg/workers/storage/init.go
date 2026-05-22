@@ -149,7 +149,8 @@ func (stg *Storage) unsafeMigrateDBTables() {
 				value UNION(float64 FLOAT8, uint64 UBIGINT) NOT NULL,
 				PRIMARY KEY (metric_id, timestamp)
 			);
-			INSERT INTO metric_values_new SELECT * FROM metric_values;
+			INSERT INTO metric_values_new (metric_id, timestamp, value)
+				SELECT metric_id, timestamp, value FROM metric_values;
 			DROP TABLE metric_values;
 			ALTER TABLE metric_values_new RENAME TO metric_values;
 			UPDATE metadata SET schema_version = 2;`); err != nil {

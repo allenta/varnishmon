@@ -43,21 +43,7 @@
 #     # architecture.
 #     $ PLATFORM=resolute make package
 #
-#     # Periodic update of dependencies:
-#     #   - Development & CI environments:
-#     #     + extras/docker/Dockerfile: Go, Node.js, FPM, etc.
-#     #     + .github/workflows/main.yml: Go, etc.
-#     #     + extras/github/docker/*: FPM, etc.
-#     #     + Makefile
-#     #       * Go tools not handled using the tools pattern
-#     #       * Go version (major) in -compat parameter for go mod tidy
-#     #       * Rebuild mocks: make mocks
-#     #   - Go:
-#     #     + go (only major version) directive in go.mod
-#     #     + go get -u ./... + make mod fmt lint vet modernize test
-#     #   - Node.js:
-#     #     + rm -rf package-lock.json node_modules && npm update --save && npm audit fix
-#     #     + npm outdated && npm install --save-exact <--save | --save-dev> <package>@latest
+#     # Recurring dependency update workflow: .claude/skills/update-dependencies/SKILL.md.
 #
 #     # Fetch profiling data & metrics.
 #     $ curl -o /tmp/cpu.pprof http://127.0.0.1:6100/debug/pprof/profile?seconds=15

@@ -3,6 +3,21 @@
         * DB schema version bumped to 2.
         * Dropped FOREIGN KEY constraint on `metric_values.metric_id`.
     + Drop RHEL 8 support.
+    + Updated dependencies:
+        * Dev & CI environments:
+            - DuckDB: 1.5.2 → 1.5.3.
+            - Node.js: 24.15.0 → 24.16.0.
+            - uv: 0.11.11 → 0.11.16.
+        * Go:
+            - modernize: v0.21.1 → v0.45.0.
+            - mcp-go: v0.52.0 → v0.54.0.
+            - x/sys: v0.44.0 → v0.45.0.
+        * Node.js:
+            - @types/react: 19.2.14 → 19.2.15.
+            - @vitejs/plugin-react-swc: 4.3.0 → 4.3.1.
+            - eslint-plugin-react-hooks: 7.0.1 → 7.1.1.
+            - sass-embedded: 1.99.0 → 1.100.0.
+            - vite: 8.0.12 → 8.0.14.
 
 - 0.8.12-1 (2026-05-11):
     + Test release to try out changes in GitHub actions.

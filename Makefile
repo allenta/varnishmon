@@ -97,7 +97,7 @@ modernize:
 		set -e; \
 		\
 		echo '> Running modernize...'; \
-		go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@v0.21.1 -fix ./...; \
+		go run golang.org/x/tools/go/analysis/passes/modernize/cmd/modernize@v0.45.0 -fix ./...; \
 	)
 
 TEST_PACKAGES ?= '$(ROOT)/...'

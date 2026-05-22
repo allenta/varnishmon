@@ -34,7 +34,8 @@ runs:
         cache-from: type=gha,scope=${{ inputs.platform }}-${{ inputs.architecture }}-${{ inputs.go-version }}
         cache-to: type=gha,mode=max,scope=${{ inputs.platform }}-${{ inputs.architecture }}-${{ inputs.go-version }}
 
-    - run: |
+    - shell: bash
+      run: |
         docker run \
           --rm \
           --platform linux/${{ inputs.architecture }} \

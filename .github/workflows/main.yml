@@ -29,13 +29,9 @@ jobs:
           - bookworm
           - rhel10
           - rhel9
-          - rhel8
         architecture:
           - amd64
           - arm64
-        exclude:
-          - platform: rhel8
-            architecture: arm64
 
     steps:
       - uses: actions/checkout@v6

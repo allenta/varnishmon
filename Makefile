@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 UMASK := 022
 
-VERSION := 0.8.12
+VERSION := 0.8.13
 ITERATION := 1
 REVISION := $(shell cd '$(ROOT)' && git rev-parse --short HEAD)
 ENVIRONMENT ?= production
@@ -13,19 +13,8 @@ ARCHITECTURE := $(shell go env GOARCH)
 
 export GO111MODULE
 
-# Precompiled DuckDB static bundles work fine for all platforms except RHEL 8
-# due to an outdated glibc version. In this case, the bundle is built on demand
-# (see the 'duckdb-static-bundle' target). This is a costly operation, so GitHub
-# Actions caching is used to populate 'duckdb-static-bundle/libduckdb_bundle.a'
-# and avoid rebuilding the bundle on every run (see
-# 'extras/github/build-action/action.yml').
-ifeq ($(PLATFORM),rhel8)
-	CGO_LDFLAGS=-lstdc++ -lm -ldl -lduckdb_bundle -L$(ROOT)/duckdb-static-bundle/
-	GO_BUILD_TAGS=duckdb_use_static_lib
-else
-	CGO_LDFLAGS=
-	GO_BUILD_TAGS=
-endif
+CGO_LDFLAGS=
+GO_BUILD_TAGS=
 export CGO_LDFLAGS
 
 FPM = \
@@ -41,7 +30,7 @@ FPM = \
 		--config-files /etc/varnish/varnishmon.yml
 
 .PHONY: build
-build: mrproper duckdb-static-bundle
+build: mrproper
 	@( \
 		set -e; \
 		\
@@ -108,14 +97,14 @@ modernize:
 		set -e; \
 		\
 		echo '> Running modernize...'; \
-		go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@v0.21.1 -fix ./...; \
+		go run golang.org/x/tools/go/analysis/passes/modernize/cmd/modernize@v0.45.0 -fix ./...; \
 	)
 
 TEST_PACKAGES ?= '$(ROOT)/...'
 TEST_PATTERN ?= .
 
 .PHONY: test
-test: duckdb-static-bundle
+test:
 	@( \
 		set -e; \
 		\
@@ -167,7 +156,7 @@ dist: build
 		[ '$(PLATFORM)' = 'resolute' -o '$(PLATFORM)' = 'noble' -o \
 		    '$(PLATFORM)' = 'jammy' -o '$(PLATFORM)' = 'trixie' -o \
 			'$(PLATFORM)' = 'bookworm' -o '$(PLATFORM)' = 'rhel10' -o \
-			'$(PLATFORM)' = 'rhel9' -o '$(PLATFORM)' = 'rhel8' ] || \
+			'$(PLATFORM)' = 'rhel9' ] || \
 				{ echo >&2 'Invalid platform ($(PLATFORM))'; exit 1; }; \
 		\
 		[ '$(ENVIRONMENT)' = 'production' ] || \
@@ -212,7 +201,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),resolute noble jammy trixie bookworm))
 		cp '$(ROOT)/extras/packaging/debian/varnishmon.logrotate' '$(ROOT)/build/dist/etc/logrotate.d/varnishmon'; \
 		cp '$(ROOT)/extras/packaging/debian/varnishmon.service' '$(ROOT)/build/dist/lib/systemd/system/'; \
 	)
-else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel10 rhel9 rhel8))
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel10 rhel9))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -259,7 +248,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),resolute noble jammy trixie bookworm))
 			--config-files /etc/logrotate.d/varnishmon \
 			-C '$(ROOT)/build/dist' .; \
 	)
-else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel10 rhel9 rhel8))
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),rhel10 rhel9))
 	@( \
 		set -e; \
 		umask $(UMASK); \
@@ -307,39 +296,10 @@ web-lint:
 web-prettier:
 	$(call WEB_NPM_TASK,prettier)
 
-# Beware of the hardcoded DuckDB version in the 'git clone' command. See:
-# https://github.com/marcboeker/go-duckdb/blob/main/.github/workflows/deps.yaml.
-.PHONY: duckdb-static-bundle
-duckdb-static-bundle:
-	@( \
-		set -e; \
-		\
-		if [ ! -f '$(ROOT)/duckdb-static-bundle/libduckdb_bundle.a' ]; then \
-			if [ '$(PLATFORM)' = 'rhel8' ]; then \
-				echo '> Building DuckDB static bundle for RHEL8...'; \
-				rm -rf /tmp/duckdb; \
-				git clone -b v1.1.3 --depth 1 https://github.com/duckdb/duckdb.git /tmp/duckdb; \
-				cd /tmp/duckdb; \
-				CFLAGS='-O3' \
-					CXXFLAGS='-O3' \
-					BUILD_SHELL=0 \
-					BUILD_UNITTESTS=0 \
-					DUCKDB_PLATFORM=any \
-					ENABLE_EXTENSION_AUTOLOADING=1 \
-					ENABLE_EXTENSION_AUTOINSTALL=1 \
-					BUILD_EXTENSIONS='json' \
-					make bundle-library -j 2; \
-				\
-				mkdir -p '$(ROOT)/duckdb-static-bundle'; \
-				cp /tmp/duckdb/build/release/libduckdb_bundle.a '$(ROOT)/duckdb-static-bundle'; \
-			fi; \
-		fi; \
-	)
-
 .PHONY: mrproper
 mrproper:
 	@( \
 		echo '> Cleaning up...'; \
 		rm -rf '$(ROOT)/build'; \
-		git clean -f -x -d -e .env -e assets/web/node_modules -e duckdb-static-bundle -e varnishmon.db $(ROOT); \
+		git clean -f -x -d -e .env -e assets/web/node_modules -e varnishmon.db $(ROOT); \
 	)

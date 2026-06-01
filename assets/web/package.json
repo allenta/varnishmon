@@ -25,16 +25,16 @@
     "@vitejs/plugin-react-swc": "4.3.1",
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-prettier": "5.5.5",
+    "eslint-plugin-prettier": "5.5.6",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.2",
     "globals": "17.6.0",
     "prettier": "3.8.3",
     "sass-embedded": "1.100.0",
-    "vite": "8.0.14",
+    "vite": "8.0.15",
     "vite-plugin-eslint": "1.8.1",
-    "vite-plugin-minify": "2.1.0",
+    "vite-plugin-minify": "3.0.0",
     "vite-plugin-static-copy": "4.1.0"
   }
 }

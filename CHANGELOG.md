@@ -1,4 +1,4 @@
-- ?
+- 0.8.13-1 (2026-06-01):
     + Migrate do [github.com/duckdb/duckdb-go](https://github.com/duckdb/duckdb-go#migration-from-marcboekergo-duckdb).
         * DB schema version bumped to 2.
         * Dropped FOREIGN KEY constraint on `metric_values.metric_id`.

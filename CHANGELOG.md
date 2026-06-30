@@ -1,3 +1,27 @@
+- ?:
+    + Updated dependencies:
+        * Dev & CI environments:
+            - DuckDB: 1.5.3 → 1.5.4.
+            - Go: 1.26.3 → 1.26.4.
+            - Node.js: 24.16.0 → 24.18.0.
+            - uv: 0.11.17 → 0.11.25.
+        * Go:
+            - modernize: v0.45.0 → v0.47.0.
+            - duckdb-go/v2: v2.10503.0 → v2.10504.0.
+            - mcp-go: v0.54.1 → v0.55.1.
+            - x/sys: v0.45.0 → v0.46.0.
+        * Node.js:
+            - @fortawesome/fontawesome-free: 7.2.0 → 7.3.0.
+            - @types/react: 19.2.15 → 19.2.17.
+            - eslint-plugin-react-refresh: 0.5.2 → 0.5.3.
+            - globals: 17.6.0 → 17.7.0.
+            - plotly.js-basic-dist: 3.5.1 → 3.6.0.
+            - prettier: 3.8.3 → 3.9.4.
+            - react: 19.2.6 → 19.2.7.
+            - react-dom: 19.2.6 → 19.2.7.
+            - vite: 8.0.15 → 8.1.1.
+            - vite-plugin-static-copy: 4.1.0 → 4.1.1.
+
 - 0.8.13-1 (2026-06-01):
     + Migrate do [github.com/duckdb/duckdb-go](https://github.com/duckdb/duckdb-go#migration-from-marcboekergo-duckdb).
         * DB schema version bumped to 2.

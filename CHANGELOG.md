@@ -1,25 +1,28 @@
 - ?:
     + Updated dependencies:
         * Dev & CI environments:
-            - DuckDB: 1.5.3 → 1.5.4.
-            - Go: 1.26.3 → 1.26.4.
-            - Node.js: 24.16.0 → 24.18.0.
-            - uv: 0.11.17 → 0.11.25.
+            - DuckDB: 1.5.3 → 1.5.5.
+            - Go: 1.26.3 → 1.26.5.
+            - Node.js: 24.16.0 → 24.18.1.
+            - uv: 0.11.17 → 0.12.0.
         * Go:
-            - modernize: v0.45.0 → v0.47.0.
-            - duckdb-go/v2: v2.10503.0 → v2.10504.0.
-            - mcp-go: v0.54.1 → v0.55.1.
-            - x/sys: v0.45.0 → v0.46.0.
+            - modernize: v0.45.0 → v0.48.0.
+            - client_golang: v1.23.2 → v1.24.1.
+            - duckdb-go/v2: v2.10503.0 → v2.10505.0.
+            - mcp-go: v0.54.1 → v0.57.0.
+            - x/sys: v0.45.0 → v0.47.0.
         * Node.js:
-            - @fortawesome/fontawesome-free: 7.2.0 → 7.3.0.
-            - @types/react: 19.2.15 → 19.2.17.
+            - @fortawesome/fontawesome-free: 7.2.0 → 7.3.1.
+            - @types/react: 19.2.15 → 19.2.18.
+            - @types/react-dom: 19.2.3 → 19.2.4.
+            - @vitejs/plugin-react-swc: 4.3.1 → 4.3.3.
             - eslint-plugin-react-refresh: 0.5.2 → 0.5.3.
-            - globals: 17.6.0 → 17.7.0.
-            - plotly.js-basic-dist: 3.5.1 → 3.6.0.
-            - prettier: 3.8.3 → 3.9.4.
-            - react: 19.2.6 → 19.2.7.
-            - react-dom: 19.2.6 → 19.2.7.
-            - vite: 8.0.15 → 8.1.1.
+            - globals: 17.6.0 → 17.8.0.
+            - plotly.js-basic-dist: 3.5.1 → 3.7.0.
+            - prettier: 3.8.3 → 3.9.6.
+            - react: 19.2.6 → 19.2.8.
+            - react-dom: 19.2.6 → 19.2.8.
+            - vite: 8.0.15 → 8.2.0.
             - vite-plugin-static-copy: 4.1.0 → 4.1.1.
 
 - 0.8.13-1 (2026-06-01):

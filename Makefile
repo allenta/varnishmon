@@ -73,7 +73,7 @@ lint:
 		\
 		if [ ! -f "$$HOME/go/bin/golangci-lint" ]; then \
 			echo '> Installing golangci-lint...'; \
-			curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.12.2; \
+			curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.13.2; \
 		fi; \
 		\
 		echo '> Running golangci-lint...'; \
@@ -97,7 +97,7 @@ modernize:
 		set -e; \
 		\
 		echo '> Running modernize...'; \
-		go run golang.org/x/tools/go/analysis/passes/modernize/cmd/modernize@v0.48.0 -fix ./...; \
+		go run golang.org/x/tools/go/analysis/passes/modernize/cmd/modernize@v0.49.0 -fix ./...; \
 	)
 
 TEST_PACKAGES ?= '$(ROOT)/...'
@@ -126,7 +126,7 @@ mod:
 		set -e; \
 		\
 		echo '> Adding missing and removing unused modules...'; \
-		go mod tidy -compat=1.26; \
+		go mod tidy -compat=1.27; \
 		\
 		echo '> Printing module requirement graph...'; \
 		go mod graph; \

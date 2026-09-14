@@ -7,7 +7,7 @@ toolchain go1.27.0
 require (
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
 	github.com/gin-contrib/gzip v1.2.6
-	github.com/gin-contrib/pprof v1.5.4
+	github.com/gin-contrib/pprof v1.5.5
 	github.com/gin-gonic/gin v1.12.0
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/mark3labs/mcp-go v0.58.0

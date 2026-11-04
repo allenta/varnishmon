@@ -1,10 +1,10 @@
 FROM docker.io/ubuntu:resolute-20260421
 
-ENV DUCKDB_VERSION=1.5.6
+ENV DUCKDB_VERSION=2.0.0
 ENV FPM_VERSION=1.17.0
-ENV GO_VERSION=1.27.1
-ENV NODE_VERSION=24.21.0
-ENV UV_VERSION=0.12.22
+ENV GO_VERSION=1.27.3
+ENV NODE_VERSION=26.13.0
+ENV UV_VERSION=0.13.7
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -69,9 +69,7 @@ RUN mkdir -p /etc/apt/keyrings \
     && rm -rf /var/lib/apt/lists/* \
     && usermod -a -G varnish dev
 
-RUN curl -L -s https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/duckdb_cli-linux-$(dpkg --print-architecture).zip -o /tmp/duckdb_cli-linux.zip \
-    && unzip /tmp/duckdb_cli-linux.zip -d /usr/local/bin \
-    && rm /tmp/duckdb_cli-linux.zip
+RUN curl -L -s https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/duckdb-cli-linux-$(dpkg --print-architecture).tar.gz | tar xvfz - -C /usr/local/bin
 
 COPY ./supervisord.conf /etc/supervisor/conf.d/
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

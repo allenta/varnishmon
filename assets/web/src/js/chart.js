@@ -421,9 +421,9 @@ class Chart {
 
     // Create / update tooltip.
     const tooltipMessage = `${new Date().toISOString()}: ${error}`;
-    let tooltip = Tooltip.getInstance(errorIcon);
+    const tooltip = Tooltip.getInstance(errorIcon);
     if (tooltip == null) {
-      tooltip = new Tooltip(errorIcon, { title: tooltipMessage });
+      new Tooltip(errorIcon, { title: tooltipMessage });
     } else {
       tooltip.setContent({ '.tooltip-inner': tooltipMessage });
     }

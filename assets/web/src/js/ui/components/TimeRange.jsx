@@ -1,10 +1,15 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import * as config from '../../config';
 import * as helpers from '../../helpers';
 import { TimeRangePicker } from '../../time-picker';
 
+/**
+ * @param {object} props - Component props.
+ * @param {?object} [props.timeRangePicker]
+ * @param {Function} props.setTimeRangePicker
+ * @param {Function} props.reload
+ */
 export function TimeRange({ timeRangePicker, setTimeRangePicker, reload }) {
   const containerRef = React.useRef(null);
 
@@ -100,9 +105,3 @@ export function TimeRange({ timeRangePicker, setTimeRangePicker, reload }) {
     </div>
   );
 }
-
-TimeRange.propTypes = {
-  timeRangePicker: PropTypes.object,
-  setTimeRangePicker: PropTypes.func.isRequired,
-  reload: PropTypes.func.isRequired,
-};

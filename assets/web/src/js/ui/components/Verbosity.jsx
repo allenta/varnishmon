@@ -1,8 +1,12 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import * as config from '../../config';
 
+/**
+ * @param {object} props - Component props.
+ * @param {string} props.verbosity
+ * @param {Function} props.setVerbosity
+ */
 export function Verbosity({ verbosity, setVerbosity }) {
   const verbosityId = React.useId();
 
@@ -37,8 +41,3 @@ export function Verbosity({ verbosity, setVerbosity }) {
     </>
   );
 }
-
-Verbosity.propTypes = {
-  verbosity: PropTypes.string.isRequired,
-  setVerbosity: PropTypes.func.isRequired,
-};

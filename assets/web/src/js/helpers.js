@@ -52,7 +52,7 @@ export function notify(level, message) {
   // Create the notification and append it to the container.
   const notification = template.content.cloneNode(true).firstElementChild;
   const btnClose = notification.querySelector('.btn-close');
-  let decoration = '';
+  let decoration;
   if (level === 'info') {
     notification.classList.add('bg-primary', 'text-white');
     btnClose.classList.add('btn-close-white');

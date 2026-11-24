@@ -1,7 +1,15 @@
-import PropTypes from 'prop-types';
-
 import { Cluster } from './Cluster';
 
+/**
+ * @param {object} props - Component props.
+ * @param {object} props.timeRangePicker
+ * @param {object} props.initialRangeRef
+ * @param {number} props.refreshInterval
+ * @param {number} props.columns
+ * @param {string} props.aggregator
+ * @param {number} props.step
+ * @param {?object} [props.filteredMetrics]
+ */
 export function Clusters({ filteredMetrics, ...props }) {
   return (
     <div className="accordion accordion-flush flex-grow-1 d-flex flex-column">
@@ -12,13 +20,3 @@ export function Clusters({ filteredMetrics, ...props }) {
     </div>
   );
 }
-
-Clusters.propTypes = {
-  timeRangePicker: PropTypes.object.isRequired,
-  initialRangeRef: PropTypes.object.isRequired,
-  refreshInterval: PropTypes.number.isRequired,
-  columns: PropTypes.number.isRequired,
-  aggregator: PropTypes.string.isRequired,
-  step: PropTypes.number.isRequired,
-  filteredMetrics: PropTypes.object,
-};

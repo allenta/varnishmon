@@ -4,15 +4,13 @@ import * as config from '../config';
 
 export function useFilter({ metrics }) {
   const [filter, setFilter] = React.useState(config.getFilter());
-  const [filterStats, setFilterStats] = React.useState('');
   const [verbosity, setVerbosity] = React.useState(config.getVerbosity());
-  const [filteredMetrics, setFilteredMetrics] = React.useState(metrics);
 
-  React.useEffect(() => {
+  // Filtered metrics & stats are derived from the inputs, so they are computed
+  // during rendering instead of being synchronized into state from an effect.
+  const [filteredMetrics, filterStats] = React.useMemo(() => {
     if (metrics == null) {
-      setFilterStats('');
-      setFilteredMetrics(null);
-      return;
+      return [null, ''];
     }
 
     const newFilteredMetrics = { ...metrics, clusters: [] };
@@ -45,12 +43,12 @@ export function useFilter({ metrics }) {
       }
     });
 
-    setFilterStats(
+    return [
+      newFilteredMetrics,
       `${numVisibleMetrics} metrics found (${numMetrics - numVisibleMetrics} hidden),` +
         ` organized in ${numVisibleClusters} clusters (${numClusters - numVisibleClusters}` +
         ' hidden)',
-    );
-    setFilteredMetrics(newFilteredMetrics);
+    ];
   }, [metrics, filter, verbosity]);
 
   return [

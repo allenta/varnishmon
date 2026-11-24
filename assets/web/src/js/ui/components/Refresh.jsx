@@ -1,8 +1,11 @@
-import PropTypes from 'prop-types';
-
 import * as config from '../../config';
 import { EVENTS } from '../events';
 
+/**
+ * @param {object} props - Component props.
+ * @param {number} props.refreshInterval
+ * @param {Function} props.setRefreshInterval
+ */
 export function Refresh({ refreshInterval, setRefreshInterval }) {
   const onChange = (event) => {
     const value = parseInt(event.target.value, 10);
@@ -41,8 +44,3 @@ export function Refresh({ refreshInterval, setRefreshInterval }) {
     </>
   );
 }
-
-Refresh.propTypes = {
-  refreshInterval: PropTypes.number.isRequired,
-  setRefreshInterval: PropTypes.func.isRequired,
-};

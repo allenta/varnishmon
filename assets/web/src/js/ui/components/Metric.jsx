@@ -1,9 +1,18 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import Chart from '../../chart';
 import { EVENTS } from '../events';
 
+/**
+ * @param {object} props - Component props.
+ * @param {object} props.timeRangePicker
+ * @param {object} props.initialRangeRef
+ * @param {number} props.refreshInterval
+ * @param {number} props.columns
+ * @param {string} props.aggregator
+ * @param {number} props.step
+ * @param {object} props.metric
+ */
 export function Metric({
   timeRangePicker,
   initialRangeRef,
@@ -36,7 +45,7 @@ export function Metric({
       );
       setChart(newChart);
 
-      newChart.addEventListener('zoom', (event) => {
+      const onChartZoomListener = (event) => {
         // Apply the zoom range to all the charts except the one that triggered
         // the event.
         document.dispatchEvent(
@@ -57,7 +66,8 @@ export function Metric({
             initialRangeRef.current = null;
           }
         }
-      });
+      };
+      newChart.addEventListener('zoom', onChartZoomListener);
 
       const onZoomListener = (event) => {
         if (event.detail.source !== newChart) {
@@ -74,6 +84,7 @@ export function Metric({
       return () => {
         document.removeEventListener(EVENTS.ZOOM, onZoomListener);
         document.removeEventListener(EVENTS.REFRESH, onRefreshListener);
+        newChart.removeEventListener('zoom', onChartZoomListener);
         newChart.destroy();
         setChart(null);
       };
@@ -83,7 +94,7 @@ export function Metric({
     // those values change. Those changes are handled by the 'useEffect' hooks
     // below, which update the chart instance accordingly. Remaining dependencies
     // are include to keep the linter happy, but all of them are irrelevant.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line @eslint-react/exhaustive-deps
   }, [containerRef, setChart, timeRangePicker, initialRangeRef, metric]);
 
   React.useEffect(() => {
@@ -127,13 +138,3 @@ export function Metric({
     </div>
   );
 }
-
-Metric.propTypes = {
-  timeRangePicker: PropTypes.object.isRequired,
-  initialRangeRef: PropTypes.object.isRequired,
-  refreshInterval: PropTypes.number.isRequired,
-  columns: PropTypes.number.isRequired,
-  aggregator: PropTypes.string.isRequired,
-  step: PropTypes.number.isRequired,
-  metric: PropTypes.object.isRequired,
-};

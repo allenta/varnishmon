@@ -1,4 +1,7 @@
 - ?:
+    + Replaced `eslint-plugin-react` & `eslint-plugin-react-hooks` with [`@eslint-react/eslint-plugin`](https://github.com/Rel1cx/eslint-react), unblocking the upgrade to ESLint 10 ([jsx-eslint/eslint-plugin-react#3977](https://github.com/jsx-eslint/eslint-plugin-react/issues/3977)).
+        * Fixed issues reported by the new lint rules.
+        * Replaced React `propTypes` (ignored since React 19) with JSDoc annotations and dropped the `prop-types` dependency.
     + Updated dependencies:
         * Dev & CI environments:
             - DuckDB: 1.5.3 → 2.0.0.
@@ -16,10 +19,12 @@
             - testify: v1.11.1 → v1.12.1.
             - x/sys: v0.45.0 → v0.49.0.
         * Node.js:
+            - @eslint/js: 9.39.2 → 10.0.1.
             - @fortawesome/fontawesome-free: 7.2.0 → 7.3.1.
             - @types/react: 19.2.15 → 19.3.0.
             - @types/react-dom: 19.2.3 → 19.3.0.
             - @vitejs/plugin-react-swc: 4.3.1 → 4.3.3.
+            - eslint: 9.39.2 → 10.14.0.
             - eslint-plugin-prettier: 5.5.6 → 5.5.7.
             - eslint-plugin-react-refresh: 0.5.2 → 0.5.7.
             - globals: 17.6.0 → 17.14.0.

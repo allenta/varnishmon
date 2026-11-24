@@ -1,10 +1,19 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import Collapse from 'bootstrap/js/dist/collapse';
 
 import { Metric } from './Metric';
 import { EVENTS } from '../events';
 
+/**
+ * @param {object} props - Component props.
+ * @param {object} props.timeRangePicker
+ * @param {object} props.initialRangeRef
+ * @param {number} props.refreshInterval
+ * @param {number} props.columns
+ * @param {string} props.aggregator
+ * @param {number} props.step
+ * @param {object} props.cluster
+ */
 export function Cluster({ cluster, ...props }) {
   const containerRef = React.useRef(null);
   const [accordion, setAccordion] = React.useState(null);
@@ -49,7 +58,9 @@ export function Cluster({ cluster, ...props }) {
         // causes errors to be logged in the console. UI transitions are
         // executed asynchronously and that doesn't play well with immediate
         // disposal of the instance. A hardcoded delay is used here to mitigate
-        // this issue.
+        // this issue. The timeout is intentionally not tracked: it is the
+        // cleanup itself, so there is nothing left to cancel it.
+        // eslint-disable-next-line @eslint-react/web-api-no-leaked-timeout
         setTimeout(() => newAccordion.dispose(), 1000);
       };
     }
@@ -90,13 +101,3 @@ export function Cluster({ cluster, ...props }) {
     </div>
   );
 }
-
-Cluster.propTypes = {
-  timeRangePicker: PropTypes.object.isRequired,
-  initialRangeRef: PropTypes.object.isRequired,
-  refreshInterval: PropTypes.number.isRequired,
-  columns: PropTypes.number.isRequired,
-  aggregator: PropTypes.string.isRequired,
-  step: PropTypes.number.isRequired,
-  cluster: PropTypes.object.isRequired,
-};

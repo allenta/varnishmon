@@ -1,4 +1,4 @@
-- ?:
+- 0.8.14-1 (2026-11-24):
     + Replaced `eslint-plugin-react` & `eslint-plugin-react-hooks` with [`@eslint-react/eslint-plugin`](https://github.com/Rel1cx/eslint-react), unblocking the upgrade to ESLint 10 ([jsx-eslint/eslint-plugin-react#3977](https://github.com/jsx-eslint/eslint-plugin-react/issues/3977)).
         * Fixed issues reported by the new lint rules.
         * Replaced React `propTypes` (ignored since React 19) with JSDoc annotations and dropped the `prop-types` dependency.

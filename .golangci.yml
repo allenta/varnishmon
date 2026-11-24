@@ -9,6 +9,7 @@ linters:
     - gocognit # Too opinionated.
     - depguard # No need for dependency white/blacklisting.
     - exhaustruct # Too opinionated.
+    - exhaustruct_v5 # Too opinionated.
     - forbidigo # Too opinionated.
     - forcetypeassert # Too opinionated.
     - funcorder # Too opinionated.

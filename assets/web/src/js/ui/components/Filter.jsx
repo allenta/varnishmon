@@ -1,10 +1,14 @@
 import { Dropdown } from 'bootstrap';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import * as config from '../../config';
 import * as helpers from '../../helpers';
 
+/**
+ * @param {object} props - Component props.
+ * @param {string} props.filter
+ * @param {Function} props.setFilter
+ */
 export function Filter({ filter, setFilter }) {
   const [localFilter, setLocalFilter] = React.useState(filter);
   const [history, setHistory] = React.useState(config.getFilterHistory());
@@ -97,8 +101,3 @@ export function Filter({ filter, setFilter }) {
     </>
   );
 }
-
-Filter.propTypes = {
-  filter: PropTypes.string.isRequired,
-  setFilter: PropTypes.func.isRequired,
-};

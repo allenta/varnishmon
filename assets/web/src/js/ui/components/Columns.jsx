@@ -1,8 +1,12 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import * as config from '../../config';
 
+/**
+ * @param {object} props - Component props.
+ * @param {number} props.columns
+ * @param {Function} props.setColumns
+ */
 export function Columns({ columns, setColumns }) {
   const columnsId = React.useId();
 
@@ -37,8 +41,3 @@ export function Columns({ columns, setColumns }) {
     </>
   );
 }
-
-Columns.propTypes = {
-  columns: PropTypes.number.isRequired,
-  setColumns: PropTypes.func.isRequired,
-};

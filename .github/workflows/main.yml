@@ -7,7 +7,7 @@ on:
     - cron: 0 5 * * 1
 
 env:
-  GO_VERSION: 1.26.3
+  GO_VERSION: 1.27.3
 
 permissions:
   actions: write
@@ -17,7 +17,7 @@ jobs:
   build:
     name: Build (${{ matrix.platform }} ${{ matrix.architecture }})
 
-    runs-on: ${{ matrix.architecture == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
+    runs-on: ${{ matrix.architecture == 'arm64' && 'ubuntu-26.04-arm' || 'ubuntu-26.04' }}
 
     strategy:
       matrix:
@@ -34,7 +34,7 @@ jobs:
           - arm64
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ./extras/github/build-action
         with:
@@ -50,10 +50,10 @@ jobs:
 
     name: Release
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: actions/download-artifact@v8
         with:

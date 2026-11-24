@@ -23,7 +23,7 @@ class TimePicker {
       timepicker: true,
       dateFormat: 'yyyy-MM-dd',
       timeFormat: 'HH:mm',
-      locale: localeEn,
+      locale: localeEn.default,
       firstDay: 1,
       autoClose: false,
       keyboardNav: false,

@@ -1,8 +1,12 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import * as config from '../../config';
 
+/**
+ * @param {object} props - Component props.
+ * @param {string} props.aggregator
+ * @param {Function} props.setAggregator
+ */
 export function Aggregator({ aggregator, setAggregator }) {
   const aggregatorId = React.useId();
 
@@ -37,8 +41,3 @@ export function Aggregator({ aggregator, setAggregator }) {
     </>
   );
 }
-
-Aggregator.propTypes = {
-  aggregator: PropTypes.string.isRequired,
-  setAggregator: PropTypes.func.isRequired,
-};

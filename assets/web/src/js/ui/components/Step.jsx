@@ -1,9 +1,13 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import * as config from '../../config';
 import * as helpers from '../../helpers';
 
+/**
+ * @param {object} props - Component props.
+ * @param {number} props.step
+ * @param {Function} props.setStep
+ */
 export function Step({ step, setStep }) {
   const stepId = React.useId();
   const [localStep, setLocalStep] = React.useState(step);
@@ -51,8 +55,3 @@ export function Step({ step, setStep }) {
     </>
   );
 }
-
-Step.propTypes = {
-  step: PropTypes.number.isRequired,
-  setStep: PropTypes.func.isRequired,
-};
